@@ -36,6 +36,35 @@ class Setting extends Model
         'info_color' => 'string',
         'success_color' => 'string',
         'warning_color' => 'string',
+        'invoice_email_subject' => 'string',
+        'invoice_email_body' => 'string',
+        'invoice_email_subject_sr' => 'string',
+        'invoice_email_body_sr' => 'string',
+        'invoice_pdf_filename_format' => 'string',
+        'company_name' => 'string',
+        'company_address' => 'string',
+        'company_email' => 'string',
+        'company_phone' => 'string',
+        'company_vat_id' => 'string',
+        'company_bank_account' => 'string',
+        // OFS Fiscalization
+        'ofs_base_url' => 'string',
+        'ofs_api_key' => 'string',
+        'ofs_serial_number' => 'string',
+        'ofs_pac' => 'string',
+        'ofs_seller_tin' => 'string',
+        'ofs_seller_name' => 'string',
+        'ofs_seller_address' => 'string',
+        'ofs_seller_town' => 'string',
+        // Invoice Numbering
+        'invoice_prefixes' => 'array',
+        'invoice_sequences' => 'array',
+        'invoice_default_currency' => 'string',
+
+
+        // tax categories for OFS - sync
+        'ofs_tax_categories' => 'array',
+
 
     ];
 
@@ -43,7 +72,12 @@ class Setting extends Model
     private static function settings(): array
     {
         return self::$cachedSettings ??= Cache::remember(self::$cacheKey, now()->addMinutes(3), function () {
-            return self::pluck('value', 'key')->toArray();
+            try {
+                return self::pluck('value', 'key')->toArray();
+            } catch (\Exception $e) {
+                // Return config settings if table doesn't exist (e.g., during testing)
+                return config('settings', []);
+            }
         });
     }
 
@@ -63,7 +97,7 @@ class Setting extends Model
             'boolean' => (bool) $value,
             'integer' => (int) $value,
             'array' => is_array($value) ? $value : [],
-            default => (string) $value,
+            default => is_array($value) ? json_encode($value) : (string) $value,
         };
     }
 

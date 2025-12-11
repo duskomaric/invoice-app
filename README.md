@@ -47,3 +47,44 @@ If you prefer using Docker for everything (no local PHP/Node required), you can 
    ./vendor/bin/sail composer run setup
    ```
 
+## 🧪 Testing
+
+### Running Tests
+
+Run all tests:
+```bash
+./vendor/bin/sail test
+```
+
+Run specific test file:
+```bash
+./vendor/bin/sail test tests/Unit/Models/ClientTest.php
+```
+
+Run specific test method:
+```bash
+./vendor/bin/sail test --filter=test_balance_accessor_returns_correct_value
+```
+
+### Test Coverage
+
+Run tests with coverage report:
+```bash
+./vendor/bin/sail test --coverage
+```
+
+Run tests with minimum coverage threshold:
+```bash
+./vendor/bin/sail test --coverage --min=80
+```
+
+View detailed coverage for specific directory:
+```bash
+./vendor/bin/sail test tests/Unit/Models/ --coverage
+```
+
+### Coverage Goals
+- **Models**: 100% coverage
+- **Services**: 100% coverage
+- **Controllers**: 90%+ coverage
+- **Overall**: 90%+ coverage

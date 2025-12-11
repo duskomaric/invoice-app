@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'invoice' => 'Invoice',
+    'date' => 'Date',
+    'due_date' => 'Due Date',
+    'to' => 'To',
+    'from' => 'From',
+    'description' => 'Description',
+    'price' => 'Price',
+    'quantity' => 'Qty',
+    'total' => 'Total',
+    'subtotal' => 'Subtotal',
+    'tax' => 'Tax',
+    'amount_due' => 'Amount Due',
+    'paid' => 'Paid',
+    'status' => 'Status',
+    'draft' => 'Draft',
+    'sent' => 'Sent',
+    'paid_status' => 'Paid',
+    'overdue' => 'Overdue',
+    'vat_id' => 'VAT ID',
+    'tax_id' => 'Tax ID',
+    'phone' => 'Phone',
+    'email' => 'Email',
+    'bank_account' => 'Bank Account',
+];

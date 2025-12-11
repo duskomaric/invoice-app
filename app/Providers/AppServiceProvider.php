@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureCommands();
         $this->configureDates();
-        $this->configureModels();
+        //$this->configureModels();
     }
 
     private function configureCommands(): void

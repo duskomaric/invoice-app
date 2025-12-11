@@ -46,6 +46,11 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function hasPermission(PermissionEnum $permission): bool
     {
+        // SuperAdmin has all permissions
+        if ($this->role === RoleEnum::SuperAdmin) {
+            return true;
+        }
+
         if (! isset(self::$rolePermissionsCache[$this->role->value])) {
             self::$rolePermissionsCache[$this->role->value] = PermissionRoleEnum::where('role', $this->role->value)
                 ->with('permission')

@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'invoice' => 'Faktura',
+    'date' => 'Datum',
+    'due_date' => 'Datum dospijeća',
+    'to' => 'Za',
+    'from' => 'Od',
+    'description' => 'Opis',
+    'price' => 'Cijena',
+    'quantity' => 'Kol',
+    'total' => 'Ukupno',
+    'subtotal' => 'Međuzbir',
+    'tax' => 'Porez',
+    'amount_due' => 'Ukupan iznos',
+    'paid' => 'Plaćeno',
+    'status' => 'Status',
+    'draft' => 'Nacrt',
+    'sent' => 'Poslano',
+    'paid_status' => 'Plaćeno',
+    'overdue' => 'Kasni',
+    'vat_id' => 'PDV ID',
+    'tax_id' => 'JIB',
+    'phone' => 'Telefon',
+    'email' => 'Email',
+    'bank_account' => 'Žiro račun',
+];

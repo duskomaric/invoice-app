@@ -26,12 +26,17 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class DashboardPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+//        if (app()->isLocal()) {
+//            URL::forceScheme('https');
+//        }
+
         return $panel
             ->default()
             ->id('dashboard')
