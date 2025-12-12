@@ -1,5 +1,5 @@
 <x-mail::message>
-{{ $body }}
+    {!! $body !!}
 
 <x-mail::button :url="$clickUrl">
 Download Invoice
