@@ -10,21 +10,39 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('client_id')->constrained()->cascadeOnDelete();
+            
+            // Basics
             $table->string('status')->default('draft');
+            $table->string('language')->default('sr_latn'); // Default to Serbian Latin
             $table->date('date');
             $table->date('due_date')->nullable();
-            $table->integer('subtotal')->default(0);
-            $table->integer('tax')->default(0);
-            $table->integer('total')->default(0);
+            
+            // Payments
             $table->integer('amount_paid')->default(0);
-            $table->text('notes')->nullable();
+            
+            // Numbering & Currency
+            $table->string('currency')->default('BAM');
+            $table->string('invoice_number')->nullable()->unique();
+            $table->unsignedInteger('sequence_number')->nullable();
+            $table->year('sequence_year')->nullable();
 
+            $table->text('notes')->nullable();
+            
             // Recurring fields
             $table->boolean('is_recurring')->default(false);
             $table->string('frequency')->nullable(); // weekly, monthly, etc.
             $table->date('next_invoice_date')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('invoices')->nullOnDelete();
+
+            // Fiscalization Data (OFS)
+            $table->boolean('is_fiscalized')->default(false);
+            $table->string('fiscal_invoice_number')->nullable(); // BFM-NUMBER
+            $table->string('fiscal_counter')->nullable(); // e.g. 1/123/1
+            $table->text('fiscal_verification_url')->nullable();
+            $table->dateTime('fiscalized_at')->nullable();
+            $table->json('fiscal_meta')->nullable(); // To store full response details if needed
 
             $table->timestamps();
         });

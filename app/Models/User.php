@@ -13,7 +13,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser, HasName, MustVerifyEmail
+use Filament\Models\Contracts\HasTenants;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
+
+class User extends Authenticatable implements FilamentUser, HasName, MustVerifyEmail, HasTenants
 {
     use HasFactory, Notifiable;
 
@@ -70,5 +74,26 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->status === UserStatus::ACTIVE;
+    }
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class);
+    }
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        return $this->companies;
+    }
+
+    public function canAccessTenant(\Illuminate\Database\Eloquent\Model $tenant): bool
+    {
+        $hasAccess = $this->companies->contains($tenant);
+
+        if ($this->role === RoleEnum::SuperAdmin) {
+            return $hasAccess;
+        }
+
+        return $hasAccess && $tenant->is_active;
     }
 }

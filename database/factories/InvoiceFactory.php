@@ -18,12 +18,5 @@ class InvoiceFactory extends Factory
             'is_recurring' => false,
         ];
     }
-    public function configure(): static
-    {
-        return $this->afterCreating(function (\App\Models\Invoice $invoice) {
-            \App\Models\InvoiceItem::factory()->count(rand(1, 5))->create([
-                'invoice_id' => $invoice->id,
-            ]);
-        });
-    }
+
 }

@@ -10,9 +10,12 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('price');
+            $table->string('unit')->default('service');
+            $table->string('tax_category')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

@@ -15,6 +15,7 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
+        'company_id',
         'client_id',
         'status',
         'language',
@@ -39,6 +40,8 @@ class Invoice extends Model
         'fiscalized_at',
         'fiscal_meta',
     ];
+
+
 
     protected $casts = [
         'status' => InvoiceStatus::class,
@@ -122,6 +125,11 @@ class Invoice extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function items(): HasMany

@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
             $table->foreignId('article_id')->nullable()->constrained()->nullOnDelete();
-            $table->text('description');
+            $table->string('name')->default('Item'); // Should be populated from article
+            $table->text('description')->nullable();
             $table->integer('quantity')->default(1);
             $table->integer('unit_price');
             $table->integer('total');

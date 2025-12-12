@@ -45,6 +45,9 @@ class DashboardPanelProvider extends PanelProvider
             ->passwordReset(RequestPasswordReset::class)
             ->emailChangeVerification()
             ->profile(EditProfile::class)
+            ->tenant(\App\Models\Company::class)
+            ->tenantRegistration(\App\Filament\Pages\RegisterCompany::class)
+            ->tenantProfile(\App\Filament\Pages\EditCompanyProfile::class)
 
             ->colors([
                 'primary' => Color::{Setting::get('primary_color')},

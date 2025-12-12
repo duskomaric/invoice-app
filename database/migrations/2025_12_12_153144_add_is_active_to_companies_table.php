@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('articles', function (Blueprint $table) {
-            $table->string('unit')->after('price');
+        Schema::table('companies', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true)->after('slug');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('articles', function (Blueprint $table) {
-            $table->dropColumn('unit');
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropColumn('is_active');
         });
     }
 };

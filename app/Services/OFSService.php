@@ -2,26 +2,53 @@
 
 namespace App\Services;
 
+use App\Models\Company;
 use App\Models\Setting;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OFSService
 {
     protected $baseUrl;
+    protected ?Company $company = null;
 
-    public function __construct()
+    public function __construct(?Company $company = null)
     {
-        // Read from Settings database instead of config file
-        $this->baseUrl = Setting::get('ofs_base_url', 'https://pos.ofs.ba');
+        // Resolve company/tenant
+        $this->company = $company;
+        if (!$this->company) {
+            try {
+                $tenant = Filament::getTenant();
+                if ($tenant instanceof Company) {
+                    $this->company = $tenant;
+                }
+            } catch (\Throwable $e) {
+                // Not in tenant context
+            }
+        }
+
+        // Base URL priority: 1. Company Model 2. Settings table
+        $this->baseUrl = $this->getConf('ofs_base_url', 'https://pos.ofs.ba');
+    }
+
+    /**
+     * Get configuration value with priority: Company Model -> Setting Model -> Default
+     */
+    protected function getConf(string $key, string $default = ''): string
+    {
+        if ($this->company && !empty($this->company->$key)) {
+            return $this->company->$key;
+        }
+        return Setting::get($key, $default);
     }
 
     protected function headers()
     {
         return [
-            'Authorization' => 'Bearer ' . Setting::get('ofs_api_key', ''),
-            'X-Teron-SerialNumber' => Setting::get('ofs_serial_number', ''),
-            'X-PAC' => Setting::get('ofs_pac', ''),
+            'Authorization' => 'Bearer ' . $this->getConf('ofs_api_key'),
+            'X-Teron-SerialNumber' => $this->getConf('ofs_serial_number'),
+            'X-PAC' => $this->getConf('ofs_pac'),
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];

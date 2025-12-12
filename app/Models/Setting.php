@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value', 'company_id'];
 
     public $timestamps = true;
 
     protected static string $cacheKey = 'app_settings_cache';
 
-    protected static ?array $cachedSettings = null;
+    protected static array $cachedSettings = [];
 
     protected static array $castsTo = [
         'notification_text' => 'string',
@@ -68,12 +71,34 @@ class Setting extends Model
 
     ];
 
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     // Load all settings once per request + cache
     private static function settings(): array
     {
-        return self::$cachedSettings ??= Cache::remember(self::$cacheKey, now()->addMinutes(3), function () {
+        $tenantId = null;
+        try {
+            $tenantId = Filament::getTenant()?->id;
+        } catch (\Throwable $e) {
+            // Context where tenant is not available
+        }
+
+        // If no tenant context, try to fallback to first company (e.g. CLI or global context)
+        // OR better: return empty and rely on config defaults.
+        if (!$tenantId) {
+             // Use Default Company (ID 1 created in migration) as fallback for now
+             // so that global settings like colors still work if accessed outside tenant loop
+             $tenantId = 1; 
+        }
+
+        $cacheKey = self::$cacheKey . '_' . $tenantId;
+
+        return self::$cachedSettings[$cacheKey] ??= Cache::remember($cacheKey, now()->addMinutes(3), function () use ($tenantId) {
             try {
-                return self::pluck('value', 'key')->toArray();
+                return self::where('company_id', $tenantId)->pluck('value', 'key')->toArray();
             } catch (\Exception $e) {
                 // Return config settings if table doesn't exist (e.g., during testing)
                 return config('settings', []);
@@ -104,16 +129,37 @@ class Setting extends Model
     public static function set(string $key, mixed $value): void
     {
         $stored = $value === null ? null : json_encode($value, JSON_UNESCAPED_UNICODE);
+        
+        $tenantId = null;
+        try {
+            $tenantId = Filament::getTenant()?->id;
+        } catch (\Throwable $e) {}
 
-        self::updateOrCreate(['key' => $key], ['value' => $stored]);
+        if (!$tenantId) $tenantId = 1; // Fallback to default company
 
-        Cache::forget(self::$cacheKey);
-        self::$cachedSettings = null;
+        self::updateOrCreate(
+            ['key' => $key, 'company_id' => $tenantId], 
+            ['value' => $stored]
+        );
+
+        $cacheKey = self::$cacheKey . '_' . $tenantId;
+        Cache::forget($cacheKey);
+        unset(self::$cachedSettings[$cacheKey]);
     }
 
     public static function flushCache(): void
     {
-        Cache::forget(self::$cacheKey);
-        self::$cachedSettings = null;
+        // Flush all? Hard to know keys.
+        // Just clear the current tenant one
+        $tenantId = null;
+        try {
+            $tenantId = Filament::getTenant()?->id;
+        } catch (\Throwable $e) {}
+        
+        if (!$tenantId) $tenantId = 1;
+
+        $cacheKey = self::$cacheKey . '_' . $tenantId;
+        Cache::forget($cacheKey);
+        unset(self::$cachedSettings[$cacheKey]);
     }
 }

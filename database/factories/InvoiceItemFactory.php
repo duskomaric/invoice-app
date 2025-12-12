@@ -16,7 +16,8 @@ class InvoiceItemFactory extends Factory
         return [
             'invoice_id' => Invoice::factory(),
             'article_id' => $article->id,
-            'description' => $article->name,
+            'name' => $article->name,
+            'description' => $article->description ?? fake()->sentence(),
             'quantity' => $quantity,
             'unit_price' => $article->price,
             'total' => $article->price * $quantity,

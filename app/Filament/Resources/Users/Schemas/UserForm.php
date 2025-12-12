@@ -67,6 +67,14 @@ class UserForm
                             ->prefixIcon(Heroicon::ShieldCheck)
                             ->helperText('User role determines access and permissions.')
                             ->columnSpan(1),
+
+                        Select::make('companies')
+                            ->label('Companies')
+                            ->relationship('companies', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable()
+                            ->columnSpan(1),
                     ]),
             ]);
     }
