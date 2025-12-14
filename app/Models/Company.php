@@ -30,10 +30,12 @@ class Company extends Model
         'ofs_serial_number',
         'ofs_pac',
         'is_active',
+        'subscription_ends_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'subscription_ends_at' => 'datetime',
     ];
 
     public function users(): BelongsToMany

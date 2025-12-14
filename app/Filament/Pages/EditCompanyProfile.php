@@ -18,6 +18,18 @@ class EditCompanyProfile extends EditTenantProfile
     {
         return $schema
             ->schema([
+                Section::make('Subscription Status')
+                    ->schema([
+                        \Filament\Forms\Components\Placeholder::make('subscription_info')
+                            ->label('Valid Until')
+                            ->content(fn ($record) => $record->subscription_ends_at 
+                                ? $record->subscription_ends_at->format('d.m.Y') . 
+                                  ' (' . ($record->subscription_ends_at->isPast() ? 'Expired' : $record->subscription_ends_at->diffForHumans()) . ')'
+                                : 'Lifetime Subscription (Unlimited)'
+                            )
+                            ->columnSpanFull(),
+                    ]),
+
                 Section::make('Basic Information')
                     ->schema([
                         TextInput::make('name')

@@ -73,7 +73,26 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->status === UserStatus::ACTIVE;
+        if ($this->status !== UserStatus::ACTIVE) {
+            return false;
+        }
+
+//        if ($this->role === RoleEnum::SuperAdmin) {
+//            return true;
+//        }
+
+        // Check if user has any active company based on subscription
+        // NULL subscription_ends_at means Lifetime (Active)
+        // If not NULL, check if future
+        $hasActiveCompany = $this->companies->filter(function ($company) {
+            return $company->subscription_ends_at === null || $company->subscription_ends_at->isFuture();
+        })->isNotEmpty();
+
+        if (! $hasActiveCompany) {
+             return false;
+        }
+
+        return true;
     }
 
     public function companies(): BelongsToMany
@@ -83,7 +102,15 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function getTenants(Panel $panel): array|Collection
     {
-        return $this->companies;
+        // SuperAdmin sees all companies
+        if ($this->role === RoleEnum::SuperAdmin) {
+            return $this->companies;
+        }
+
+        // Regular users only see companies with valid subscription
+        return $this->companies->filter(function ($company) {
+             return $company->subscription_ends_at === null || $company->subscription_ends_at->isFuture();
+        });
     }
 
     public function canAccessTenant(\Illuminate\Database\Eloquent\Model $tenant): bool
@@ -94,6 +121,11 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
             return $hasAccess;
         }
 
-        return $hasAccess && $tenant->is_active;
+        // Check subscription
+        if ($tenant->subscription_ends_at && $tenant->subscription_ends_at->isPast()) {
+            return false;
+        }
+
+        return $hasAccess;
     }
 }

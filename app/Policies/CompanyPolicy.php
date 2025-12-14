@@ -26,17 +26,17 @@ class CompanyPolicy
 
     public function view(User $user, Company $company): bool
     {
-        return false;
+        return $user->role === RoleEnum::Administrator && $user->companies->contains($company);
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->role === RoleEnum::Administrator;
     }
 
     public function update(User $user, Company $company): bool
     {
-        return false;
+        return $user->role === RoleEnum::Administrator && $user->companies->contains($company);
     }
 
     public function delete(User $user, Company $company): bool

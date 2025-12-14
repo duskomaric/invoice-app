@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -31,10 +33,11 @@ class CompanyResource extends Resource
                 TextInput::make('slug')
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
-                Toggle::make('is_active')
-                    ->label('Active Status')
-                    ->default(true)
-                    ->helperText('Disable to block access for this company.'),
+                \Filament\Forms\Components\DatePicker::make('subscription_ends_at')
+                    ->label('Subscription Expires At')
+                    ->native(false)
+                    ->displayFormat('d.m.Y')
+                    ->closeOnDateSelection(),
             ]);
     }
 
@@ -47,9 +50,17 @@ class CompanyResource extends Resource
                     ->sortable(),
                 TextColumn::make('slug')
                     ->searchable(),
-                ToggleColumn::make('is_active')
-                    ->label('Active')
-                    ->sortable(),
+                TextColumn::make('subscription_ends_at')
+                    ->label('Subscription')
+                    ->date('d.m.Y')
+                    ->sortable()
+                    ->description(fn (Company $record) => $record->subscription_ends_at
+                        ? ($record->subscription_ends_at->isPast()
+                            ? 'Expired ' . $record->subscription_ends_at->diffForHumans()
+                            : 'Expires ' . $record->subscription_ends_at->diffForHumans())
+                        : 'No subscription set'
+                    )
+                    ->color(fn (Company $record) => $record->subscription_ends_at?->isPast() ? 'danger' : 'success'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -59,10 +70,13 @@ class CompanyResource extends Resource
                 //
             ])
             ->actions([
-                // Default actions for simple resource
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                //
+//                \Filament\Tables\Actions\BulkActionGroup::make([
+//                    \Filament\Tables\Actions\DeleteBulkAction::make(),
+//                ]),
             ]);
     }
 
