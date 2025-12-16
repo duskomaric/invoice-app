@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Companies;
 
-use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class CompanyResource extends Resource
@@ -26,18 +25,44 @@ class CompanyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('slug')
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true),
-                \Filament\Forms\Components\DatePicker::make('subscription_ends_at')
-                    ->label('Subscription Expires At')
-                    ->native(false)
-                    ->displayFormat('d.m.Y')
-                    ->closeOnDateSelection(),
+            ->schema([
+                Section::make('Basic Information')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('slug')
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        DatePicker::make('subscription_ends_at')
+                            ->label('Subscription Expires At')
+                            ->native(false)
+                            ->displayFormat('d.m.Y')
+                            ->closeOnDateSelection(),
+                    ])->columns(2),
+
+                Section::make('SMTP Settings')
+                    ->description('Configure custom email server. Leave blank to use system default.')
+                    ->schema([
+                        TextInput::make('smtp_host')
+                            ->label('Host'),
+                        TextInput::make('smtp_port')
+                            ->label('Port'),
+                        TextInput::make('smtp_username')
+                            ->label('Username'),
+                        TextInput::make('smtp_password')
+                            ->label('Password')
+                            ->password()
+                            ->revealable(),
+                        TextInput::make('smtp_encryption')
+                            ->label('Encryption'),
+                        TextInput::make('smtp_from_address')
+                            ->label('From Email')
+                            ->email(),
+                        TextInput::make('smtp_from_name')
+                            ->label('From Name'),
+                    ])->columns(2)
+                    ->collapsed(),
             ]);
     }
 

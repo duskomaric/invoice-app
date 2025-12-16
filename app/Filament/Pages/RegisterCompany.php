@@ -35,6 +35,8 @@ class RegisterCompany extends RegisterTenant
 
         $company->users()->attach(auth()->user());
 
+        \App\Models\EmailTemplate::seedDefaults($company);
+
         return $company;
     }
 }

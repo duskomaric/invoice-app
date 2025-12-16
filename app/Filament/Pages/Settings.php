@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
+use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Models\Permission;
 use App\Models\PermissionRoleEnum;
 use App\Models\Setting;
@@ -37,6 +38,8 @@ class Settings extends Page
     protected static ?string $navigationLabel = 'Settings';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+
+    protected static ?string $cluster = SettingsCluster::class;
 
     protected static ?int $navigationSort = 2;
 
@@ -80,12 +83,7 @@ class Settings extends Page
 
     public string $warning_color;
 
-    public $invoice_email_subject;
 
-    public $invoice_email_body;
-
-    public $invoice_email_subject_sr;
-    public $invoice_email_body_sr;
 
     public $invoice_pdf_filename_format;
 
@@ -143,10 +141,6 @@ class Settings extends Page
             'success_color' => Setting::get('success_color'),
             'warning_color' => Setting::get('warning_color'),
 
-            'invoice_email_subject' => (string) Setting::get('invoice_email_subject'),
-            'invoice_email_body' => (string) Setting::get('invoice_email_body'),
-            'invoice_email_subject_sr' => (string) Setting::get('invoice_email_subject_sr'),
-            'invoice_email_body_sr' => (string) Setting::get('invoice_email_body_sr'),
             'invoice_pdf_filename_format' => (string) Setting::get('invoice_pdf_filename_format'),
 
             'company_name' => (string) Setting::get('company_name'),
@@ -286,51 +280,7 @@ class Settings extends Page
                                 ->columnSpanFull(),
                         ])->columns(12),
 
-                    Section::make('Email Configuration')
-                        ->description('Configure the email template sent to clients.')
-                        ->schema([
-                            Fieldset::make('English Template')
-                                ->schema([
-                                    TextInput::make('invoice_email_subject')
-                                        ->label('Email Subject')
-                                        ->helperText('Available placeholders: {{ number }}')
-                                        ->required()
-                                        ->columnSpanFull(),
 
-                                    RichEditor::make('invoice_email_body')
-                                        ->label('Email Body (Markdown)')
-                                        ->helperText('Available placeholders: {{ client }}, {{ number }}, {{ amount }}, {{ due_date }}, {{ company }}')
-                                        ->toolbarButtons([
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            ['bulletList', 'orderedList'],
-                                            ['link'],
-                                            ['undo', 'redo'],
-                                        ])
-                                        ->required()
-                                        ->columnSpanFull(),
-                                ])->columnSpanFull()->columns(12),
-
-                            Fieldset::make('Serbian (Latin) Template')
-                                ->schema([
-                                    TextInput::make('invoice_email_subject_sr')
-                                        ->label('Email Subject')
-                                        ->helperText('Available placeholders: {{ number }}')
-                                        ->required()
-                                        ->columnSpanFull(),
-
-                                    RichEditor::make('invoice_email_body_sr')
-                                        ->label('Email Body (Markdown)')
-                                        ->helperText('Available placeholders: {{ client }}, {{ number }}, {{ amount }}, {{ due_date }}, {{ company }}')
-                                        ->toolbarButtons([
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            ['bulletList', 'orderedList'],
-                                            ['link'],
-                                            ['undo', 'redo'],
-                                        ])
-                                        ->required()
-                                        ->columnSpanFull(),
-                                ])->columnSpanFull()->columns(12),
-                        ])->columnSpanFull()->columns(12),
 
                     Section::make('PDF Configuration')
                         ->description('Configure the generated PDF invoice.')
@@ -563,7 +513,8 @@ class Settings extends Page
                         ->description('Assign and manage permissions for each role.')
                         ->schema($this->buildPermissionsFields()),
                 ]),
-            ]),
+
+            ])->vertical(),
         ];
     }
 
@@ -654,10 +605,7 @@ class Settings extends Page
         Setting::set('success_color', $data['success_color'] ?? Color::Green->value);
         Setting::set('warning_color', $data['warning_color'] ?? Color::Yellow->value);
 
-        Setting::set('invoice_email_subject', $data['invoice_email_subject'] ?? '');
-        Setting::set('invoice_email_body', $data['invoice_email_body'] ?? '');
-        Setting::set('invoice_email_subject_sr', $data['invoice_email_subject_sr'] ?? '');
-        Setting::set('invoice_email_body_sr', $data['invoice_email_body_sr'] ?? '');
+
         Setting::set('invoice_pdf_filename_format', $data['invoice_pdf_filename_format'] ?? '');
 
         Setting::set('company_name', $data['company_name'] ?? '');

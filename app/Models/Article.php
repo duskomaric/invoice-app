@@ -14,15 +14,15 @@ class Article extends Model
         'company_id',
         'name',
         'description',
-        'price',
+        'prices_meta',
         'unit',
         'tax_category',
         'is_active',
     ];
 
     protected $casts = [
-        'price' => 'integer',
         'is_active' => 'boolean',
+        'prices_meta' => 'array',
     ];
 
     public function company(): BelongsTo

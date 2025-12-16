@@ -35,9 +35,39 @@ class InvoiceService
         );
     }
 
-    public function sendEmail(Invoice $invoice, string $email): void
+    public function sendEmail(Invoice $invoice, string $email, ?string $subject = null, ?string $body = null): void
     {
-        Mail::to($email)->send(new InvoiceMail($invoice));
+        // Backup original config
+        $originalTransport = config('mail.mailers.smtp');
+        $originalFrom = config('mail.from');
+
+        try {
+            $this->configureMailer($invoice->company);
+            Mail::to($email)->send(new InvoiceMail($invoice, $subject, $body));
+        } finally {
+            // Restore original config
+            config(['mail.mailers.smtp' => $originalTransport]);
+            config(['mail.from' => $originalFrom]);
+            Mail::purge('smtp');
+        }
+    }
+
+    protected function configureMailer(\App\Models\Company $company): void
+    {
+        if ($company->smtp_host) {
+            config([
+                'mail.mailers.smtp.transport' => 'smtp',
+                'mail.mailers.smtp.host' => $company->smtp_host,
+                'mail.mailers.smtp.port' => $company->smtp_port,
+                'mail.mailers.smtp.username' => $company->smtp_username,
+                'mail.mailers.smtp.password' => $company->smtp_password,
+                'mail.mailers.smtp.encryption' => $company->smtp_encryption,
+                'mail.from.address' => $company->smtp_from_address ?? config('mail.from.address'),
+                'mail.from.name' => $company->smtp_from_name ?? config('mail.from.name'),
+            ]);
+            
+            Mail::purge('smtp');
+        }
     }
 
     public function updateStatus(Invoice $invoice, int $paidAmount): void

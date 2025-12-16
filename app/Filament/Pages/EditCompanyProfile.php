@@ -81,6 +81,33 @@ class EditCompanyProfile extends EditTenantProfile
                         TextInput::make('ofs_pac')
                             ->label('PAC Code'),
                     ])->columns(2),
+
+                Section::make('SMTP Settings')
+                    ->description('Configure your custom email server. Leave blank to use the system default.')
+                    ->schema([
+                        TextInput::make('smtp_host')
+                            ->label('Host')
+                            ->placeholder('smtp.example.com'),
+                        TextInput::make('smtp_port')
+                            ->label('Port')
+                            ->placeholder('587'),
+                        TextInput::make('smtp_username')
+                            ->label('Username'),
+                        TextInput::make('smtp_password')
+                            ->label('Password')
+                            ->password()
+                            ->revealable(),
+                        TextInput::make('smtp_encryption')
+                            ->label('Encryption')
+                            ->placeholder('tls'),
+                        TextInput::make('smtp_from_address')
+                            ->label('From Email')
+                            ->email()
+                            ->placeholder('info@yourcompany.com'),
+                        TextInput::make('smtp_from_name')
+                            ->label('From Name')
+                            ->placeholder('My Company Ltd.'),
+                    ])->columns(2),
             ]);
     }
 }

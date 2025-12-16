@@ -6,23 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
+        Schema::create('email_templates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->text('description')->nullable();
-            $table->json('prices_meta')->nullable();
-            $table->string('unit')->default('service');
-            $table->string('tax_category')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('subject');
+            $table->text('body');
+            $table->string('type')->default('invoice'); // invoice, quote, etc.
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('email_templates');
     }
 };

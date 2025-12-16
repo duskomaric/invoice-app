@@ -31,6 +31,14 @@ class Company extends Model
         'ofs_pac',
         'is_active',
         'subscription_ends_at',
+        // SMTP Configuration
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+        'smtp_from_address',
+        'smtp_from_name',
     ];
 
     protected $casts = [
@@ -56,6 +64,11 @@ class Company extends Model
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
+    }
+
+    public function currencies(): HasMany
+    {
+        return $this->hasMany(Currency::class);
     }
 
     public function settings(): HasMany

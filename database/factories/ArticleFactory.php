@@ -9,9 +9,20 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
+            'name' => $this->faker->unique()->catchPhrase(),
             'description' => fake()->sentence(),
-            'price' => fake()->randomFloat(2, 10, 1000),
+            'prices_meta' => [
+                'USD' => [
+                    'price' => $this->faker->randomFloat(2, 1, 100),
+                    'currency_code' => 'USD',
+                ],
+                'EUR' => [
+                    'price' => $this->faker->randomFloat(2, 1, 100),
+                    'currency_code' => 'EUR',
+                ],
+            ],
+            'unit' => $this->faker->randomElement(['piece', 'kg', 'liter']),
+//            'tax_category' => $this->faker->randomElement(['standard', 'reduced', 'zero']),
             'is_active' => true,
         ];
     }
