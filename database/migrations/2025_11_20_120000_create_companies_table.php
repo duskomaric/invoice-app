@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->nullable()->unique();
+
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('subscription_ends_at')->nullable();
             
             // Address & Contact
             $table->string('address')->nullable();
@@ -36,6 +39,15 @@ return new class extends Migration
             $table->string('ofs_api_key')->nullable();
             $table->string('ofs_serial_number')->nullable();
             $table->string('ofs_pac')->nullable();
+
+            // SMTP Configuration
+            $table->string('smtp_host')->nullable();
+            $table->string('smtp_port')->nullable();
+            $table->string('smtp_username')->nullable();
+            $table->string('smtp_password')->nullable();
+            $table->string('smtp_encryption')->nullable();
+            $table->string('smtp_from_address')->nullable();
+            $table->string('smtp_from_name')->nullable();
             
             $table->timestamps();
         });

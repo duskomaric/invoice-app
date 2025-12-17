@@ -26,6 +26,14 @@ class Email extends Page
 
     protected string $view = 'filament.pages.settings';
 
+    public string $smtp_host;
+    public string $smtp_port;
+    public string $smtp_username;
+    public string $smtp_password;
+    public string $smtp_encryption;
+    public string $smtp_from_address;
+    public string $smtp_from_name;
+
     public function mount(): void
     {
         $this->form->fill([

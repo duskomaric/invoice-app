@@ -60,9 +60,9 @@ class Setting extends Model
         'ofs_seller_address' => 'string',
         'ofs_seller_town' => 'string',
         // Invoice Numbering
-        'invoice_prefixes' => 'array',
-        'invoice_sequences' => 'array',
-        'invoice_default_currency' => 'string',
+        'invoice_numbering_format' => 'string',
+        'invoice_numbering_pad_length' => 'integer',
+        'invoice_numbering_start_number' => 'integer',
 
 
         // tax categories for OFS - sync

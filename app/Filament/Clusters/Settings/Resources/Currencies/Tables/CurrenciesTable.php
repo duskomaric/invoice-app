@@ -15,6 +15,7 @@ class CurrenciesTable
         return $table
             ->columns([
                 TextColumn::make('code')->label('Code'),
+                TextColumn::make('prefix')->label('Prefix'),
                 TextColumn::make('name')->label('Name'),
             ])
             ->filters([

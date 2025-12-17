@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Enums\InvoiceFrequency;
 use App\Enums\InvoiceStatus;
-use App\Models\Setting;
+use App\Services\InvoiceNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -76,27 +76,7 @@ class Invoice extends Model
      */
     public function generateInvoiceNumber(): void
     {
-        $year = now()->year;
-        $currency = $this->currency ?? Setting::get('invoice_default_currency', 'BAM');
-
-        // Get current sequences
-        $sequences = Setting::get('invoice_sequences', []);
-        $currentNumber = $sequences[$currency][$year] ?? 0;
-        $nextNumber = $currentNumber + 1;
-
-        // Update sequence in settings
-        $sequences[$currency][$year] = $nextNumber;
-        Setting::set('invoice_sequences', $sequences);
-
-        // Get prefix for currency
-        $prefixes = Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']);
-        $prefix = $prefixes[$currency] ?? $currency;
-
-        // Set values
-        $this->currency = $currency;
-        $this->sequence_number = $nextNumber;
-        $this->sequence_year = $year;
-        $this->invoice_number = sprintf('%s-%03d/%d', $prefix, $nextNumber, $year);
+        app(InvoiceNumberingService::class)->assignToInvoice($this);
     }
 
     /**

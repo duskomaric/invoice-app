@@ -6,9 +6,12 @@ use App\Enums\InvoiceFrequency;
 use App\Enums\InvoiceStatus;
 use App\Filament\Components\MoneyInput;
 use App\Models\Article;
-use App\Models\Setting;
+use App\Models\Currency;
+use App\Services\InvoiceNumberingService;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -68,8 +71,23 @@ class InvoiceForm
                                     ->columnSpan(3),
 
                                 Select::make('currency')
-                                    ->options(Setting::get('invoice_prefixes'))
+                                    ->options(function () {
+                                        $tenantId = Filament::getTenant()?->id;
+
+                                        return Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
+                                            ->orderBy('code')
+                                            ->pluck('code', 'code')
+                                            ->toArray();
+                                    })
                                     ->required()
+                                    ->columnSpan(3),
+
+                                Placeholder::make('invoice_number_preview')
+                                    ->label('Next Invoice Number')
+                                    ->content(fn (Get $get) => app(InvoiceNumberingService::class)->preview(
+                                        $get('currency'),
+                                        $get('date')
+                                    ))
                                     ->columnSpan(3),
                             ])
                             ->columns(12)

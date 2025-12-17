@@ -5,15 +5,13 @@ namespace App\Filament\Clusters\Settings\Pages;
 use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Models\Setting;
 use BackedEnum;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\HtmlString;
 
 class InvoiceNumbering extends Page
 {
@@ -29,63 +27,47 @@ class InvoiceNumbering extends Page
 
     protected string $view = 'filament.pages.settings';
 
+    public string $invoice_numbering_format;
+    public int $invoice_numbering_pad_length;
+    public int $invoice_numbering_start_number;
+
+
     public function mount(): void
     {
         $this->form->fill([
-            'invoice_prefixes' => Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']),
-            'invoice_default_currency' => (string) Setting::get('invoice_default_currency', 'BAM'),
+            'invoice_numbering_format' => (string) Setting::get('invoice_numbering_format', '{prefix}-{number}/{year}'),
+            'invoice_numbering_pad_length' => (int) Setting::get('invoice_numbering_pad_length', 3),
+            'invoice_numbering_start_number' => (int) Setting::get('invoice_numbering_start_number', 1),
         ]);
     }
 
     protected function getFormSchema(): array
     {
         return [
-            Section::make('Currency Prefixes')
-                ->description('Configure invoice number prefixes for each currency. Format: PREFIX-###/YEAR')
+            Section::make('Numbering Rules')
+                ->description('Configure how invoice numbers are generated.')
                 ->schema([
-                    KeyValue::make('invoice_prefixes')
-                        ->label('Currency Prefixes')
-                        ->keyLabel('Currency Code (e.g., EUR, BAM)')
-                        ->valueLabel('Prefix')
-                        ->helperText('Example: EUR → EUR will create invoices like EUR-001/'.date('Y'))
-                        ->addButtonLabel('Add Currency')
-                        ->reorderable(false)
-                        ->columnSpanFull(),
-
-                    Select::make('invoice_default_currency')
-                        ->label('Default Currency')
-                        ->options(fn ($get) => $get('invoice_prefixes') ?? ['BAM' => 'BAM', 'EUR' => 'EUR'])
+                    TextInput::make('invoice_numbering_format')
+                        ->label('Number Format')
+                        ->helperText('Placeholders: {prefix}, {currency}, {number}, {year}, {month}, {day}')
                         ->required()
-                        ->default('BAM')
-                        ->columnSpan(6),
-                ])->columns(12),
-
-            Section::make('Sequence Counters')
-                ->description('Current invoice numbers per currency and year. These update automatically.')
-                ->schema([
-                    Placeholder::make('sequences_display')
-                        ->label('Current Sequences')
-                        ->content(function () {
-                            $sequences = Setting::get('invoice_sequences', []);
-                            if (empty($sequences)) {
-                                return new HtmlString('<p class="text-sm text-gray-500">No invoices created yet.</p>');
-                            }
-
-                            $output = '<div class="space-y-2">';
-                            foreach ($sequences as $currency => $years) {
-                                $output .= '<div class="font-semibold">' . $currency . ':</div>';
-                                $output .= '<ul class="ml-4 space-y-1">';
-                                foreach ($years as $year => $number) {
-                                    $output .= '<li class="text-sm">Year ' . $year . ': <span class="font-mono">' . $number . '</span></li>';
-                                }
-                                $output .= '</ul>';
-                            }
-                            $output .= '</div>';
-
-                            return new HtmlString($output);
-                        })
                         ->columnSpanFull(),
-                ]),
+
+                    TextInput::make('invoice_numbering_pad_length')
+                        ->label('Pad Zeros')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required()
+                        ->columnSpan(6),
+
+                    TextInput::make('invoice_numbering_start_number')
+                        ->label('Starting Number')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required()
+                        ->columnSpan(6),
+                ])
+                ->columns(12),
         ];
     }
 
@@ -93,8 +75,9 @@ class InvoiceNumbering extends Page
     {
         $data = $this->form->getState();
 
-        Setting::set('invoice_prefixes', $data['invoice_prefixes'] ?? ['BAM' => 'BAM', 'EUR' => 'EUR']);
-        Setting::set('invoice_default_currency', $data['invoice_default_currency'] ?? 'BAM');
+        Setting::set('invoice_numbering_format', $data['invoice_numbering_format'] ?? '{prefix}-{number}/{year}');
+        Setting::set('invoice_numbering_pad_length', (int) ($data['invoice_numbering_pad_length'] ?? 3));
+        Setting::set('invoice_numbering_start_number', (int) ($data['invoice_numbering_start_number'] ?? 1));
 
         Notification::make()
             ->success()

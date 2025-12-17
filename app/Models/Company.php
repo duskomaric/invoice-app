@@ -24,6 +24,7 @@ class Company extends Model
         'identification_number',
         'vat_number',
         'bank_account',
+        'town',
         // OFS Configuration
         'ofs_base_url',
         'ofs_api_key',

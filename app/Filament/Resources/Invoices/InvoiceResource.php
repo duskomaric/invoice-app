@@ -7,7 +7,9 @@ use App\Filament\Resources\Invoices\Pages\EditInvoice;
 use App\Filament\Resources\Invoices\Pages\ListInvoices;
 use App\Filament\Resources\Invoices\Schemas\InvoiceForm;
 use App\Filament\Resources\Invoices\Tables\InvoiceTable;
+use App\Models\Currency;
 use App\Models\Invoice;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -35,16 +37,23 @@ class InvoiceResource extends Resource
 
     public static function getTabs(): array
     {
-        $prefixes = \App\Models\Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']);
+        $tenantId = Filament::getTenant()?->id;
+
+        $currencies = Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
+            ->orderBy('code')
+            ->pluck('code')
+            ->toArray();
 
         $tabs = [
             'all' => \Filament\Resources\Components\Tab::make('All Invoices'),
         ];
 
-        foreach ($prefixes as $currency => $prefix) {
+        foreach ($currencies as $currency) {
             $tabs[$currency] = \Filament\Resources\Components\Tab::make($currency)
                 ->modifyQueryUsing(fn ($query) => $query->where('currency', $currency))
-                ->badge(Invoice::where('currency', $currency)->count());
+                ->badge(Invoice::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
+                    ->where('currency', $currency)
+                    ->count());
         }
 
         return $tabs;

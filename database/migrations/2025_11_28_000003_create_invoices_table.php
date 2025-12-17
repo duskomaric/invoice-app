@@ -24,9 +24,11 @@ return new class extends Migration
             
             // Numbering & Currency
             $table->string('currency')->default('BAM');
-            $table->string('invoice_number')->nullable()->unique();
+            $table->string('invoice_number')->nullable();
             $table->unsignedInteger('sequence_number')->nullable();
             $table->year('sequence_year')->nullable();
+
+            $table->unique(['company_id', 'invoice_number']);
 
             $table->text('notes')->nullable();
             

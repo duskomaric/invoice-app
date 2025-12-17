@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('city')->nullable();

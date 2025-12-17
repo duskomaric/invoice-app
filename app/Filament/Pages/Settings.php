@@ -115,10 +115,6 @@ class Settings extends Page
     public $ofs_seller_address;
     public $ofs_seller_town;
 
-    // Invoice Numbering Settings
-    public $invoice_prefixes;
-    public $invoice_default_currency;
-
     public ?string $selectedRole;
 
     public array $permissions = [];
@@ -169,9 +165,6 @@ class Settings extends Page
             'ofs_seller_name' => (string) Setting::get('ofs_seller_name'),
             'ofs_seller_address' => (string) Setting::get('ofs_seller_address'),
             'ofs_seller_town' => (string) Setting::get('ofs_seller_town'),
-
-            'invoice_prefixes' => Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']),
-            'invoice_default_currency' => (string) Setting::get('invoice_default_currency', 'BAM'),
 
             // SMTP Settings
             'smtp_host' => (string) Setting::get('smtp_host'),
@@ -380,58 +373,6 @@ class Settings extends Page
                                 ->required()
                                 ->columnSpan(6),
                         ])->columns(12),
-                ]),
-
-                // -----------------------
-                // Invoice Numbering
-                // -----------------------
-                Tab::make('Invoice Numbering')->schema([
-                    Section::make('Currency Prefixes')
-                        ->description('Configure invoice number prefixes for each currency. Format: PREFIX-###/YEAR')
-                        ->schema([
-                            \Filament\Forms\Components\KeyValue::make('invoice_prefixes')
-                                ->label('Currency Prefixes')
-                                ->keyLabel('Currency Code (e.g., EUR, BAM)')
-                                ->valueLabel('Prefix')
-                                ->helperText('Example: EUR → EUR will create invoices like EUR-001/'. date('Y'))
-                                ->addButtonLabel('Add Currency')
-                                ->reorderable(false)
-                                ->columnSpanFull(),
-
-                            Select::make('invoice_default_currency')
-                                ->label('Default Currency')
-                                ->options(fn ($get) => $get('invoice_prefixes') ?? ['BAM' => 'BAM', 'EUR' => 'EUR'])
-                                ->required()
-                                ->default('BAM')
-                                ->columnSpan(6),
-                        ])->columns(12),
-
-                    Section::make('Sequence Counters')
-                        ->description('Current invoice numbers per currency and year. These update automatically.')
-                        ->schema([
-                            Placeholder::make('sequences_display')
-                                ->label('Current Sequences')
-                                ->content(function () {
-                                    $sequences = Setting::get('invoice_sequences', []);
-                                    if (empty($sequences)) {
-                                        return new HtmlString('<p class="text-sm text-gray-500">No invoices created yet.</p>');
-                                    }
-
-                                    $output = '<div class="space-y-2">';
-                                    foreach ($sequences as $currency => $years) {
-                                        $output .= '<div class="font-semibold">' . $currency . ':</div>';
-                                        $output .= '<ul class="ml-4 space-y-1">';
-                                        foreach ($years as $year => $number) {
-                                            $output .= '<li class="text-sm">Year ' . $year . ': <span class="font-mono">' . $number . '</span></li>';
-                                        }
-                                        $output .= '</ul>';
-                                    }
-                                    $output .= '</div>';
-
-                                    return new HtmlString($output);
-                                })
-                                ->columnSpanFull(),
-                        ]),
                 ]),
 
                 // -----------------------
@@ -688,9 +629,6 @@ class Settings extends Page
         Setting::set('ofs_seller_name', $data['ofs_seller_name'] ?? '');
         Setting::set('ofs_seller_address', $data['ofs_seller_address'] ?? '');
         Setting::set('ofs_seller_town', $data['ofs_seller_town'] ?? '');
-
-        Setting::set('invoice_prefixes', $data['invoice_prefixes'] ?? ['BAM' => 'BAM', 'EUR' => 'EUR']);
-        Setting::set('invoice_default_currency', $data['invoice_default_currency'] ?? 'BAM');
 
         // Your existing permissions logic...
         //        if (!empty($this->selectedRole)) {
