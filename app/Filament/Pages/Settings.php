@@ -33,6 +33,8 @@ class Settings extends Page
 {
     use InteractsWithForms;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|\UnitEnum|null $navigationGroup = 'Application Settings';
 
     protected static ?string $navigationLabel = 'Settings';
