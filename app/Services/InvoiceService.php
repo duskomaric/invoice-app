@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\InvoiceStatus;
 use App\Mail\InvoiceMail;
 use App\Models\Invoice;
+use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,7 +28,7 @@ class InvoiceService
     public function getPdfFilename(Invoice $invoice): string
     {
         $format = \App\Models\Setting::get('invoice_pdf_filename_format', 'invoice_{{ number }}.pdf');
-        
+
         return str_replace(
             ['{{ number }}', '{{ client }}'],
             [$invoice->id, \Illuminate\Support\Str::slug($invoice->client->name)],
@@ -54,18 +55,20 @@ class InvoiceService
 
     protected function configureMailer(\App\Models\Company $company): void
     {
-        if ($company->smtp_host) {
+        $smtpHost = Setting::get('smtp_host');
+
+        if ($smtpHost) {
             config([
                 'mail.mailers.smtp.transport' => 'smtp',
-                'mail.mailers.smtp.host' => $company->smtp_host,
-                'mail.mailers.smtp.port' => $company->smtp_port,
-                'mail.mailers.smtp.username' => $company->smtp_username,
-                'mail.mailers.smtp.password' => $company->smtp_password,
-                'mail.mailers.smtp.encryption' => $company->smtp_encryption,
-                'mail.from.address' => $company->smtp_from_address ?? config('mail.from.address'),
-                'mail.from.name' => $company->smtp_from_name ?? config('mail.from.name'),
+                'mail.mailers.smtp.host' => $smtpHost,
+                'mail.mailers.smtp.port' => Setting::get('smtp_port'),
+                'mail.mailers.smtp.username' => Setting::get('smtp_username'),
+                'mail.mailers.smtp.password' => Setting::get('smtp_password'),
+                'mail.mailers.smtp.encryption' => Setting::get('smtp_encryption'),
+                'mail.from.address' => Setting::get('smtp_from_address') ?? config('mail.from.address'),
+                'mail.from.name' => Setting::get('smtp_from_name') ?? config('mail.from.name'),
             ]);
-            
+
             Mail::purge('smtp');
         }
     }

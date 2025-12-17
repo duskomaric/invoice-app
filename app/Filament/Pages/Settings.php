@@ -94,6 +94,15 @@ class Settings extends Page
     public $company_vat_id;
     public $company_bank_account;
 
+    // SMTP Settings
+    public $smtp_host;
+    public $smtp_port;
+    public $smtp_username;
+    public $smtp_password;
+    public $smtp_encryption;
+    public $smtp_from_address;
+    public $smtp_from_name;
+
     // OFS Fiscalization Settings
     public $ofs_base_url;
     public $ofs_api_key;
@@ -161,6 +170,15 @@ class Settings extends Page
 
             'invoice_prefixes' => Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']),
             'invoice_default_currency' => (string) Setting::get('invoice_default_currency', 'BAM'),
+
+            // SMTP Settings
+            'smtp_host' => (string) Setting::get('smtp_host'),
+            'smtp_port' => (string) Setting::get('smtp_port'),
+            'smtp_username' => (string) Setting::get('smtp_username'),
+            'smtp_password' => (string) Setting::get('smtp_password'),
+            'smtp_encryption' => (string) Setting::get('smtp_encryption'),
+            'smtp_from_address' => (string) Setting::get('smtp_from_address'),
+            'smtp_from_name' => (string) Setting::get('smtp_from_name'),
         ]);
 
         $this->logViewerUrl = Setting::get('log_viewer_access_key')
@@ -415,6 +433,42 @@ class Settings extends Page
                 ]),
 
                 // -----------------------
+                // Email Settings
+                // -----------------------
+                Tab::make('Email')->schema([
+                    Section::make('SMTP Configuration')
+                        ->description('Configure your email server settings. Leave blank to use the system default.')
+                        ->schema([
+                            TextInput::make('smtp_host')
+                                ->label('SMTP Host')
+                                ->placeholder('smtp.mailtrap.io'),
+                            TextInput::make('smtp_port')
+                                ->label('SMTP Port')
+                                ->numeric()
+                                ->placeholder('587'),
+                            TextInput::make('smtp_username')
+                                ->label('SMTP Username'),
+                            TextInput::make('smtp_password')
+                                ->label('SMTP Password')
+                                ->password()
+                                ->revealable(),
+                            TextInput::make('smtp_encryption')
+                                ->label('Encryption')
+                                ->placeholder('tls')
+                                ->helperText('Usually "tls" or "ssl"'),
+                            TextInput::make('smtp_from_address')
+                                ->label('From Email Address')
+                                ->email()
+                                ->placeholder('noreply@yourdomain.com'),
+                            TextInput::make('smtp_from_name')
+                                ->label('From Name')
+                                ->placeholder('Your Company Name'),
+                        ])
+                        ->columns(2),
+                ])
+                ->icon('heroicon-o-envelope'),
+
+                // -----------------------
                 // Notifications
                 // -----------------------
                 Tab::make('Notifications')->schema([
@@ -609,6 +663,15 @@ class Settings extends Page
         Setting::set('invoice_pdf_filename_format', $data['invoice_pdf_filename_format'] ?? '');
 
         Setting::set('company_name', $data['company_name'] ?? '');
+        
+        // SMTP Settings
+        Setting::set('smtp_host', $data['smtp_host'] ?? '');
+        Setting::set('smtp_port', $data['smtp_port'] ?? '');
+        Setting::set('smtp_username', $data['smtp_username'] ?? '');
+        Setting::set('smtp_password', $data['smtp_password'] ?? '');
+        Setting::set('smtp_encryption', $data['smtp_encryption'] ?? '');
+        Setting::set('smtp_from_address', $data['smtp_from_address'] ?? '');
+        Setting::set('smtp_from_name', $data['smtp_from_name'] ?? '');
         Setting::set('company_address', $data['company_address'] ?? '');
         Setting::set('company_email', $data['company_email'] ?? '');
         Setting::set('company_phone', $data['company_phone'] ?? '');
