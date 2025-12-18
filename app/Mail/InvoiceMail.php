@@ -2,6 +2,8 @@
 
 namespace App\Mail;
 
+use App\Services\InvoiceService;
+use App\Models\CompanySetting;
 use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
@@ -35,7 +37,7 @@ class InvoiceMail extends Mailable
         $subjectKey = $locale === 'sr' ? 'invoice_email_subject_sr' : 'invoice_email_subject';
         $defaultSubject = $locale === 'sr' ? 'Faktura #{{ number }}' : 'Invoice #{{ number }}';
 
-        $subject = \App\Models\Setting::get($subjectKey, $defaultSubject);
+        $subject = CompanySetting::get($subjectKey, $defaultSubject);
         $subject = str_replace('{{ number }}', $this->invoice->id, $subject);
 
         return new Envelope(
@@ -66,7 +68,7 @@ class InvoiceMail extends Mailable
         app()->setLocale($locale);
 
         $bodyKey = $locale === 'sr' ? 'invoice_email_body_sr' : 'invoice_email_body';
-        $body = \App\Models\Setting::get($bodyKey, '');
+        $body = (string) CompanySetting::get($bodyKey, '');
         
         $body = $this->replacePlaceholders($body);
 
@@ -89,7 +91,7 @@ class InvoiceMail extends Mailable
                 $this->invoice->id,
                 number_format($this->invoice->total / 100, 2) . ' BAM',
                 $this->invoice->due_date->format('M d, Y'),
-                \App\Models\Setting::get('company_name', config('app.name'))
+                CompanySetting::get('company_name', config('app.name'))
             ],
             $content
         );
@@ -97,8 +99,17 @@ class InvoiceMail extends Mailable
 
     public function attachments(): array
     {
-        $pdf = Pdf::loadView('pdf.invoice', ['invoice' => $this->invoice]);
-        $filename = (new \App\Services\InvoiceService())->getPdfFilename($this->invoice);
+        $service = app(InvoiceService::class);
+        $view = $service->getPdfViewName($this->invoice);
+        $bankAccounts = $service->resolveBankAccounts($this->invoice);
+        $bankAccount = $bankAccounts->first();
+
+        $pdf = Pdf::loadView($view, [
+            'invoice' => $this->invoice,
+            'bankAccounts' => $bankAccounts,
+            'bankAccount' => $bankAccount,
+        ]);
+        $filename = $service->getPdfFilename($this->invoice);
 
         return [
             Attachment::fromData(fn () => $pdf->output(), $filename)

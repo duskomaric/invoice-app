@@ -39,7 +39,7 @@ class ArticleForm
                                     ->required()
                                     ->maxLength(255)
                                     ->prefixIcon('heroicon-o-tag')
-                                    ->columnSpan(8),
+                                    ->columnSpan(7),
 
                                 Select::make('unit')
                                     ->label('Unit')
@@ -50,7 +50,21 @@ class ArticleForm
                                     ->required()
                                     ->default('KOM')
                                     ->prefixIcon('heroicon-o-scale')
-                                    ->columnSpan(4),
+                                    ->columnSpan(3),
+
+                                Select::make('tax_category')
+                                    ->label('Tax Category')
+                                    ->options([
+                                        'F' => '11% (F)',
+                                        'N' => '0.00% (N)',
+                                        'T' => '2% (T)',
+                                        'E' => '6% (E)',
+                                        'P' => '40% (P)',
+                                    ])
+                                    ->required()
+                                    ->default('KOM')
+                                    ->prefixIcon('heroicon-o-bookmark')
+                                    ->columnSpan(2),
 
                                 Textarea::make('description')
                                     ->rows(4)

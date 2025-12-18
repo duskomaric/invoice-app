@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\RoleEnum;
 use App\Enums\UserStatus;
-use App\Models\Setting;
+use App\Models\CompanySetting;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -107,8 +107,8 @@ class UsersTable
                     }),
             ])
             ->defaultSort('created_at', 'desc')
-            ->paginated(Setting::get('pagination'))
-            ->defaultPaginationPageOption(Setting::get('default_pagination_option'))
+//            ->paginated(CompanySetting::get('pagination'))
+            ->defaultPaginationPageOption(CompanySetting::get('default_pagination_option'))
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),

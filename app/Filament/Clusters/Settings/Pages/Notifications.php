@@ -22,11 +22,17 @@ class Notifications extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBell;
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+
     protected static ?string $navigationLabel = 'Notifications';
 
     protected static ?int $navigationSort = 6;
 
     protected string $view = 'filament.pages.settings';
+
+    public string $notification_text;
+    public string $notification_type;
+    public bool $notification_enabled;
 
     public function mount(): void
     {

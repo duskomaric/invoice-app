@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\InvoiceTemplate;
 use App\Enums\InvoiceStatus;
 use App\Mail\InvoiceMail;
+use App\Models\CompanyBankAccount;
+use App\Models\CompanySetting;
 use App\Models\Invoice;
-use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Collection;
 
 class InvoiceService
 {
@@ -19,15 +22,65 @@ class InvoiceService
         return Pdf::loadHTML($html)->output();
     }
 
+    public function getPdfViewName(Invoice $invoice): string
+    {
+        $template = $invoice->invoice_template
+            ?: CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value);
+
+        return InvoiceTemplate::tryFrom($template)?->getViewName()
+            ?? InvoiceTemplate::Classic->getViewName();
+    }
+
     public function getPdfHtml(Invoice $invoice): string
     {
         app()->setLocale($invoice->language ?? 'en');
-        return view('pdf.invoice', ['invoice' => $invoice])->render();
+
+        $bankAccounts = $this->resolveBankAccounts($invoice);
+        $bankAccount = $bankAccounts->first();
+
+        return view($this->getPdfViewName($invoice), [
+            'invoice' => $invoice,
+            'bankAccounts' => $bankAccounts,
+            'bankAccount' => $bankAccount,
+        ])->render();
+    }
+
+    /**
+     * @return Collection<int, CompanyBankAccount>
+     */
+    public function resolveBankAccounts(Invoice $invoice): Collection
+    {
+        if ($invoice->relationLoaded('bankAccounts')) {
+            $selected = $invoice->bankAccounts;
+        } else {
+            $selected = $invoice->bankAccounts()->get();
+        }
+
+        if ($selected->isNotEmpty()) {
+            return $selected;
+        }
+
+        $defaultId = (int) CompanySetting::get('default_company_bank_account_id', 0);
+
+        if ($defaultId > 0) {
+            $default = CompanyBankAccount::where('company_id', $invoice->company_id)
+                ->where('id', $defaultId)
+                ->first();
+
+            return $default ? collect([$default]) : collect();
+        }
+
+        $default = CompanyBankAccount::where('company_id', $invoice->company_id)
+            ->orderByDesc('is_default')
+            ->orderBy('id')
+            ->first();
+
+        return $default ? collect([$default]) : collect();
     }
 
     public function getPdfFilename(Invoice $invoice): string
     {
-        $format = \App\Models\Setting::get('invoice_pdf_filename_format', 'invoice_{{ number }}.pdf');
+        $format = CompanySetting::get('invoice_pdf_filename_format', 'invoice_{{ number }}.pdf');
 
         return str_replace(
             ['{{ number }}', '{{ client }}'],
@@ -55,18 +108,18 @@ class InvoiceService
 
     protected function configureMailer(\App\Models\Company $company): void
     {
-        $smtpHost = Setting::get('smtp_host');
+        $smtpHost = CompanySetting::get('smtp_host');
 
         if ($smtpHost) {
             config([
                 'mail.mailers.smtp.transport' => 'smtp',
                 'mail.mailers.smtp.host' => $smtpHost,
-                'mail.mailers.smtp.port' => Setting::get('smtp_port'),
-                'mail.mailers.smtp.username' => Setting::get('smtp_username'),
-                'mail.mailers.smtp.password' => Setting::get('smtp_password'),
-                'mail.mailers.smtp.encryption' => Setting::get('smtp_encryption'),
-                'mail.from.address' => Setting::get('smtp_from_address') ?? config('mail.from.address'),
-                'mail.from.name' => Setting::get('smtp_from_name') ?? config('mail.from.name'),
+                'mail.mailers.smtp.port' => CompanySetting::get('smtp_port'),
+                'mail.mailers.smtp.username' => CompanySetting::get('smtp_username'),
+                'mail.mailers.smtp.password' => CompanySetting::get('smtp_password'),
+                'mail.mailers.smtp.encryption' => CompanySetting::get('smtp_encryption'),
+                'mail.from.address' => CompanySetting::get('smtp_from_address') ?? config('mail.from.address'),
+                'mail.from.name' => CompanySetting::get('smtp_from_name') ?? config('mail.from.name'),
             ]);
 
             Mail::purge('smtp');

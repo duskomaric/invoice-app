@@ -72,7 +72,7 @@ class ListInvoices extends ListRecords
     public function getTabs(): array
     {
         $tenantId = Filament::getTenant()?->id;
-        $numbering = app(InvoiceNumberingService::class);
+//        $numbering = app(InvoiceNumberingService::class);
 
         $invoiceQuery = Invoice::query()->when($tenantId, fn (Builder $q) => $q->where('company_id', $tenantId));
 
@@ -82,9 +82,9 @@ class ListInvoices extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->when($tenantId, fn (Builder $q) => $q->where('company_id', $tenantId))),
         ];
 
-        if (! $numbering->usesPerCurrencySequence()) {
-            return $tabs;
-        }
+//        if (! $numbering->usesPerCurrencySequence()) {
+//            return $tabs;
+//        }
 
         $currencies = Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
             ->orderBy('code')

@@ -18,6 +18,7 @@ class ArticleTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->description(fn ($record) => new HtmlString("<small>" . nl2br(e($record->description)) . "</small>"))
                     ->searchable()
                     ->sortable(),
 

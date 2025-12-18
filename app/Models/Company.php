@@ -76,4 +76,9 @@ class Company extends Model
     {
         return $this->hasMany(Setting::class);
     }
+
+    public function bankAccounts(): HasMany
+    {
+        return $this->hasMany(CompanyBankAccount::class);
+    }
 }

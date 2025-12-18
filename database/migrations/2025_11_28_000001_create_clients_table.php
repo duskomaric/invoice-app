@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('zip')->nullable();
             $table->string('country')->nullable();
             $table->string('tax_id')->nullable();
+            $table->string('vat_id')->nullable();
             $table->timestamps();
         });
     }

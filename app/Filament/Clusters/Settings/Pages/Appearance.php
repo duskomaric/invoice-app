@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Settings\Pages;
 
 use App\Filament\Clusters\Settings\SettingsCluster;
-use App\Models\Setting;
+use App\Models\CompanySetting;
 use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -16,7 +16,7 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 
-class General extends Page
+class Appearance extends Page
 {
     use InteractsWithForms;
 
@@ -24,25 +24,38 @@ class General extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAdjustmentsHorizontal;
 
-    protected static ?string $navigationLabel = 'General';
+    protected static ?string $navigationLabel = 'Appearance';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
 
     protected static ?int $navigationSort = 1;
 
     protected string $view = 'filament.pages.settings';
 
+    public array $pagination = [];
+    public string $modal_width = '';
+    public string $default_pagination_option = '';
+    public bool $top_navigation = false;
+    public string $primary_color = '';
+    public string $danger_color = '';
+    public string $gray_color = '';
+    public string $info_color = '';
+    public string $success_color = '';
+    public string $warning_color = '';
+
     public function mount(): void
     {
         $this->form->fill([
-            'pagination' => Setting::get('pagination'),
-            'modal_width' => Setting::get('modal_width'),
-            'default_pagination_option' => Setting::get('default_pagination_option'),
-            'top_navigation' => Setting::get('top_navigation'),
-            'primary_color' => Setting::get('primary_color'),
-            'danger_color' => Setting::get('danger_color'),
-            'gray_color' => Setting::get('gray_color'),
-            'info_color' => Setting::get('info_color'),
-            'success_color' => Setting::get('success_color'),
-            'warning_color' => Setting::get('warning_color'),
+            'pagination' => CompanySetting::get('pagination'),
+            'modal_width' => CompanySetting::get('modal_width'),
+            'default_pagination_option' => CompanySetting::get('default_pagination_option'),
+            'top_navigation' => CompanySetting::get('top_navigation'),
+            'primary_color' => CompanySetting::get('primary_color'),
+            'danger_color' => CompanySetting::get('danger_color'),
+            'gray_color' => CompanySetting::get('gray_color'),
+            'info_color' => CompanySetting::get('info_color'),
+            'success_color' => CompanySetting::get('success_color'),
+            'warning_color' => CompanySetting::get('warning_color'),
         ]);
     }
 
@@ -62,7 +75,7 @@ class General extends Page
 
                     Select::make('default_pagination_option')
                         ->label('Default Pagination Option')
-                        ->options(fn () => collect(Setting::get('pagination', []))
+                        ->options(fn () => collect(CompanySetting::get('pagination', []))
                             ->mapWithKeys(fn ($value) => [$value => $value])
                             ->toArray())
                         ->columnSpan(3),
@@ -79,7 +92,7 @@ class General extends Page
                     Toggle::make('top_navigation')
                         ->label('Use Top Navigation')
                         ->inline(false)
-                        ->default(Setting::get('top_navigation'))
+                        ->default(CompanySetting::get('top_navigation'))
                         ->columnSpan(3),
                 ])->columns(12),
 
@@ -99,7 +112,7 @@ class General extends Page
                             array_map('ucfirst', array_keys(Color::all())),
                             array_map('ucfirst', array_keys(Color::all()))
                         ))
-                        ->default(Setting::get($key))
+                        ->default(CompanySetting::get($key))
                         ->columnSpan(2)
                     )->toArray()
                 )->columns(6),
@@ -110,16 +123,16 @@ class General extends Page
     {
         $data = $this->form->getState();
 
-        Setting::set('pagination', $data['pagination'] ?? [10, 25, 50, 100]);
-        Setting::set('modal_width', $data['modal_width'] ?? Width::Medium->value);
-        Setting::set('default_pagination_option', $data['default_pagination_option'] ?? 10);
-        Setting::set('top_navigation', $data['top_navigation'] ?? false);
-        Setting::set('primary_color', $data['primary_color'] ?? Color::Blue->value);
-        Setting::set('danger_color', $data['danger_color'] ?? Color::Red->value);
-        Setting::set('gray_color', $data['gray_color'] ?? Color::Gray->value);
-        Setting::set('info_color', $data['info_color'] ?? Color::Blue->value);
-        Setting::set('success_color', $data['success_color'] ?? Color::Green->value);
-        Setting::set('warning_color', $data['warning_color'] ?? Color::Yellow->value);
+        CompanySetting::set('pagination', $data['pagination'] ?? [10, 25, 50, 100]);
+        CompanySetting::set('modal_width', $data['modal_width'] ?? Width::Medium->value);
+        CompanySetting::set('default_pagination_option', $data['default_pagination_option'] ?? 10);
+        CompanySetting::set('top_navigation', $data['top_navigation'] ?? false);
+        CompanySetting::set('primary_color', $data['primary_color'] ?? Color::Blue->value);
+        CompanySetting::set('danger_color', $data['danger_color'] ?? Color::Red->value);
+        CompanySetting::set('gray_color', $data['gray_color'] ?? Color::Gray->value);
+        CompanySetting::set('info_color', $data['info_color'] ?? Color::Blue->value);
+        CompanySetting::set('success_color', $data['success_color'] ?? Color::Green->value);
+        CompanySetting::set('warning_color', $data['warning_color'] ?? Color::Yellow->value);
 
         Notification::make()
             ->success()

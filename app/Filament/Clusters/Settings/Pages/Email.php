@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Settings\Pages;
 
 use App\Filament\Clusters\Settings\SettingsCluster;
-use App\Models\Setting;
+use App\Models\CompanySetting;
 use BackedEnum;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -22,6 +22,8 @@ class Email extends Page
 
     protected static ?string $navigationLabel = 'Email';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+
     protected static ?int $navigationSort = 5;
 
     protected string $view = 'filament.pages.settings';
@@ -37,13 +39,13 @@ class Email extends Page
     public function mount(): void
     {
         $this->form->fill([
-            'smtp_host' => (string) Setting::get('smtp_host'),
-            'smtp_port' => (string) Setting::get('smtp_port'),
-            'smtp_username' => (string) Setting::get('smtp_username'),
-            'smtp_password' => (string) Setting::get('smtp_password'),
-            'smtp_encryption' => (string) Setting::get('smtp_encryption'),
-            'smtp_from_address' => (string) Setting::get('smtp_from_address'),
-            'smtp_from_name' => (string) Setting::get('smtp_from_name'),
+            'smtp_host' => (string) CompanySetting::get('smtp_host'),
+            'smtp_port' => (string) CompanySetting::get('smtp_port'),
+            'smtp_username' => (string) CompanySetting::get('smtp_username'),
+            'smtp_password' => (string) CompanySetting::get('smtp_password'),
+            'smtp_encryption' => (string) CompanySetting::get('smtp_encryption'),
+            'smtp_from_address' => (string) CompanySetting::get('smtp_from_address'),
+            'smtp_from_name' => (string) CompanySetting::get('smtp_from_name'),
         ]);
     }
 
@@ -86,13 +88,13 @@ class Email extends Page
     {
         $data = $this->form->getState();
 
-        Setting::set('smtp_host', $data['smtp_host'] ?? '');
-        Setting::set('smtp_port', $data['smtp_port'] ?? '');
-        Setting::set('smtp_username', $data['smtp_username'] ?? '');
-        Setting::set('smtp_password', $data['smtp_password'] ?? '');
-        Setting::set('smtp_encryption', $data['smtp_encryption'] ?? '');
-        Setting::set('smtp_from_address', $data['smtp_from_address'] ?? '');
-        Setting::set('smtp_from_name', $data['smtp_from_name'] ?? '');
+        CompanySetting::set('smtp_host', $data['smtp_host'] ?? '');
+        CompanySetting::set('smtp_port', $data['smtp_port'] ?? '');
+        CompanySetting::set('smtp_username', $data['smtp_username'] ?? '');
+        CompanySetting::set('smtp_password', $data['smtp_password'] ?? '');
+        CompanySetting::set('smtp_encryption', $data['smtp_encryption'] ?? '');
+        CompanySetting::set('smtp_from_address', $data['smtp_from_address'] ?? '');
+        CompanySetting::set('smtp_from_name', $data['smtp_from_name'] ?? '');
 
         Notification::make()
             ->success()

@@ -165,8 +165,23 @@
                     @if(\App\Models\Setting::get('company_vat_id'))
                         {{ __('invoice.vat_id') }}: {{ \App\Models\Setting::get('company_vat_id') }}<br>
                     @endif
-                    @if(\App\Models\Setting::get('company_bank_account'))
-                        {{ __('invoice.bank_account') }}: {{ \App\Models\Setting::get('company_bank_account') }}
+                    @if(isset($bankAccounts) && $bankAccounts && $bankAccounts->isNotEmpty())
+                        @foreach($bankAccounts as $bankAccount)
+                            {{ __('invoice.bank_account') }}: {{ $bankAccount->account_number }}<br>
+                            {{ __('invoice.bank') }}: {{ $bankAccount->bank_name }}<br>
+                            @if($bankAccount->swift)
+                                SWIFT: {{ $bankAccount->swift }}
+                            @endif
+                            @if(! $loop->last)
+                                <br>
+                            @endif
+                        @endforeach
+                    @elseif(isset($bankAccount) && $bankAccount)
+                        {{ __('invoice.bank_account') }}: {{ $bankAccount->account_number }}<br>
+                        {{ __('invoice.bank') }}: {{ $bankAccount->bank_name }}<br>
+                        @if($bankAccount->swift)
+                            SWIFT: {{ $bankAccount->swift }}
+                        @endif
                     @endif
                 </p>
             </div>

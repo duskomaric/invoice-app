@@ -23,11 +23,17 @@ class Integrations extends Page
 
     protected static ?string $navigationLabel = 'Integrations';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+
     protected static ?int $navigationSort = 8;
 
     protected string $view = 'filament.pages.settings';
 
     public string $logViewerUrl = '#';
+
+    public string $github_token = '';
+    public string $log_viewer_access_key = '';
+    public string $support_link = '';
 
     public function mount(): void
     {

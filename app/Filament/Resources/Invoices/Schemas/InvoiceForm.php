@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\Invoices\Schemas;
 
+use App\Enums\InvoiceTemplate;
 use App\Enums\InvoiceFrequency;
 use App\Enums\InvoiceStatus;
+use App\Enums\LanguageEnum;
 use App\Filament\Components\MoneyInput;
 use App\Models\Article;
+use App\Models\CompanyBankAccount;
+use App\Models\CompanySetting;
 use App\Models\Currency;
 use App\Services\InvoiceNumberingService;
 use Filament\Facades\Filament;
@@ -38,6 +42,7 @@ class InvoiceForm
 
                         /* BASIC INVOICE INFO */
                         Section::make('Invoice')
+                            ->description(fn (Get $get) => app(InvoiceNumberingService::class)->preview($get('currency'), $get('date')))
                             ->schema([
                                 Select::make('client_id')
                                     ->relationship('client', 'name')
@@ -53,11 +58,12 @@ class InvoiceForm
                                     ->columnSpan(3),
 
                                 Select::make('language')
-                                    ->options([
-                                        'en' => 'English',
-                                        'sr' => 'Serbian (Latin)',
-                                    ])
-                                    ->default('en')
+                                    ->options(
+                                        collect(LanguageEnum::cases())
+                                            ->mapWithKeys(fn (LanguageEnum $lang) => [$lang->value => $lang->getLabel()])
+                                            ->toArray()
+                                    )
+                                    ->default(CompanySetting::get('default_invoice_language'))
                                     ->required()
                                     ->columnSpan(3),
 
@@ -67,7 +73,7 @@ class InvoiceForm
                                     ->columnSpan(3),
 
                                 DatePicker::make('due_date')
-                                    ->default(now()->addDays(30))
+                                    ->default(now()->addDays(CompanySetting::get('default_invoice_due_days')))
                                     ->columnSpan(3),
 
                                 Select::make('currency')
@@ -80,14 +86,38 @@ class InvoiceForm
                                             ->toArray();
                                     })
                                     ->required()
+                                    ->default(CompanySetting::get('default_invoice_currency'))
                                     ->columnSpan(3),
+
+                                Select::make('invoice_template')
+                                    ->label('Template')
+                                    ->options(collect(InvoiceTemplate::cases())
+                                        ->mapWithKeys(fn (InvoiceTemplate $t) => [$t->value => $t->getLabel()])
+                                        ->toArray())
+                                    ->default(fn () => CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value))
+                                    ->required()
+                                    ->columnSpan(3),
+
+                                Select::make('bankAccounts')
+                                    ->label('Bank accounts')
+                                    ->relationship(
+                                        name: 'bankAccounts',
+                                        titleAttribute: 'bank_name',
+                                        modifyQueryUsing: fn ($query) => $query->where('company_id', Filament::getTenant()?->id)
+                                    )
+                                    ->multiple()
+                                    ->preload()
+                                    ->searchable()
+                                    ->default(function () {
+                                        $defaultId = (int) CompanySetting::get('default_company_bank_account_id', 0);
+
+                                        return $defaultId > 0 ? [$defaultId] : [];
+                                    })
+                                    ->columnSpan(6),
 
                                 Placeholder::make('invoice_number_preview')
                                     ->label('Next Invoice Number')
-                                    ->content(fn (Get $get) => app(InvoiceNumberingService::class)->preview(
-                                        $get('currency'),
-                                        $get('date')
-                                    ))
+                                    ->content(fn (Get $get) => app(InvoiceNumberingService::class)->preview($get('currency'), $get('date')))
                                     ->columnSpan(3),
                             ])
                             ->columns(12)
@@ -99,11 +129,9 @@ class InvoiceForm
                                 Repeater::make('items')
                                     ->relationship()
                                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
-                                        $data['total'] = ($data['quantity'] ?? 1) * ($data['unit_price'] ?? 0);
                                         return $data;
                                     })
                                     ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                                        $data['total'] = ($data['quantity'] ?? 1) * ($data['unit_price'] ?? 0);
                                         return $data;
                                     })
                                     ->schema([
@@ -112,20 +140,36 @@ class InvoiceForm
                                             ->searchable()
                                             ->preload()
                                             ->reactive()
-                                            ->afterStateUpdated(function ($state, Set $set) {
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                 $article = Article::find($state);
-                                                if ($article) {
-                                                    $set('unit_price', $article->price / 100);
-                                                    $set('name', $article->name);
-                                                    $set('description', $article->description);
+                                                if (! $article) {
+                                                    return;
                                                 }
+
+                                                $currency = $get('../../currency');
+
+                                                $raw = $article->prices_meta[$currency]
+                                                    ?? collect($article->prices_meta)->first()
+                                                    ?? 0;
+
+                                                $rawPrice = is_array($raw)
+                                                    ? ($raw['price'] ?? 0)
+                                                    : $raw;
+
+                                                $price = (float) str_replace(',', '.', (string) $rawPrice);
+                                                $qty = max(1, (int) ($get('quantity') ?? 1));
+
+                                                $set('unit_price', number_format($price, 2, ',', '.'));
+                                                $set('total', number_format($price * $qty, 2, ',', '.'));
+
+                                                $set('name', $article->name);
+                                                $set('description', $article->description);
                                             })
-                                            ->columnSpan(4),
+                                            ->columnSpan(5),
 
-                                        TextInput::make('name')
-                                            ->required()
-                                            ->columnSpan(3),
 
+
+                                        Hidden::make('name'),
                                         Hidden::make('description'),
 
                                         TextInput::make('quantity')
@@ -133,24 +177,32 @@ class InvoiceForm
                                             ->default(1)
                                             ->reactive()
                                             ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                                $price = (float) str_replace(',', '.', str_replace('.', '', $get('unit_price')));
-                                                $set('total', $state * $price);
+                                                $qty = max(1, (int) $state);
+
+                                                $unitPriceState = $get('unit_price');
+                                                $unit = is_int($unitPriceState)
+                                                    ? $unitPriceState / 100
+                                                    : (float) str_replace(',', '.', str_replace('.', '', (string) $unitPriceState));
+
+                                                $set('total', number_format($unit * $qty, 2, ',', '.'));
                                             })
-                                            ->columnSpan(1),
+                                            ->columnSpan(2),
 
                                         MoneyInput::make('unit_price')
                                             ->reactive()
-                                            ->afterStateUpdated(fn ($state, Set $set, Get $get) =>
-                                            $set('total',
-                                                (float) str_replace(',', '.', str_replace('.', '', $state))
-                                                * $get('quantity')
-                                            )
-                                            )
-                                            ->columnSpan(2),
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                $qty = max(1, (int) ($get('quantity') ?? 1));
+                                                $unit = is_int($state)
+                                                    ? $state / 100
+                                                    : (float) str_replace(',', '.', str_replace('.', '', (string) $state));
+
+                                                $set('total', number_format($unit * $qty, 2, ',', '.'));
+                                            })
+                                            ->columnSpan(3),
 
                                         MoneyInput::make('total')
                                             ->disabled()
-                                            ->dehydrated()
+                                            ->dehydrated() // stored as cents
                                             ->columnSpan(2),
                                     ])
                                     ->columns(12),

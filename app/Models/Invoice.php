@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Enums\InvoiceFrequency;
 use App\Enums\InvoiceStatus;
+use App\Enums\LanguageEnum;
 use App\Services\InvoiceNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Invoice extends Model
@@ -30,6 +32,7 @@ class Invoice extends Model
         // Currency & Invoice Numbering
         'currency',
         'invoice_number',
+        'invoice_template',
         'sequence_number',
         'sequence_year',
         // Fiscal data
@@ -58,6 +61,7 @@ class Invoice extends Model
         'is_fiscalized' => 'boolean',
         'fiscalized_at' => 'datetime',
         'fiscal_meta' => 'array',
+        'language' => LanguageEnum::class,
     ];
 
     protected static function boot()
@@ -110,6 +114,12 @@ class Invoice extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function bankAccounts(): BelongsToMany
+    {
+        return $this->belongsToMany(CompanyBankAccount::class)
+            ->withTimestamps();
     }
 
     public function items(): HasMany

@@ -94,7 +94,6 @@ class Settings extends Page
     public $company_email;
     public $company_phone;
     public $company_vat_id;
-    public $company_bank_account;
 
     // SMTP Settings
     public $smtp_host;
@@ -155,7 +154,6 @@ class Settings extends Page
             'company_email' => (string) Setting::get('company_email'),
             'company_phone' => (string) Setting::get('company_phone'),
             'company_vat_id' => (string) Setting::get('company_vat_id'),
-            'company_bank_account' => (string) Setting::get('company_bank_account'),
 
             'ofs_base_url' => (string) Setting::get('ofs_base_url'),
             'ofs_api_key' => (string) Setting::get('ofs_api_key'),
@@ -281,19 +279,8 @@ class Settings extends Page
                                 ->label('Company Address')
                                 ->rows(3)
                                 ->columnSpanFull(),
-                            TextInput::make('company_phone')
-                                ->label('Company Phone')
-                                ->tel()
-                                ->columnSpan(6),
-                            TextInput::make('company_vat_id')
-                                ->label('Company VAT / Tax ID')
-                                ->columnSpan(6),
-                            TextInput::make('company_bank_account')
-                                ->label('Bank Account / IBAN')
-                                ->columnSpanFull(),
-                        ])->columns(12),
-
-
+                        ])
+                        ->columns(12),
 
                     Section::make('PDF Configuration')
                         ->description('Configure the generated PDF invoice.')
@@ -304,7 +291,8 @@ class Settings extends Page
                                 ->placeholder('invoice_{{ number }}.pdf')
                                 ->required()
                                 ->columnSpanFull(),
-                        ])->columns(12),
+                        ])
+                        ->columns(12),
                 ]),
 
                 // -----------------------
@@ -619,7 +607,6 @@ class Settings extends Page
         Setting::set('company_email', $data['company_email'] ?? '');
         Setting::set('company_phone', $data['company_phone'] ?? '');
         Setting::set('company_vat_id', $data['company_vat_id'] ?? '');
-        Setting::set('company_bank_account', $data['company_bank_account'] ?? '');
 
         Setting::set('ofs_base_url', $data['ofs_base_url'] ?? 'https://pos.ofs.ba');
         Setting::set('ofs_api_key', $data['ofs_api_key'] ?? '');

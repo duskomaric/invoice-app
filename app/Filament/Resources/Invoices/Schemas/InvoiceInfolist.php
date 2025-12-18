@@ -23,13 +23,13 @@ class InvoiceInfolist
                             ->date(),
                         TextEntry::make('due_date')
                             ->date(),
-                        TextEntry::make('language')
-                            ->formatStateUsing(fn (string $state): string => match ($state) {
-                                'en' => 'English',
-                                'sr' => 'Serbian (Latin)',
-                                default => $state,
-                            }),
-                    ])->columns(2),
+//                        TextEntry::make('language')
+//                            ->formatStateUsing(fn (string $state): string => match ($state) {
+//                                'en' => 'English',
+//                                'sr' => 'Serbian (Latin)',
+//                                default => $state,
+//                            }),
+                    ])->columns(5)->columnSpanFull(),
 
                 Section::make('Items')
                     ->schema([
@@ -43,7 +43,7 @@ class InvoiceInfolist
                                     ->money('BAM', '100', 'sr'),
                             ])
                             ->columns(4),
-                    ]),
+                    ])->columnSpanFull(),
 
                 Section::make('Totals')
                     ->schema([
@@ -57,7 +57,7 @@ class InvoiceInfolist
                             ->size('lg'),
                         TextEntry::make('amount_paid')
                             ->money('BAM', '100', 'sr'),
-                    ])->columns(2),
+                    ])->columns(4)->columnSpanFull(),
 
                 Section::make('Fiscal Data')
                     ->schema([

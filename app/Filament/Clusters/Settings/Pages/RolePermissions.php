@@ -28,6 +28,8 @@ class RolePermissions extends Page
 
     protected static ?string $navigationLabel = 'Role Permissions';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+
     protected static ?int $navigationSort = 9;
 
     protected string $view = 'filament.pages.settings';
