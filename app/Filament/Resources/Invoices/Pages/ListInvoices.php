@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Invoices\Pages;
 
-use App\Filament\Clusters\Settings\Resources\Currencies\CurrencyResource;
 use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Models\CompanySetting;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Services\InvoiceNumberingService;
 use Filament\Facades\Filament;
-use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -20,17 +19,12 @@ class ListInvoices extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        $tenantId = Filament::getTenant()?->id;
-        $currencies = Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
-            ->orderBy('code')
-            ->pluck('code')
-            ->toArray();
-
-        $actions = [];
-
         $numbering = app(InvoiceNumberingService::class);
 
-        if (! $numbering->usesPerCurrencySequence()) {
+        $tenantId = Filament::getTenant()?->id;
+        $prefixSetting = (string) CompanySetting::get('invoice_numbering_prefix', 'currency', $tenantId);
+
+        if ($prefixSetting !== 'currency') {
             return [
                 CreateAction::make('create')
                     ->label(fn () => 'New Invoice (' . $numbering->preview(null, now()) . ')')
@@ -40,29 +34,27 @@ class ListInvoices extends ListRecords
             ];
         }
 
-        if (empty($currencies)) {
+        $currencies = Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
+            ->orderBy('code')
+            ->pluck('code')
+            ->toArray();
+
+        if ($currencies === []) {
             return [
-                Action::make('add_currency')
-                    ->label('Add Currency')
+                CreateAction::make('create')
+                    ->label(fn () => 'New Invoice (' . $numbering->preview(null, now()) . ')')
                     ->icon('heroicon-o-plus-circle')
                     ->color('primary')
-                    ->url(fn (): string => CurrencyResource::getUrl('create')),
+                    ->url(fn (): string => static::getResource()::getUrl('create')),
             ];
         }
 
+        $actions = [];
         foreach ($currencies as $currency) {
-            $actions[] = CreateAction::make("create_{$currency}")
-                ->label(fn () => 'New ' . $currency . ' Invoice (' . $numbering->preview($currency, now()) . ')')
+            $actions[] = CreateAction::make('create_' . strtolower($currency))
+                ->label(fn () => 'New ' . $currency . ' (' . $numbering->preview($currency, now()) . ')')
                 ->icon('heroicon-o-plus-circle')
-                ->color(match($currency) {
-                    'EUR' => 'warning',
-                    'BAM' => 'success',
-                    default => 'primary',
-                })
-                ->mutateDataUsing(function (array $data) use ($currency) {
-                    $data['currency'] = $currency;
-                    return $data;
-                })
+                ->color('primary')
                 ->url(fn (): string => static::getResource()::getUrl('create', ['currency' => $currency]));
         }
 
@@ -72,7 +64,6 @@ class ListInvoices extends ListRecords
     public function getTabs(): array
     {
         $tenantId = Filament::getTenant()?->id;
-//        $numbering = app(InvoiceNumberingService::class);
 
         $invoiceQuery = Invoice::query()->when($tenantId, fn (Builder $q) => $q->where('company_id', $tenantId));
 
@@ -81,10 +72,6 @@ class ListInvoices extends ListRecords
                 ->badge($invoiceQuery->clone()->count())
                 ->modifyQueryUsing(fn (Builder $query) => $query->when($tenantId, fn (Builder $q) => $q->where('company_id', $tenantId))),
         ];
-
-//        if (! $numbering->usesPerCurrencySequence()) {
-//            return $tabs;
-//        }
 
         $currencies = Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
             ->orderBy('code')

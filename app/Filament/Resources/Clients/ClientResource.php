@@ -20,6 +20,8 @@ class ClientResource extends Resource
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-users';
 
+    protected static string|null|\UnitEnum $navigationGroup = 'Management';
+
     public static function form(Schema $schema): Schema
     {
         return ClientForm::configure($schema);

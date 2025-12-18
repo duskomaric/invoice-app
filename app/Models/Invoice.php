@@ -31,10 +31,10 @@ class Invoice extends Model
         'parent_id',
         // Currency & Invoice Numbering
         'currency',
+        'invoice_prefix',
+        'invoice_year',
         'invoice_number',
         'invoice_template',
-        'sequence_number',
-        'sequence_year',
         // Fiscal data
         'is_fiscalized',
         'fiscal_invoice_number',
@@ -54,9 +54,6 @@ class Invoice extends Model
         'next_invoice_date' => 'date',
         'amount_paid' => 'integer',
         'is_recurring' => 'boolean',
-        // Currency & numbering
-        'sequence_number' => 'integer',
-        'sequence_year' => 'integer',
         // Fiscal data casts
         'is_fiscalized' => 'boolean',
         'fiscalized_at' => 'datetime',
@@ -88,7 +85,17 @@ class Invoice extends Model
      */
     public function getFormattedNumberAttribute(): string
     {
-        return $this->invoice_number ?? "ID-{$this->id}";
+        if (! $this->invoice_number) {
+            return "ID-{$this->id}";
+        }
+
+        $year = $this->invoice_year ?: (int) ($this->date?->year ?? now()->year);
+
+        if (! $this->invoice_prefix) {
+            return "{$this->invoice_number}/{$year}";
+        }
+
+        return "{$this->invoice_prefix}-{$this->invoice_number}/{$year}";
     }
 
     public function getSubtotalAttribute(): int

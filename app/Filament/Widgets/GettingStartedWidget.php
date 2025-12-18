@@ -13,6 +13,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
@@ -50,9 +51,10 @@ class GettingStartedWidget extends Widget implements HasForms
                 ],
             ],
 
-            'invoice_numbering_format' => (string) CompanySetting::get('invoice_numbering_format', '{prefix}-{number}/{year}'),
-            'invoice_numbering_pad_length' => (int) CompanySetting::get('invoice_numbering_pad_length', 3),
-            'invoice_numbering_start_number' => (int) CompanySetting::get('invoice_numbering_start_number', 1),
+            'invoice_numbering_reset_yearly' => (bool) CompanySetting::get('invoice_numbering_reset_yearly', true),
+            'invoice_numbering_pad_zeros' => (int) CompanySetting::get('invoice_numbering_pad_zeros', 3),
+            'invoice_numbering_starting_number' => (int) CompanySetting::get('invoice_numbering_starting_number', 1),
+            'invoice_numbering_prefix' => (string) CompanySetting::get('invoice_numbering_prefix', 'currency'),
 
             'company_name' => (string) CompanySetting::get('company_name'),
             'company_address' => (string) CompanySetting::get('company_address'),
@@ -140,33 +142,38 @@ class GettingStartedWidget extends Widget implements HasForms
                         ->completedIcon(Heroicon::OutlinedCheckCircle)
                         ->description('Configure how invoice numbers are generated.')
                         ->schema([
-                            TextInput::make('invoice_numbering_format')
-                                ->label('Number format')
-                                ->helperText('Placeholders: {prefix}, {currency}, {number}, {year}, {month}, {day}')
-                                ->required()
+                            Toggle::make('invoice_numbering_reset_yearly')
+                                ->label('Reset counter yearly')
                                 ->columnSpanFull(),
 
-                            TextInput::make('invoice_numbering_pad_length')
+                            TextInput::make('invoice_numbering_prefix')
+                                ->label('Prefix')
+                                ->helperText("Use 'currency' to use invoice currency as prefix, or enter static text like INV")
+                                ->required()
+                                ->columnSpan(6),
+
+                            TextInput::make('invoice_numbering_pad_zeros')
                                 ->label('Pad zeros')
                                 ->numeric()
                                 ->minValue(1)
                                 ->required()
-                                ->columnSpan(6),
+                                ->columnSpan(3),
 
-                            TextInput::make('invoice_numbering_start_number')
+                            TextInput::make('invoice_numbering_starting_number')
                                 ->label('Starting number')
                                 ->numeric()
                                 ->minValue(1)
                                 ->required()
-                                ->columnSpan(6),
+                                ->columnSpan(3),
                         ])
                         ->columns(12)
                         ->afterValidation(function () {
                             $data = $this->form->getState();
 
-                            CompanySetting::set('invoice_numbering_format', $data['invoice_numbering_format'] ?? '{prefix}-{number}/{year}');
-                            CompanySetting::set('invoice_numbering_pad_length', (int) ($data['invoice_numbering_pad_length'] ?? 3));
-                            CompanySetting::set('invoice_numbering_start_number', (int) ($data['invoice_numbering_start_number'] ?? 1));
+                            CompanySetting::set('invoice_numbering_reset_yearly', (bool) ($data['invoice_numbering_reset_yearly'] ?? true));
+                            CompanySetting::set('invoice_numbering_pad_zeros', (int) ($data['invoice_numbering_pad_zeros'] ?? 3));
+                            CompanySetting::set('invoice_numbering_starting_number', (int) ($data['invoice_numbering_starting_number'] ?? 1));
+                            CompanySetting::set('invoice_numbering_prefix', (string) ($data['invoice_numbering_prefix'] ?? 'currency'));
                         }),
 
                     Step::make('Company invoice details')
@@ -267,9 +274,10 @@ class GettingStartedWidget extends Widget implements HasForms
     private function hasInvoiceNumberingConfigured(int $tenantId): bool
     {
         $keys = [
-            'invoice_numbering_format',
-            'invoice_numbering_pad_length',
-            'invoice_numbering_start_number',
+            'invoice_numbering_reset_yearly',
+            'invoice_numbering_pad_zeros',
+            'invoice_numbering_starting_number',
+            'invoice_numbering_prefix',
         ];
 
         return CompanySetting::where('company_id', $tenantId)

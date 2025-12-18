@@ -33,6 +33,13 @@ class InvoiceTable
             ->columns([
                 TextColumn::make('invoice_number')
                     ->label('Invoice #')
+                    ->getStateUsing(fn (Invoice $invoice) =>
+                        ($invoice->invoice_prefix ? $invoice->invoice_prefix . '-' : '')
+                        . $invoice->invoice_number
+                        . '/'
+                        . ($invoice->invoice_year ?: ($invoice->date?->year ?? now()->year))
+                    )
+
                     ->searchable()
                     ->sortable()
                     ->copyable()

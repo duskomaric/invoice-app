@@ -39,9 +39,10 @@ return [
     'ofs_seller_address' => 'Ulica bb',
     'ofs_seller_town' => 'Pranjvor',
 
-    'invoice_numbering_format' => '{prefix}-{number}/{year}',
-    'invoice_numbering_pad_length' => 3,
-    'invoice_numbering_start_number' => 1,
+    'invoice_numbering_reset_yearly' => true,
+    'invoice_numbering_pad_zeros' => 3,
+    'invoice_numbering_starting_number' => 1,
+    'invoice_numbering_prefix' => '',//''currency',
 
     'smtp_host' => '',
     'smtp_port' => '',

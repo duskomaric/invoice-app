@@ -15,7 +15,7 @@ return new class extends Migration
 
             // Basics
             $table->string('status')->default('draft');
-            $table->string('language')->default('sr_latn'); // Default to Serbian Latin
+            $table->string('language'); // Default to Serbian Latin
             $table->date('date');
             $table->date('due_date')->nullable();
 
@@ -24,12 +24,13 @@ return new class extends Migration
 
             // Numbering & Currency
             $table->string('currency')->default('BAM');
-            $table->string('invoice_number')->nullable();
+            $table->string('invoice_prefix')->nullable();
+            $table->string('invoice_prefix_key')->storedAs("COALESCE(invoice_prefix, '')");
+            $table->unsignedSmallInteger('invoice_year');
+            $table->string('invoice_number');
             $table->string('invoice_template')->nullable();
-            $table->unsignedInteger('sequence_number')->nullable();
-            $table->year('sequence_year')->nullable();
 
-            $table->unique(['company_id', 'invoice_number']);
+            $table->unique(['company_id', 'invoice_prefix_key', 'invoice_year', 'invoice_number'], 'invoices_company_prefixkey_year_number_unique');
 
             $table->text('notes')->nullable();
 

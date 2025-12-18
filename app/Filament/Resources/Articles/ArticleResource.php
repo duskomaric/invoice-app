@@ -18,6 +18,8 @@ class ArticleResource extends Resource
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-cube';
 
+    protected static string|null|\UnitEnum $navigationGroup = 'Management';
+
     public static function form(Schema $schema): Schema
     {
         return ArticleForm::configure($schema);

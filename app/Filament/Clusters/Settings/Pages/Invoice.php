@@ -7,21 +7,23 @@ use App\Enums\LanguageEnum;
 use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
+use App\Models\Invoice as InvoiceModel;
 use App\Services\InvoiceNumberingService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Support\Enums\Width;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\HtmlString;
 
 class Invoice extends Page
 {
@@ -52,9 +54,10 @@ class Invoice extends Page
 //    public string $company_phone;
 //    public string $company_vat_id;
 
-    public string $invoice_numbering_format;
-    public int $invoice_numbering_pad_length;
-    public int $invoice_numbering_start_number;
+    public bool $invoice_numbering_reset_yearly;
+    public int $invoice_numbering_pad_zeros;
+    public int $invoice_numbering_starting_number;
+    public string $invoice_numbering_prefix;
 
     public function mount(): void
     {
@@ -71,23 +74,16 @@ class Invoice extends Page
 //            'company_phone' => (string) CompanySetting::get('company_phone'),
 //            'company_vat_id' => (string) CompanySetting::get('company_vat_id'),
 
-            'invoice_numbering_format' => (string) CompanySetting::get('invoice_numbering_format', '{prefix}-{number}/{year}'),
-            'invoice_numbering_pad_length' => (int) CompanySetting::get('invoice_numbering_pad_length', 3),
-            'invoice_numbering_start_number' => (int) CompanySetting::get('invoice_numbering_start_number', 1),
+            'invoice_numbering_reset_yearly' => (bool) CompanySetting::get('invoice_numbering_reset_yearly', true),
+            'invoice_numbering_pad_zeros' => (int) CompanySetting::get('invoice_numbering_pad_zeros', 3),
+            'invoice_numbering_starting_number' => (int) CompanySetting::get('invoice_numbering_starting_number', 1),
+            'invoice_numbering_prefix' => (string) CompanySetting::get('invoice_numbering_prefix', 'currency'),
         ]);
     }
 
     protected function getFormSchema(): array
     {
         $numbering = app(InvoiceNumberingService::class);
-
-        $presets = [
-            '{currency}-{number}/{year}',
-            '{prefix}/{year}/{number}',
-            '{year}-{month}-{number}',
-            '{prefix}/{year}/{month}/{number}',
-            'INV-{number}/{year}',
-        ];
 
         return [
             Section::make('Invoice General Settings')
@@ -138,138 +134,119 @@ class Invoice extends Page
                         ->columnSpanFull(),
                 ])->columns(12),
 
-            Section::make('Numbering Rules')
+            Section::make('Invoice numbering')
                 ->description('Configure how invoice numbers are generated.')
                 ->schema([
-                    TextInput::make('invoice_numbering_format')
-                        ->label('Number Format')
-                        ->helperText('Placeholders: {prefix}, {currency}, {number}, {year}, {month}, {day}. You can also include static text, e.g. INV-{number}/{year}.')
-                        ->required()
+                    Toggle::make('invoice_numbering_reset_yearly')
+                        ->label('Reset counter yearly')
+                        ->helperText('If enabled, numbering resets each year for the selected prefix.')
                         ->live()
-                        ->columnSpanFull()
+                        ->columnSpanFull(),
+
+                    TextInput::make('invoice_numbering_prefix')
+                        ->label('Prefix')
+                        ->helperText('Use Currency, None, or enter custom text (e.g. INV)')
+                        ->placeholder('currency | INV | empty')
+                        ->columnSpan(6)
                         ->hintActions([
-                            Action::make('presets')
-                                ->label('Presets')
-                                ->icon('heroicon-o-squares-2x2')
-                                ->modalWidth(Width::Small)
-                                ->modalSubmitAction(false)
-                                ->modalCancelActionLabel('Close')
-                                ->schema([
-                                    Grid::make(1)->schema([
-                                        Placeholder::make('p1')
-                                            ->label($presets[0])
-                                            ->content(fn () => $numbering->previewForConfig(
-                                                format: $presets[0],
-                                                padLength: (int) ($this->form->getState()['invoice_numbering_pad_length'] ?? 3),
-                                                startingNumber: (int) ($this->form->getState()['invoice_numbering_start_number'] ?? 1),
-                                                currency: 'EUR',
-                                                date: now(),
-                                            ))
-                                            ->extraAttributes(['class' => 'text-sm text-gray-500'])
-                                            ->hintAction(
-                                                Action::make('use1')
-                                                    ->label('Use')
-                                                    ->action(fn () => $this->form->fill([
-                                                        'invoice_numbering_format' => $presets[0],
-                                                    ]))
-                                            ),
-                                        Placeholder::make('p2')
-                                            ->label($presets[1])
-                                            ->content(fn () => $numbering->previewForConfig(
-                                                format: $presets[1],
-                                                padLength: (int) ($this->form->getState()['invoice_numbering_pad_length'] ?? 3),
-                                                startingNumber: (int) ($this->form->getState()['invoice_numbering_start_number'] ?? 1),
-                                                currency: 'EUR',
-                                                date: now(),
-                                            ))
-                                            ->hintAction(
-                                                Action::make('use2')
-                                                    ->label('Use')
-                                                    ->action(fn () => $this->form->fill([
-                                                        'invoice_numbering_format' => $presets[1],
-                                                    ]))
-                                            ),
+                            Action::make('none')
+                                ->label('None')
+                                ->action(fn (Set $set) => $set('invoice_numbering_prefix', 'none')),
 
-                                        Placeholder::make('p3')
-                                            ->label($presets[2])
-                                            ->content(fn () => $numbering->previewForConfig(
-                                                format: $presets[2],
-                                                padLength: (int) ($this->form->getState()['invoice_numbering_pad_length'] ?? 3),
-                                                startingNumber: (int) ($this->form->getState()['invoice_numbering_start_number'] ?? 1),
-                                                currency: 'EUR',
-                                                date: now(),
-                                            ))
-                                            ->hintAction(
-                                                Action::make('use3')
-                                                    ->label('Use')
-                                                    ->action(fn () => $this->form->fill([
-                                                        'invoice_numbering_format' => $presets[2],
-                                                    ]))
-                                            ),
+                            Action::make('currency')
+                                ->label('Currency')
+                                ->action(fn (Set $set) => $set('invoice_numbering_prefix', 'currency')),
 
-                                        Placeholder::make('p4')
-                                            ->label($presets[3])
-                                            ->content(fn () => $numbering->previewForConfig(
-                                                format: $presets[3],
-                                                padLength: (int) ($this->form->getState()['invoice_numbering_pad_length'] ?? 3),
-                                                startingNumber: (int) ($this->form->getState()['invoice_numbering_start_number'] ?? 1),
-                                                currency: 'EUR',
-                                                date: now(),
-                                            ))
-                                            ->hintAction(
-                                                Action::make('use4')
-                                                    ->label('Use')
-                                                    ->action(fn () => $this->form->fill([
-                                                        'invoice_numbering_format' => $presets[3],
-                                                    ]))
-                                            ),
+                            Action::make('inv')
+                                ->label('F')
+                                ->action(fn (Set $set) => $set('invoice_numbering_prefix', 'F')),
 
-                                        Placeholder::make('p5')
-                                            ->label($presets[4])
-                                            ->content(fn () => $numbering->previewForConfig(
-                                                format: $presets[4],
-                                                padLength: (int) ($this->form->getState()['invoice_numbering_pad_length'] ?? 3),
-                                                startingNumber: (int) ($this->form->getState()['invoice_numbering_start_number'] ?? 1),
-                                                currency: 'EUR',
-                                                date: now(),
-                                            ))
-                                            ->hintAction(
-                                                Action::make('use5')
-                                                    ->label('Use')
-                                                    ->action(fn () => $this->form->fill([
-                                                        'invoice_numbering_format' => $presets[4],
-                                                    ]))
-                                            ),
-                                    ]),
-                                ]),
+                            Action::make('inv')
+                                ->label('INV')
+                                ->action(fn (Set $set) => $set('invoice_numbering_prefix', 'INV')),
                         ]),
 
-                    TextInput::make('invoice_numbering_pad_length')
-                        ->label('Pad Zeros')
+                    TextInput::make('invoice_numbering_pad_zeros')
+                        ->label('Pad zeros')
                         ->numeric()
                         ->minValue(1)
                         ->required()
-                        ->live()
-                        ->columnSpan(6),
+                        ->columnSpan(3),
 
-                    TextInput::make('invoice_numbering_start_number')
-                        ->label('Starting Number')
+                    TextInput::make('invoice_numbering_starting_number')
+                        ->label('Starting number')
                         ->numeric()
                         ->minValue(1)
                         ->required()
-                        ->live()
-                        ->columnSpan(6),
+                        ->columnSpan(3),
+
+                    Section::make('Used numerations')
+                        ->schema(function () {
+                            $tenantId = filament()->getTenant()?->id;
+                            if (! $tenantId) {
+                                return [];
+                            }
+
+                            $currencyCodes = filament()->getTenant()?->currencies()->pluck('code')->map(fn ($c) => strtoupper((string) $c))->toArray() ?? [];
+
+                            $rows = InvoiceModel::where('company_id', $tenantId)
+                                ->selectRaw('invoice_prefix, invoice_year, MAX(CAST(invoice_number AS UNSIGNED)) as max_number, MAX(LENGTH(invoice_number)) as pad_length, COUNT(*) as invoices_count')
+                                ->groupBy('invoice_prefix', 'invoice_year')
+                                ->orderBy('invoice_prefix')
+                                ->orderByDesc('invoice_year')
+                                ->get();
+
+                            $components = [];
+
+                            foreach ($rows as $row) {
+                                $prefix = $row->invoice_prefix !== null ? strtoupper((string) $row->invoice_prefix) : null;
+                                $bucketYear = (int) $row->invoice_year;
+                                $maxNumber = (int) $row->max_number;
+                                $padLength = max(1, (int) $row->pad_length);
+                                $count = (int) $row->invoices_count;
+
+                                $labelPrefix = $prefix ?: '(no prefix)';
+                                $key = preg_replace('/[^A-Za-z0-9_]/', '_', $labelPrefix . '_' . $bucketYear);
+                                $isCurrency = $prefix && in_array($prefix, $currencyCodes, true);
+
+                                $numberPart = str_pad((string) $maxNumber, $padLength, '0', STR_PAD_LEFT);
+                                $display = match (true) {
+                                    $bucketYear > 0 && $prefix => "{$prefix}-{$numberPart}/{$bucketYear}",
+                                    $bucketYear > 0 && ! $prefix => "{$numberPart}/{$bucketYear}",
+                                    $prefix => "{$prefix}-{$numberPart}",
+                                    default => $numberPart,
+                                };
+
+                                $components[] = Placeholder::make('used_numeration_' . $key)
+                                    ->label($bucketYear > 0 ? "{$labelPrefix} ({$bucketYear})" : "{$labelPrefix} (all years)")
+                                    ->content(new HtmlString("{$display}<br><span class=\"text-xs text-gray-500\">Invoices: {$count}</span>"))
+                                    ->hintAction(
+                                        Action::make('use_numeration_' . $key)
+                                            ->label('Use')
+                                            ->action(function (Set $set) use ($isCurrency, $prefix, $bucketYear, $padLength, $maxNumber) {
+                                                $set('invoice_numbering_reset_yearly', $bucketYear > 0);
+                                                $set('invoice_numbering_pad_zeros', $padLength);
+                                                $set('invoice_numbering_starting_number', max(1, $maxNumber + 1));
+                                                $set('invoice_numbering_prefix', $isCurrency ? 'currency' : ($prefix ?: 'none'));
+
+                                                Notification::make()
+                                                    ->success()
+                                                    ->title('Numeration selected')
+                                                    ->send();
+                                            })
+                                    )
+                                    ->columnSpan(12);
+                            }
+
+                            return $components;
+                        })
+                        ->columns(12)
+                        ->columnSpanFull(),
 
                     Placeholder::make('invoice_numbering_preview')
-                        ->label('Next Invoice Number')
-                        ->content(fn (Get $get) => $numbering->previewForConfig(
-                            format: (string) $get('invoice_numbering_format'),
-                            padLength: (int) $get('invoice_numbering_pad_length'),
-                            startingNumber: (int) $get('invoice_numbering_start_number'),
-                            currency: 'EUR',
-                            date: now(),
-                        ))
-                        ->columnSpanFull(),
+                        ->label('Next invoice number')
+                        ->content(fn () => $numbering->preview(null, now()))
+                        ->columnSpan(6),
                 ])
                 ->columns(12),
 
@@ -318,9 +295,10 @@ class Invoice extends Page
 //        CompanySetting::set('company_phone', $data['company_phone'] ?? '');
 //        CompanySetting::set('company_vat_id', $data['company_vat_id'] ?? '');
 
-        CompanySetting::set('invoice_numbering_format', $data['invoice_numbering_format'] ?? '{prefix}-{number}/{year}');
-        CompanySetting::set('invoice_numbering_pad_length', (int) ($data['invoice_numbering_pad_length'] ?? 3));
-        CompanySetting::set('invoice_numbering_start_number', (int) ($data['invoice_numbering_start_number'] ?? 1));
+        CompanySetting::set('invoice_numbering_reset_yearly', (bool) ($data['invoice_numbering_reset_yearly'] ?? true));
+        CompanySetting::set('invoice_numbering_pad_zeros', (int) ($data['invoice_numbering_pad_zeros'] ?? 3));
+        CompanySetting::set('invoice_numbering_starting_number', (int) ($data['invoice_numbering_starting_number'] ?? 1));
+        CompanySetting::set('invoice_numbering_prefix', (string) ($data['invoice_numbering_prefix'] ?? 'currency'));
 
         Notification::make()
             ->success()

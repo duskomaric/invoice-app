@@ -51,22 +51,6 @@ class InvoiceForm
                                     ->preload()
                                     ->columnSpan(6),
 
-                                Select::make('status')
-                                    ->options(InvoiceStatus::class)
-                                    ->default(InvoiceStatus::Draft)
-                                    ->required()
-                                    ->columnSpan(3),
-
-                                Select::make('language')
-                                    ->options(
-                                        collect(LanguageEnum::cases())
-                                            ->mapWithKeys(fn (LanguageEnum $lang) => [$lang->value => $lang->getLabel()])
-                                            ->toArray()
-                                    )
-                                    ->default(CompanySetting::get('default_invoice_language'))
-                                    ->required()
-                                    ->columnSpan(3),
-
                                 DatePicker::make('date')
                                     ->default(now())
                                     ->required()
@@ -74,50 +58,6 @@ class InvoiceForm
 
                                 DatePicker::make('due_date')
                                     ->default(now()->addDays(CompanySetting::get('default_invoice_due_days')))
-                                    ->columnSpan(3),
-
-                                Select::make('currency')
-                                    ->options(function () {
-                                        $tenantId = Filament::getTenant()?->id;
-
-                                        return Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
-                                            ->orderBy('code')
-                                            ->pluck('code', 'code')
-                                            ->toArray();
-                                    })
-                                    ->required()
-                                    ->default(CompanySetting::get('default_invoice_currency'))
-                                    ->columnSpan(3),
-
-                                Select::make('invoice_template')
-                                    ->label('Template')
-                                    ->options(collect(InvoiceTemplate::cases())
-                                        ->mapWithKeys(fn (InvoiceTemplate $t) => [$t->value => $t->getLabel()])
-                                        ->toArray())
-                                    ->default(fn () => CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value))
-                                    ->required()
-                                    ->columnSpan(3),
-
-                                Select::make('bankAccounts')
-                                    ->label('Bank accounts')
-                                    ->relationship(
-                                        name: 'bankAccounts',
-                                        titleAttribute: 'bank_name',
-                                        modifyQueryUsing: fn ($query) => $query->where('company_id', Filament::getTenant()?->id)
-                                    )
-                                    ->multiple()
-                                    ->preload()
-                                    ->searchable()
-                                    ->default(function () {
-                                        $defaultId = (int) CompanySetting::get('default_company_bank_account_id', 0);
-
-                                        return $defaultId > 0 ? [$defaultId] : [];
-                                    })
-                                    ->columnSpan(6),
-
-                                Placeholder::make('invoice_number_preview')
-                                    ->label('Next Invoice Number')
-                                    ->content(fn (Get $get) => app(InvoiceNumberingService::class)->preview($get('currency'), $get('date')))
                                     ->columnSpan(3),
                             ])
                             ->columns(12)
@@ -127,6 +67,8 @@ class InvoiceForm
                         Section::make('Items')
                             ->schema([
                                 Repeater::make('items')
+                                    ->hiddenLabel()
+                                    ->compact()
                                     ->relationship()
                                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                                         return $data;
@@ -213,7 +155,7 @@ class InvoiceForm
                         Section::make('Notes')
                             ->schema([
                                 Textarea::make('notes')
-                                    ->rows(4)
+                                    ->rows(2)
                                     ->columnSpanFull(),
                             ])
                             ->columnSpanFull(),
@@ -222,8 +164,58 @@ class InvoiceForm
                     ->columnSpan(9),
 
                 /* ================= RIGHT SIDE (3) ================= */
-                Section::make('Recurring')
+                Section::make('Info')
                     ->schema([
+                        Select::make('status')
+                            ->options(InvoiceStatus::class)
+                            ->default(InvoiceStatus::Draft)
+                            ->required(),
+
+                        Select::make('bankAccounts')
+                            ->label('Bank accounts')
+                            ->relationship(
+                                name: 'bankAccounts',
+                                titleAttribute: 'bank_name',
+                                modifyQueryUsing: fn ($query) => $query->where('company_id', Filament::getTenant()?->id)
+                            )
+                            ->multiple()
+                            ->preload()
+                            ->searchable()
+                            ->default(function () {
+                                $defaultId = (int) CompanySetting::get('default_company_bank_account_id', 0);
+
+                                return $defaultId > 0 ? [$defaultId] : [];
+                            }),
+
+                        Select::make('language')
+                            ->options(
+                                collect(LanguageEnum::cases())
+                                    ->mapWithKeys(fn (LanguageEnum $lang) => [$lang->value => $lang->getLabel()])
+                                    ->toArray()
+                            )
+                            ->default(CompanySetting::get('default_invoice_language'))
+                            ->required(),
+
+                        Select::make('currency')
+                            ->options(function () {
+                                $tenantId = Filament::getTenant()?->id;
+
+                                return Currency::when($tenantId, fn ($q) => $q->where('company_id', $tenantId))
+                                    ->orderBy('code')
+                                    ->pluck('code', 'code')
+                                    ->toArray();
+                            })
+                            ->required()
+                            ->default(CompanySetting::get('default_invoice_currency')),
+
+                        Select::make('invoice_template')
+                            ->label('Template')
+                            ->options(collect(InvoiceTemplate::cases())
+                                ->mapWithKeys(fn (InvoiceTemplate $t) => [$t->value => $t->getLabel()])
+                                ->toArray())
+                            ->default(fn () => CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value))
+                            ->required(),
+
                         Toggle::make('is_recurring')
                             ->live(),
 

@@ -14,6 +14,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Panel;
@@ -94,6 +95,21 @@ class DashboardPanelProvider extends PanelProvider
 
             //->strictAuthorization()
             ->defaultThemeMode(ThemeMode::Light)
+
+            ->navigationGroups([
+                'Management',
+                'Preferences',
+                'Administration',
+            ])
+            ->navigationGroups([
+//                NavigationGroup::make()
+//                    ->label('Management'),
+//                NavigationGroup::make()
+//                    ->label('Administration'),
+//                NavigationGroup::make()
+//                    ->label(fn (): string => __('navigation.settings'))
+//                    ->collapsed(),
+            ])
 
             ->middleware([
                 EncryptCookies::class,

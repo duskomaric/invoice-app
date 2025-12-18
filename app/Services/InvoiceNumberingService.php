@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Currency;
 use App\Models\CompanySetting;
 use App\Models\Invoice;
 use Filament\Facades\Filament;
@@ -13,250 +12,84 @@ use RuntimeException;
 
 class InvoiceNumberingService
 {
-    public function usesPerCurrencySequence(): bool
-    {
-        return $this->usesPerCurrencySequenceForFormat($this->getFormat());
-    }
-
     public function preview(?string $currency, mixed $date): string
     {
-        $currency = $this->resolveCurrency($currency);
-        $carbon = $this->normalizeDate($date);
+        $companyId = Filament::getTenant()?->id;
+        $currency = strtoupper($currency ?: ((string) Filament::getTenant()?->currencies()->orderBy('code')->value('code') ?: 'BAM'));
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date ?: now());
 
-        $companyId = $this->resolveCompanyId(null);
-        $format = $this->getFormat();
-        return $this->previewForConfig(
-            format: $format,
-            currency: $currency,
-            date: $carbon,
-            companyId: $companyId,
-        );
-    }
+        $prefixSetting = (string) CompanySetting::get('invoice_numbering_prefix', 'currency', $companyId);
+        $prefix = match ($prefixSetting) {
+            '', 'none' => null,
+            'currency' => $currency,
+            default => strtoupper($prefixSetting),
+        };
+        $year = (bool) CompanySetting::get('invoice_numbering_reset_yearly', true, $companyId) ? (int) $date->year : 0;
+        $pad = max(1, (int) CompanySetting::get('invoice_numbering_pad_zeros', 3, $companyId));
+        $start = max(1, (int) CompanySetting::get('invoice_numbering_starting_number', 1, $companyId));
 
-    public function previewForConfig(
-        string $format,
-        ?int $padLength = null,
-        ?int $startingNumber = null,
-        ?string $currency = null,
-        mixed $date = null,
-        ?int $companyId = null,
-    ): string {
-        $currency = $this->resolveCurrency($currency);
-        $carbon = $this->normalizeDate($date);
+        $last = null;
+        if ($companyId) {
+            $query = Invoice::where('company_id', $companyId);
+            if (is_null($prefix)) {
+                $query->whereNull('invoice_prefix');
+            } else {
+                $query->where('invoice_prefix', $prefix);
+            }
 
-        $resolvedCompanyId = $this->resolveCompanyId($companyId);
-        $year = (int) $carbon->year;
+            $last = $query
+                ->where('invoice_year', $year)
+                ->orderByRaw('CAST(invoice_number AS UNSIGNED) DESC')
+                ->value('invoice_number');
+        }
 
-        $usesPerCurrencySequence = $this->usesPerCurrencySequenceForFormat($format);
+        $next = max(is_string($last) ? (int) ltrim($last, '0') : 0, $start - 1) + 1;
+        $padded = str_pad((string) $next, $pad, '0', STR_PAD_LEFT);
 
-        $lastNumber = $this->getLastSequenceNumber(
-            companyId: $resolvedCompanyId,
-            currency: $currency,
-            date: $carbon,
-            usesPerCurrencySequence: $usesPerCurrencySequence,
-        );
+        $displayYear = $year ?: (int) $date->year;
 
-        $startingNumber = max(1, (int) ($startingNumber ?? $this->getStartingNumber()));
-        $nextNumber = max($lastNumber, $startingNumber - 1) + 1;
-
-        $padLength = max(1, (int) ($padLength ?? $this->getPadLength()));
-        $prefix = str_contains($format, '{prefix}')
-            ? $this->getPrefix($resolvedCompanyId, $currency)
-            : '';
-
-        return $this->formatInvoiceNumber(
-            format: $format,
-            currency: $currency,
-            prefix: $prefix,
-            number: $nextNumber,
-            year: $year,
-            date: $carbon,
-            padLength: $padLength,
-        );
+        return is_null($prefix)
+            ? "{$padded}/{$displayYear}"
+            : "{$prefix}-{$padded}/{$displayYear}";
     }
 
     public function assignToInvoice(Invoice $invoice): void
     {
-        $currency = $this->resolveCurrency($invoice->currency);
-        $date = $this->normalizeDate($invoice->date);
-
         if (! $invoice->company_id) {
             throw new RuntimeException('Invoice company_id must be set before assigning an invoice number.');
         }
 
         $companyId = $invoice->company_id;
+        $currency = strtoupper($invoice->currency ?: ((string) Filament::getTenant()?->currencies()->orderBy('code')->value('code') ?: 'BAM'));
+        $date = $invoice->date instanceof Carbon ? $invoice->date : Carbon::parse($invoice->date ?: now());
 
-        $year = (int) $date->year;
+        $prefixSetting = (string) CompanySetting::get('invoice_numbering_prefix', 'currency', $companyId);
+        $prefix = match ($prefixSetting) {
+            '', 'none' => null,
+            'currency' => $currency,
+            default => strtoupper($prefixSetting),
+        };
+        $year = (bool) CompanySetting::get('invoice_numbering_reset_yearly', true, $companyId) ? (int) $date->year : 0;
+        $pad = max(1, (int) CompanySetting::get('invoice_numbering_pad_zeros', 3, $companyId));
+        $start = max(1, (int) CompanySetting::get('invoice_numbering_starting_number', 1, $companyId));
 
-        $format = $this->getFormat();
-        $nextNumber = $this->getNextSequenceNumber(
-            companyId: $companyId,
-            currency: $currency,
-            date: $date,
-            format: $format,
-            startingNumber: $this->getStartingNumber(),
-        );
+        $query = Invoice::where('company_id', $companyId);
+        if (is_null($prefix)) {
+            $query->whereNull('invoice_prefix');
+        } else {
+            $query->where('invoice_prefix', $prefix);
+        }
 
-        $padLength = $this->getPadLength();
-        $prefix = str_contains($format, '{prefix}')
-            ? $this->getPrefix($companyId, $currency)
-            : '';
+        $last = $query
+            ->where('invoice_year', $year)
+            ->orderByRaw('CAST(invoice_number AS UNSIGNED) DESC')
+            ->value('invoice_number');
+
+        $next = max(is_string($last) ? (int) ltrim($last, '0') : 0, $start - 1) + 1;
 
         $invoice->currency = $currency;
-        $invoice->sequence_number = $nextNumber;
-        $invoice->sequence_year = $year;
-        $invoice->invoice_number = $this->formatInvoiceNumber(
-            format: $format,
-            currency: $currency,
-            prefix: $prefix,
-            number: $nextNumber,
-            year: $year,
-            date: $date,
-            padLength: $padLength,
-        );
-    }
-
-    private function resolveCurrency(?string $currency): string
-    {
-        if ($currency) {
-            return strtoupper($currency);
-        }
-
-        $firstCurrency = Filament::getTenant()?->currencies()->orderBy('code')->value('code');
-        if (is_string($firstCurrency) && $firstCurrency !== '') {
-            return strtoupper($firstCurrency);
-        }
-
-        return 'BAM';
-    }
-
-    private function normalizeDate(mixed $date): Carbon
-    {
-        if ($date instanceof Carbon) {
-            return $date;
-        }
-
-        if ($date instanceof \DateTimeInterface) {
-            return Carbon::instance($date);
-        }
-
-        if (is_string($date) && $date !== '') {
-            return Carbon::parse($date);
-        }
-
-        return now();
-    }
-
-    private function getLastSequenceNumber(
-        int $companyId,
-        string $currency,
-        Carbon $date,
-        bool $usesPerCurrencySequence,
-    ): int {
-        $query = Invoice::query();
-
-        $query->where('company_id', $companyId);
-
-        if ($usesPerCurrencySequence) {
-            $query->where('currency', $currency);
-        }
-
-        $query->whereYear('date', $date->year);
-
-        return (int) $query->max('sequence_number');
-    }
-
-    private function getNextSequenceNumber(
-        int $companyId,
-        string $currency,
-        Carbon $date,
-        string $format,
-        int $startingNumber,
-    ): int {
-        $lastNumber = $this->getLastSequenceNumber(
-            companyId: $companyId,
-            currency: $currency,
-            date: $date,
-            usesPerCurrencySequence: $this->usesPerCurrencySequenceForFormat($format),
-        );
-
-        $startingNumber = max(1, $startingNumber);
-
-        return max($lastNumber, $startingNumber - 1) + 1;
-    }
-
-    private function usesPerCurrencySequenceForFormat(string $format): bool
-    {
-        return str_contains($format, '{currency}') || str_contains($format, '{prefix}');
-    }
-
-    private function resolveCompanyId(?int $companyId): int
-    {
-        if ($companyId) {
-            return $companyId;
-        }
-
-        try {
-            return Filament::getTenant()?->id ?? 1;
-        } catch (\Throwable) {
-            return 1;
-        }
-    }
-
-    private function formatInvoiceNumber(
-        string $format,
-        string $currency,
-        string $prefix,
-        int $number,
-        int $year,
-        Carbon $date,
-        int $padLength,
-    ): string {
-        $replacements = [
-            '{currency}' => $currency,
-            '{prefix}' => $prefix,
-            '{number}' => str_pad((string) $number, $padLength, '0', STR_PAD_LEFT),
-            '{year}' => (string) $year,
-            '{month}' => $date->format('m'),
-            '{day}' => $date->format('d'),
-        ];
-
-        return strtr($format, $replacements);
-    }
-
-    private function getFormat(): string
-    {
-        $format = CompanySetting::get('invoice_numbering_format', '{prefix}-{number}/{year}');
-
-        return is_string($format) && $format !== ''
-            ? $format
-            : '{prefix}-{number}/{year}';
-    }
-
-    private function getPrefix(int $companyId, string $currency): string
-    {
-        $currencyModel = Currency::where('company_id', $companyId)
-            ->where('code', $currency)
-            ->first();
-
-        if ($currencyModel?->prefix) {
-            return (string) $currencyModel->prefix;
-        }
-
-        return $currency;
-    }
-
-    private function getPadLength(): int
-    {
-        $defaultPadLength = CompanySetting::get('invoice_numbering_pad_length', 3);
-
-        return max(1, (int) $defaultPadLength);
-    }
-
-    private function getStartingNumber(): int
-    {
-        $defaultStartingNumber = CompanySetting::get('invoice_numbering_start_number', 1);
-
-        return max(1, (int) $defaultStartingNumber);
+        $invoice->invoice_prefix = $prefix;
+        $invoice->invoice_year = $year;
+        $invoice->invoice_number = str_pad((string) $next, $pad, '0', STR_PAD_LEFT);
     }
 }

@@ -18,6 +18,8 @@ class PaymentResource extends Resource
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-banknotes';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Schema $schema): Schema
     {
         return PaymentForm::configure($schema);

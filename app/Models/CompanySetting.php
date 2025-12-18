@@ -6,6 +6,7 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
+use RuntimeException;
 
 class CompanySetting extends Model
 {
@@ -53,9 +54,10 @@ class CompanySetting extends Model
         'ofs_seller_name' => 'string',
         'ofs_seller_address' => 'string',
         'ofs_seller_town' => 'string',
-        'invoice_numbering_format' => 'string',
-        'invoice_numbering_pad_length' => 'integer',
-        'invoice_numbering_start_number' => 'integer',
+        'invoice_numbering_reset_yearly' => 'boolean',
+        'invoice_numbering_pad_zeros' => 'integer',
+        'invoice_numbering_starting_number' => 'integer',
+        'invoice_numbering_prefix' => 'string',
         'ofs_tax_categories' => 'array',
         'smtp_host' => 'string',
         'smtp_port' => 'string',
@@ -84,22 +86,35 @@ class CompanySetting extends Model
         });
     }
 
-    private static function resolveCompanyId(?int $companyId): int
+    private static function resolveCompanyId(?int $companyId): ?int
     {
         if ($companyId) {
             return $companyId;
         }
 
         try {
-            return Filament::getTenant()?->id ?? 1;
+            $tenantId = Filament::getTenant()?->id;
+
+            return $tenantId ? (int) $tenantId : null;
         } catch (\Throwable) {
-            return 1;
+            return null;
         }
     }
 
     public static function get(string $key, mixed $default = null, ?int $companyId = null): mixed
     {
         $resolvedCompanyId = self::resolveCompanyId($companyId);
+
+        if (! $resolvedCompanyId) {
+            $value = config("company-settings.{$key}", $default);
+
+            return match (self::$castsTo[$key] ?? 'string') {
+                'boolean' => (bool) $value,
+                'integer' => (int) $value,
+                'array' => is_array($value) ? $value : [],
+                default => is_array($value) ? json_encode($value) : (string) $value,
+            };
+        }
 
         $raw = self::settings($resolvedCompanyId)[$key] ?? null;
 
@@ -121,6 +136,10 @@ class CompanySetting extends Model
     {
         $resolvedCompanyId = self::resolveCompanyId($companyId);
 
+        if (! $resolvedCompanyId) {
+            throw new RuntimeException('CompanySetting::set requires a companyId or an active tenant.');
+        }
+
         $stored = $value === null ? null : json_encode($value, JSON_UNESCAPED_UNICODE);
 
         self::updateOrCreate(
@@ -136,6 +155,10 @@ class CompanySetting extends Model
     public static function flushCache(?int $companyId = null): void
     {
         $resolvedCompanyId = self::resolveCompanyId($companyId);
+
+        if (! $resolvedCompanyId) {
+            return;
+        }
 
         $cacheKey = self::$cacheKey . '_' . $resolvedCompanyId;
         Cache::forget($cacheKey);
