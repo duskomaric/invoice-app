@@ -33,7 +33,7 @@ class Maintenance extends Page
 
     public bool $dashboard_under_maintenance;
     public string $dashboard_under_maintenance_title;
-    public string $dashboard_under_maintenance_text;
+    public mixed $dashboard_under_maintenance_text;
 
     public function mount(): void
     {

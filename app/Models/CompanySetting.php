@@ -66,6 +66,7 @@ class CompanySetting extends Model
         'smtp_encryption' => 'string',
         'smtp_from_address' => 'string',
         'smtp_from_name' => 'string',
+        'getting_started_checklist' => 'array',
     ];
 
     public function company(): BelongsTo

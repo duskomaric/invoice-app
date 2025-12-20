@@ -12,17 +12,12 @@ class ArticleFactory extends Factory
             'name' => $this->faker->unique()->catchPhrase(),
             'description' => fake()->sentence(),
             'prices_meta' => [
-                'USD' => [
-                    'price' => $this->faker->randomFloat(2, 1, 100),
-                    'currency_code' => 'USD',
-                ],
-                'EUR' => [
-                    'price' => $this->faker->randomFloat(2, 1, 100),
-                    'currency_code' => 'EUR',
-                ],
+                'USD' => 100.50,
+                'EUR' => 122.30,
+                'BAM' => 196.60,
             ],
             'unit' => $this->faker->randomElement(['piece', 'kg', 'liter']),
-//            'tax_category' => $this->faker->randomElement(['standard', 'reduced', 'zero']),
+            'tax_category' => $this->faker->randomElement(['F', 'N', 'P']),
             'is_active' => true,
         ];
     }

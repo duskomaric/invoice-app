@@ -81,18 +81,21 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 //            return true;
 //        }
 
-        // Check if user has any active company based on subscription
-        // NULL subscription_ends_at means Lifetime (Active)
-        // If not NULL, check if future
-        $hasActiveCompany = $this->companies->filter(function ($company) {
-            return $company->subscription_ends_at === null || $company->subscription_ends_at->isFuture();
-        })->isNotEmpty();
+        $hasAnyCompany = $this->companies()->exists();
 
-        if (! $hasActiveCompany) {
-             return false;
+        if (! $hasAnyCompany) {
+            return true;
         }
 
-        return true;
+        $hasActiveCompany = $this->companies()
+            ->where(function ($query) {
+                $query
+                    ->whereNull('subscription_ends_at')
+                    ->orWhere('subscription_ends_at', '>', now());
+            })
+            ->exists();
+
+        return $hasActiveCompany;
     }
 
     public function companies(): BelongsToMany

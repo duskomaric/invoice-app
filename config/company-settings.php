@@ -44,6 +44,8 @@ return [
     'invoice_numbering_starting_number' => 1,
     'invoice_numbering_prefix' => '',//''currency',
 
+    'getting_started_checklist' => [],
+
     'smtp_host' => '',
     'smtp_port' => '',
     'smtp_username' => '',

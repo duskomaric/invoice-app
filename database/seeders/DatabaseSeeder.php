@@ -101,6 +101,7 @@ class DatabaseSeeder extends Seeder
             // Create Invoices
             Invoice::factory()->count(5)->create([
                 'company_id' => $company->id,
+                'language' => 'en',
                 'client_id' => $clients->random()->id,
             ])->each(function (Invoice $invoice) use ($articles) {
                 // Create Items

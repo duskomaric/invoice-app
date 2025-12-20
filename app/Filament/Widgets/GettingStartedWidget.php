@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Clusters\Settings\Resources\Currencies\Schemas\CurrencyForm;
-use App\Models\Currency;
 use App\Models\CompanySetting;
+use App\Filament\Clusters\Settings\Pages\Appearance as AppearanceSettingsPage;
+use App\Filament\Clusters\Settings\Pages\Email as EmailSettingsPage;
+use App\Filament\Clusters\Settings\Pages\Fiscalization as FiscalizationSettingsPage;
+use App\Filament\Clusters\Settings\Pages\Invoice as InvoiceSettingsPage;
+use App\Filament\Clusters\Settings\Resources\CompanyBankAccounts\CompanyBankAccountResource;
+use App\Filament\Clusters\Settings\Resources\Currencies\CurrencyResource;
+use App\Filament\Clusters\Settings\Resources\EmailSignature\EmailSignatureResource;
+use App\Filament\Clusters\Settings\Resources\EmailTemplateResource\EmailTemplateResource;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Filament\Widgets\Widget;
 use Filament\Support\Icons\Heroicon;
-use Filament\Support\Exceptions\Halt;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
@@ -42,25 +45,65 @@ class GettingStartedWidget extends Widget implements HasForms
             return;
         }
 
+        $checklist = CompanySetting::get('getting_started_checklist', [], $tenantId);
+        if (! is_array($checklist)) {
+            $checklist = [];
+        }
+
         $this->form->fill([
-            'currencies' => [
-                [
-                    'code' => null,
-                    'prefix' => null,
-                    'name' => null,
-                ],
-            ],
-
-            'invoice_numbering_reset_yearly' => (bool) CompanySetting::get('invoice_numbering_reset_yearly', true),
-            'invoice_numbering_pad_zeros' => (int) CompanySetting::get('invoice_numbering_pad_zeros', 3),
-            'invoice_numbering_starting_number' => (int) CompanySetting::get('invoice_numbering_starting_number', 1),
-            'invoice_numbering_prefix' => (string) CompanySetting::get('invoice_numbering_prefix', 'currency'),
-
-            'company_name' => (string) CompanySetting::get('company_name'),
-            'company_address' => (string) CompanySetting::get('company_address'),
-            'invoice_pdf_filename_format' => (string) CompanySetting::get('invoice_pdf_filename_format'),
+            'checklist' => $checklist,
         ]);
     }
+
+    private function wizardSteps(?int $tenantId): array
+    {
+        $steps = $this->steps();
+
+        return array_map(function (array $step, int $index) use ($steps, $tenantId) {
+            return Step::make($step['title'])
+                ->icon($step['icon'])
+                ->completedIcon(Heroicon::OutlinedCheckCircle)
+                ->schema([
+                    \Filament\Schemas\Components\Section::make()
+                        ->icon(Heroicon::OutlinedExclamationTriangle)
+                        ->iconColor('warning')
+                        ->schema([
+                            Placeholder::make($step['key'] . '_info')
+                                ->label('')
+                                ->content($step['description'])
+                                ->hint('This step is required before issuing invoices')
+                                ->hintIcon(Heroicon::OutlinedInformationCircle)
+                                ->hintColor('warning'),
+
+                            Action::make('open')
+                                ->label('Open page')
+                                ->url($step['url'])
+                                ->color('gray'),
+                        ]),
+                ])
+                ->afterValidation(function () use ($tenantId, $step) {
+                    if (! $tenantId) {
+                        return;
+                    }
+
+                    $checklist = CompanySetting::get('getting_started_checklist', [], $tenantId);
+                    if (! is_array($checklist)) {
+                        $checklist = [];
+                    }
+
+                    $checklist[$step['key']] = true;
+
+                    CompanySetting::set('getting_started_checklist', $checklist, $tenantId);
+
+                    $data = $this->form->getState();
+                    $this->form->fill([
+                        ...$data,
+                        'checklist' => $checklist,
+                    ]);
+                });
+        }, $steps, array_keys($steps));
+    }
+
 
     public static function canView(): bool
     {
@@ -80,130 +123,12 @@ class GettingStartedWidget extends Widget implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Wizard::make([
-                    Step::make('Currencies')
-                        ->icon(Heroicon::OutlinedDocumentCurrencyEuro)
-                        ->completedIcon(Heroicon::OutlinedCheckCircle)
-                        ->description('Add at least one currency to start creating invoices.')
-                        ->schema([
-                            Repeater::make('currencies')
-                                ->defaultItems(1)
-                                ->reorderable(false)
-                                ->schema([
-                                    ...CurrencyForm::getComponents(),
-                                ]),
-                        ])
-                        ->afterValidation(function () use ($tenantId) {
-                            if (! $tenantId) {
-                                return;
-                            }
-
-                            $data = $this->form->getState();
-
-                            $rows = $data['currencies'] ?? [];
-                            if (! is_array($rows)) {
-                                $rows = [];
-                            }
-
-                            foreach ($rows as $row) {
-                                if (! is_array($row)) {
-                                    continue;
-                                }
-
-                                $code = strtoupper((string) ($row['code'] ?? ''));
-                                $name = (string) ($row['name'] ?? '');
-
-                                if ($code === '' || $name === '') {
-                                    continue;
-                                }
-
-                                Currency::create([
-                                    'company_id' => $tenantId,
-                                    'code' => $code,
-                                    'prefix' => ($row['prefix'] ?? null) ?: null,
-                                    'name' => $name,
-                                ]);
-                            }
-
-                            $this->form->fill([
-                                ...$this->form->getState(),
-                                'currencies' => [
-                                    [
-                                        'code' => null,
-                                        'prefix' => null,
-                                        'name' => null,
-                                    ],
-                                ],
-                            ]);
-                        }),
-
-                    Step::make('Invoice numbering')
-                        ->icon(Heroicon::OutlinedHashtag)
-                        ->completedIcon(Heroicon::OutlinedCheckCircle)
-                        ->description('Configure how invoice numbers are generated.')
-                        ->schema([
-                            Toggle::make('invoice_numbering_reset_yearly')
-                                ->label('Reset counter yearly')
-                                ->columnSpanFull(),
-
-                            TextInput::make('invoice_numbering_prefix')
-                                ->label('Prefix')
-                                ->helperText("Use 'currency' to use invoice currency as prefix, or enter static text like INV")
-                                ->required()
-                                ->columnSpan(6),
-
-                            TextInput::make('invoice_numbering_pad_zeros')
-                                ->label('Pad zeros')
-                                ->numeric()
-                                ->minValue(1)
-                                ->required()
-                                ->columnSpan(3),
-
-                            TextInput::make('invoice_numbering_starting_number')
-                                ->label('Starting number')
-                                ->numeric()
-                                ->minValue(1)
-                                ->required()
-                                ->columnSpan(3),
-                        ])
-                        ->columns(12)
-                        ->afterValidation(function () {
-                            $data = $this->form->getState();
-
-                            CompanySetting::set('invoice_numbering_reset_yearly', (bool) ($data['invoice_numbering_reset_yearly'] ?? true));
-                            CompanySetting::set('invoice_numbering_pad_zeros', (int) ($data['invoice_numbering_pad_zeros'] ?? 3));
-                            CompanySetting::set('invoice_numbering_starting_number', (int) ($data['invoice_numbering_starting_number'] ?? 1));
-                            CompanySetting::set('invoice_numbering_prefix', (string) ($data['invoice_numbering_prefix'] ?? 'currency'));
-                        }),
-
-                    Step::make('Company invoice details')
-                        ->icon(Heroicon::OutlinedBuildingOffice2)
-                        ->completedIcon(Heroicon::OutlinedCheckCircle)
-                        ->description('Set company info and PDF filename format used for invoices.')
-                        ->schema([
-                            TextInput::make('company_name')
-                                ->label('Company name')
-                                ->required()
-                                ->columnSpanFull(),
-
-                            Textarea::make('company_address')
-                                ->label('Company address')
-                                ->rows(3)
-                                ->columnSpanFull(),
-
-                            TextInput::make('invoice_pdf_filename_format')
-                                ->label('PDF filename format')
-                                ->helperText('Placeholders: {{ number }}, {{ client }}')
-                                ->required()
-                                ->columnSpanFull(),
-                        ]),
-                ])
-                    ->persistStepInQueryString('getting-started-step')
+                Wizard::make($this->wizardSteps($tenantId))
                     ->startOnStep($tenantId ? $this->resolveStartStep($tenantId) : 1)
-                    ->skippable()
+                    ->skippable(false)
                     ->submitAction(new HtmlString(Blade::render(<<<'BLADE'
                         <x-filament::button type="submit" size="sm">
-                            Finish setup
+                            Save setup
                         </x-filament::button>
                     BLADE))),
             ]);
@@ -217,41 +142,39 @@ class GettingStartedWidget extends Widget implements HasForms
             return;
         }
 
-        $data = $this->form->getState();
-
-        CompanySetting::set('company_name', $data['company_name'] ?? '');
-        CompanySetting::set('company_address', $data['company_address'] ?? '');
-        CompanySetting::set('invoice_pdf_filename_format', $data['invoice_pdf_filename_format'] ?? '');
-
-        if (! self::isCompleted($tenantId)) {
-            Notification::make()
-                ->warning()
-                ->title('Setup incomplete')
-                ->body('Please complete all steps before continuing.')
-                ->send();
-
-            //throw new Halt();
+        $checklist = CompanySetting::get('getting_started_checklist', [], $tenantId);
+        if (! is_array($checklist)) {
+            $checklist = [];
         }
+
+        $steps = $this->steps();
+        $lastStep = $steps !== [] ? $steps[array_key_last($steps)] : null;
+        if (is_array($lastStep) && isset($lastStep['key'])) {
+            $checklist[(string) $lastStep['key']] = true;
+        }
+
+        CompanySetting::set('getting_started_checklist', $checklist, $tenantId);
 
         Notification::make()
             ->success()
-            ->title('Setup complete')
+            ->title('Setup saved')
             ->body('You can now start creating invoices.')
             ->send();
     }
 
     private function resolveStartStep(int $tenantId): int
     {
-        if (! $this->hasCurrencies($tenantId)) {
-            return 1;
+        $checklist = CompanySetting::get('getting_started_checklist', [], $tenantId);
+        if (! is_array($checklist)) {
+            $checklist = [];
         }
 
-        if (! $this->hasInvoiceNumberingConfigured($tenantId)) {
-            return 2;
-        }
-
-        if (! $this->hasInvoiceDetailsConfigured($tenantId)) {
-            return 3;
+        $steps = $this->steps();
+        foreach ($steps as $index => $step) {
+            $key = $step['key'];
+            if (! (bool) ($checklist[$key] ?? false)) {
+                return $index + 1;
+            }
         }
 
         return 1;
@@ -259,37 +182,91 @@ class GettingStartedWidget extends Widget implements HasForms
 
     private static function isCompleted(int $tenantId): bool
     {
-        $self = new self();
+        $checklist = CompanySetting::get('getting_started_checklist', [], $tenantId);
+        if (! is_array($checklist)) {
+            $checklist = [];
+        }
 
-        return $self->hasCurrencies($tenantId)
-            && $self->hasInvoiceNumberingConfigured($tenantId)
-            && $self->hasInvoiceDetailsConfigured($tenantId);
-    }
-
-    private function hasCurrencies(int $tenantId): bool
-    {
-        return Currency::where('company_id', $tenantId)->exists();
-    }
-
-    private function hasInvoiceNumberingConfigured(int $tenantId): bool
-    {
-        $keys = [
-            'invoice_numbering_reset_yearly',
-            'invoice_numbering_pad_zeros',
-            'invoice_numbering_starting_number',
-            'invoice_numbering_prefix',
+        $requiredKeys = [
+            'company_bank_accounts',
+            'currencies',
+            'email_signatures',
+            'email_templates',
+            'appearance',
+            'invoice',
+            'fiscalization',
+            'email',
         ];
 
-        return CompanySetting::where('company_id', $tenantId)
-            ->whereIn('key', $keys)
-            ->exists();
+        foreach ($requiredKeys as $key) {
+            if (! (bool) ($checklist[$key] ?? false)) {
+                return false;
+            }
+        }
+
+
+        return true;
     }
 
-    private function hasInvoiceDetailsConfigured(int $tenantId): bool
+    private function steps(): array
     {
-        $name = (string) CompanySetting::get('company_name');
-        $pdfFormat = (string) CompanySetting::get('invoice_pdf_filename_format');
-
-        return $name !== '' && $pdfFormat !== '';
+        return [
+            [
+                'key' => 'company_bank_accounts',
+                'title' => 'Company Bank Accounts',
+                'description' => 'Add at least one company bank account. It is used on invoice PDFs, and it allows you to choose defaults so invoices are generated with correct payment details.',
+                'url' => CompanyBankAccountResource::getUrl('index'),
+                'icon' => Heroicon::OutlinedBuildingLibrary,
+            ],
+            [
+                'key' => 'currencies',
+                'title' => 'Currencies',
+                'description' => 'Create the currencies you will issue invoices in. Invoices need a currency for totals, reporting, and templates. If you use currency-based numbering, currency code is also used as the invoice prefix.',
+                'url' => CurrencyResource::getUrl('index'),
+                'icon' => Heroicon::OutlinedDocumentCurrencyEuro,
+            ],
+            [
+                'key' => 'email_signatures',
+                'title' => 'Email Signatures',
+                'description' => 'Create and select an email signature used when sending invoices and other documents. It helps ensure consistent branding and reduces manual typing for each email.',
+                'url' => EmailSignatureResource::getUrl('index'),
+                'icon' => Heroicon::OutlinedPencilSquare,
+            ],
+            [
+                'key' => 'email_templates',
+                'title' => 'Email Templates',
+                'description' => 'Configure default email subject/body templates. This ensures invoices are sent with a consistent message and correct placeholders without having to rewrite emails each time.',
+                'url' => EmailTemplateResource::getUrl('index'),
+                'icon' => Heroicon::OutlinedDocumentText,
+            ],
+            [
+                'key' => 'appearance',
+                'title' => 'Appearance',
+                'description' => 'Set your company dashboard appearance (theme colors, pagination, layout). This helps match your branding and improves the user experience for your team.',
+                'url' => AppearanceSettingsPage::getUrl(),
+                'icon' => Heroicon::OutlinedAdjustmentsHorizontal,
+            ],
+            [
+                'key' => 'invoice',
+                'title' => 'Invoice',
+                'description' => 'Configure invoice defaults: language, template, due days, bank account defaults, numbering rules, and PDF filename formatting. This is the main setup required before creating invoices.',
+                'url' => InvoiceSettingsPage::getUrl(),
+                'icon' => Heroicon::OutlinedDocumentText,
+            ],
+            [
+                'key' => 'fiscalization',
+                'title' => 'Fiscalization',
+                'description' => 'If you use fiscalization, enter your OFS credentials and seller details. This is required to fiscalize invoices and generate legally compliant fiscal data.',
+                'url' => FiscalizationSettingsPage::getUrl(),
+                'icon' => Heroicon::OutlinedReceiptPercent,
+            ],
+            [
+                'key' => 'email',
+                'title' => 'Email',
+                'description' => 'Configure SMTP so the system can send invoices from your company domain. Without this, invoice sending may fail or use default system email settings.',
+                'url' => EmailSettingsPage::getUrl(),
+                'icon' => Heroicon::OutlinedEnvelope,
+            ],
+        ];
     }
 }
