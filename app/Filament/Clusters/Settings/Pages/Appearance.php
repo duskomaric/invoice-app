@@ -138,5 +138,7 @@ class Appearance extends Page
             ->success()
             ->title('Settings saved successfully.')
             ->send();
+
+        $this->redirect(static::getUrl());
     }
 }

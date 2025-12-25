@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Invoices\Tables;
 
 use App\Enums\InvoiceStatus;
 use App\Mail\InvoiceMail;
+use App\Models\CompanySetting;
 use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\TextInput;
@@ -76,6 +77,7 @@ class InvoiceTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->defaultPaginationPageOption(CompanySetting::get('default_pagination_option'))
             ->filters([
                 SelectFilter::make('status')
                     ->options(InvoiceStatus::class),

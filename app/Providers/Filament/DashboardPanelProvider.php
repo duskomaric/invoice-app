@@ -66,7 +66,7 @@ class DashboardPanelProvider extends PanelProvider
 //            ->brandLogo(asset('images/logo.svg'))
 //            ->darkModeBrandLogo(asset('images/logo_dark.png'))
 //            ->favicon('images/logo.svg')
-            ->topNavigation(CompanySetting::get('top_navigation'))
+            ->topNavigation(fn (): bool => CompanySetting::get('top_navigation'))
             ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn () => view('filament.hooks.top-bar'),
