@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     
-                    <div class="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-700/50 dark:to-slate-700/30 border border-slate-200/60 dark:border-slate-600/40">
+                    <div class="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                         <div class="flex items-start gap-4">
                             <x-invoice5.avatar name="Acme Corporation" size="md" />
                             <div class="flex-1">
@@ -79,12 +79,12 @@
                     {{-- Items --}}
                     <div class="space-y-2">
                         <template x-for="(item, index) in items" :key="index">
-                            <div class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-600/40">
+                            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/40">
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
                                     <div class="lg:col-span-5">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Article</label>
                                         <div class="relative">
-                                            <select x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all">
+                                            <select x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all">
                                                 <option value="">Select article...</option>
                                                 <template x-for="article in articles" :key="article.id">
                                                     <option :value="article.id" x-text="article.name" :selected="item.article == article.id"></option>
@@ -95,13 +95,13 @@
                                     </div>
                                     <div class="lg:col-span-2">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Qty</label>
-                                        <input type="number" x-model="item.quantity" min="1" class="w-full h-9 px-3 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                                        <input type="number" x-model="item.quantity" min="1" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                     </div>
                                     <div class="lg:col-span-2">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Price</label>
                                         <div class="relative">
                                             <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs">€</span>
-                                            <input type="number" x-model="item.price" step="0.01" class="w-full h-9 pl-7 pr-2 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                                            <input type="number" x-model="item.price" step="0.01" class="w-full h-9 pl-7 pr-2 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                         </div>
                                     </div>
                                     <div class="lg:col-span-2 flex items-center lg:justify-end h-9">
@@ -167,7 +167,7 @@
                         <x-invoice5.input label="Due Date" type="date" value="2024-02-14" />
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
-                            <select class="w-full h-10 px-3 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                            <select class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                 <option value="draft">Draft</option>
                                 <option value="pending">Pending</option>
                                 <option value="paid" selected>Paid</option>

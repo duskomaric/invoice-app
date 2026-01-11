@@ -74,26 +74,20 @@
         }
         
         .nav-box {
-            background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(248,250,252,0.95) 100%);
-            border: 1px solid rgba(203, 213, 225, 0.6);
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.07),
-                0 10px 15px -3px rgba(0, 0, 0, 0.05),
-                inset 0 1px 0 rgba(255,255,255,0.8);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
         .dark .nav-box {
-            background: linear-gradient(135deg, rgba(30,41,59,0.98) 0%, rgba(30,41,59,0.95) 100%);
-            border: 1px solid rgba(71,85,105,0.5);
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.3),
-                0 10px 15px -3px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255,255,255,0.05);
+            background: #1e293b;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
         
         .sidebar-enter { animation: sidebarEnter 0.4s ease-out forwards; }
         @keyframes sidebarEnter {
-            from { width: 5rem; opacity: 0.8; }
-            to { width: 18rem; opacity: 1; }
+            from { width: 4.5rem; }
+            to { width: 16rem; }
         }
         
         .tooltip { position: relative; }

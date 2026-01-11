@@ -23,8 +23,8 @@
         @endif
         
         <input {{ $attributes->merge([
-            'class' => 'w-full h-10 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 ' .
-                ($error ? 'border-rose-300 dark:border-rose-500/50 focus:border-rose-500' : 'border-slate-200/60 dark:border-slate-600/60 focus:border-violet-400 dark:focus:border-violet-500') .
+            'class' => 'w-full h-10 rounded-lg bg-white dark:bg-slate-700 border text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 ' .
+                ($error ? 'border-rose-300 dark:border-rose-500/50 focus:border-rose-500' : 'border-slate-300 dark:border-slate-600 focus:border-violet-400 dark:focus:border-violet-500') .
                 ($icon ? ' pl-10' : ($prefix ? ' pl-8' : ' pl-4')) .
                 ($suffix ? ' pr-10' : ' pr-4')
         ]) }} />

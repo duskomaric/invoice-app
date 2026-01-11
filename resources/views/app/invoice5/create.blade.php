@@ -34,13 +34,13 @@
                             <p class="text-[11px] text-slate-500 dark:text-slate-400">Select or add a client</p>
                         </div>
                     </div>
-                    
+
                     <div class="relative" x-data="{ open: false, search: '' }" @click.away="open = false">
                         <div class="relative" x-show="!selectedClient">
                             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             <input type="text" x-model="search" @focus="open = true" @click="open = true" placeholder="Search or select a client..." class="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                         </div>
-                        <div x-show="open && !selectedClient" x-transition class="absolute left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-[80] max-h-64 overflow-y-auto" x-cloak>
+                        <div x-show="open && !selectedClient" x-transition class="absolute left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-[100] max-h-64 overflow-y-auto" x-cloak>
                             <a href="#" @click.prevent class="flex items-center gap-2.5 px-3 py-2 hover:bg-violet-50 dark:hover:bg-violet-900/20 border-b border-slate-100 dark:border-slate-700 text-violet-600 dark:text-violet-400">
                                 <div class="w-8 h-8 rounded-lg border-2 border-dashed border-violet-300 dark:border-violet-600 flex items-center justify-center">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -63,7 +63,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <template x-if="selectedClient">
                         <div class="p-3 rounded-lg bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                             <div class="flex items-start gap-3">
@@ -94,7 +94,7 @@
                             <p class="text-[11px] text-slate-500 dark:text-slate-400">Add products or services</p>
                         </div>
                     </div>
-                    
+
                     {{-- Items Header --}}
                     <div class="hidden lg:grid lg:grid-cols-12 gap-3 mb-2 px-1">
                         <div class="col-span-5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -110,12 +110,12 @@
                     {{-- Items --}}
                     <div class="space-y-2">
                         <template x-for="(item, index) in items" :key="index">
-                            <div class="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-600/40">
+                            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/40">
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
                                     <div class="lg:col-span-5">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Article</label>
                                         <div class="relative">
-                                            <select x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all">
+                                            <select x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all">
                                                 <option value="">Select article...</option>
                                                 <template x-for="article in articles" :key="article.id">
                                                     <option :value="article.id" x-text="article.name" :selected="item.article == article.id"></option>
@@ -126,13 +126,13 @@
                                     </div>
                                     <div class="lg:col-span-2">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Qty</label>
-                                        <input type="number" x-model="item.quantity" min="1" class="w-full h-9 px-3 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                                        <input type="number" x-model="item.quantity" min="1" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                     </div>
                                     <div class="lg:col-span-2">
                                         <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Price</label>
                                         <div class="relative">
                                             <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs">€</span>
-                                            <input type="number" x-model="item.price" step="0.01" class="w-full h-9 pl-7 pr-2 rounded-lg bg-white/80 dark:bg-slate-700/60 border border-slate-200/60 dark:border-slate-600/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                                            <input type="number" x-model="item.price" step="0.01" class="w-full h-9 pl-7 pr-2 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                         </div>
                                     </div>
                                     <div class="lg:col-span-2 flex items-center lg:justify-end h-9">

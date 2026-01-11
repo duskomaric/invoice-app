@@ -66,7 +66,7 @@ $statusConfig = [
                 {{-- Search --}}
                 <div class="relative flex-1 min-w-[200px]">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" placeholder="Search invoices..." class="w-full h-9 pl-9 pr-3 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                    <input type="text" placeholder="Search invoices..." class="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                 </div>
 
                 {{-- Status Filter --}}
@@ -113,7 +113,7 @@ $statusConfig = [
                 </x-invoice5.dropdown>
 
                 {{-- Attachments Toggle --}}
-                <div class="flex items-center gap-2 h-9 px-3 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60" :class="filters.hasAttachments && 'border-violet-300 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/20'">
+                <div class="flex items-center gap-2 h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600" :class="filters.hasAttachments && 'border-violet-400 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/20'">
                     <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     <span class="text-xs text-slate-600 dark:text-slate-300">Files</span>
                     <button @click="filters.hasAttachments = !filters.hasAttachments" class="relative w-9 h-5 rounded-full transition-colors" :class="filters.hasAttachments ? 'bg-violet-500' : 'bg-slate-200 dark:bg-slate-600'">

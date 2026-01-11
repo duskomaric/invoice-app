@@ -23,7 +23,7 @@ $widthClasses = [
         @click="open = !open" 
         type="button"
         {{ $attributes->merge([
-            'class' => 'h-8 px-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[11px] text-slate-700 dark:text-slate-200 flex items-center gap-1.5 hover:border-violet-400 dark:hover:border-violet-500/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 shadow-sm'
+            'class' => 'h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:border-violet-400 dark:hover:border-violet-500/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 shadow-sm'
         ]) }}
     >
         @if($icon)
