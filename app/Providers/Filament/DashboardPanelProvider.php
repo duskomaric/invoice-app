@@ -43,7 +43,7 @@ class DashboardPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('dashboard')
-            ->path('')
+            ->path('/filament')
             ->login()
             ->passwordReset(RequestPasswordReset::class)
             ->emailChangeVerification()
