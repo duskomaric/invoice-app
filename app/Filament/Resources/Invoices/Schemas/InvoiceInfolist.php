@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Invoices\Schemas;
 
+use App\Filament\Resources\Proformas\ProformaResource;
+use App\Filament\Resources\Quotes\QuoteResource;
+use App\Models\Proforma;
+use App\Models\Quote;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -23,13 +27,33 @@ class InvoiceInfolist
                             ->date(),
                         TextEntry::make('due_date')
                             ->date(),
-//                        TextEntry::make('language')
+                        TextEntry::make('language'),
 //                            ->formatStateUsing(fn (string $state): string => match ($state) {
 //                                'en' => 'English',
 //                                'sr' => 'Serbian (Latin)',
 //                                default => $state,
 //                            }),
-                    ])->columns(5)->columnSpanFull(),
+
+                        TextEntry::make('source_quote')
+                            ->label('Ponuda')
+                            ->state(fn ($record) => $record->sourceable instanceof Quote ? $record->sourceable->formatted_number : null)
+                            ->url(fn ($record) => $record->sourceable instanceof Quote
+                                ? QuoteResource::getUrl('edit', ['record' => $record->sourceable])
+                                : null)
+                            ->openUrlInNewTab()
+                            ->visible(fn ($record) => $record->sourceable instanceof Quote),
+
+                        TextEntry::make('source_proforma')
+                            ->label('Predračun')
+                            ->state(fn ($record) => $record->sourceable instanceof Proforma ? $record->sourceable->formatted_number : null)
+                            ->url(fn ($record) => $record->sourceable instanceof Proforma
+                                ? ProformaResource::getUrl('edit', ['record' => $record->sourceable])
+                                : null)
+                            ->openUrlInNewTab()
+                            ->visible(fn ($record) => $record->sourceable instanceof Proforma),
+
+
+                    ])->columns(6)->columnSpanFull(),
 
                 Section::make('Items')
                     ->schema([

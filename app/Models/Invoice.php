@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\InvoiceFrequency;
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceFrequencyEnum;
+use App\Enums\InvoiceStatusEnum;
 use App\Enums\LanguageEnum;
-use App\Services\InvoiceNumberingService;
+use App\Services\DocumentNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Invoice extends Model
 {
@@ -29,6 +30,8 @@ class Invoice extends Model
         'frequency',
         'next_invoice_date',
         'parent_id',
+        'sourceable_type',
+        'sourceable_id',
         // Currency & Invoice Numbering
         'currency',
         'invoice_prefix',
@@ -47,8 +50,8 @@ class Invoice extends Model
 
 
     protected $casts = [
-        'status' => InvoiceStatus::class,
-        'frequency' => InvoiceFrequency::class,
+        'status' => InvoiceStatusEnum::class,
+        'frequency' => InvoiceFrequencyEnum::class,
         'date' => 'date',
         'due_date' => 'date',
         'next_invoice_date' => 'date',
@@ -77,7 +80,11 @@ class Invoice extends Model
      */
     public function generateInvoiceNumber(): void
     {
-        app(InvoiceNumberingService::class)->assignToInvoice($this);
+        app(DocumentNumberingService::class)->assign($this, [
+            'prefix' => 'invoice_prefix',
+            'year' => 'invoice_year',
+            'number' => 'invoice_number',
+        ]);
     }
 
     /**
@@ -147,5 +154,15 @@ class Invoice extends Model
     public function emailLogs(): HasMany
     {
         return $this->hasMany(InvoiceEmailLog::class);
+    }
+
+    public function incomeBookEntries(): HasMany
+    {
+        return $this->hasMany(IncomeBookEntry::class);
+    }
+
+    public function sourceable(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

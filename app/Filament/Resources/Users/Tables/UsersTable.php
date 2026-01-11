@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\RoleEnum;
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use App\Models\CompanySetting;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
@@ -80,7 +80,7 @@ class UsersTable
             ->filters([
                 SelectFilter::make('status')
                     ->options(function () {
-                        return collect(UserStatus::cases())->mapWithKeys(function ($status) {
+                        return collect(UserStatusEnum::cases())->mapWithKeys(function ($status) {
                             return [$status->value => $status->getLabel()];
                         })->toArray();
                     }),

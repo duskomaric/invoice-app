@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\RoleEnum;
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -22,7 +22,7 @@ class UserFactory extends Factory
             'invitation_code' => Str::uuid(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => RoleEnum::cases()[array_rand(RoleEnum::cases())],
-            'status' => UserStatus::cases()[array_rand(UserStatus::cases())],
+            'status' => UserStatusEnum::cases()[array_rand(UserStatusEnum::cases())],
             'last_seen_at' => fake()->dateTimeBetween('-30 days', 'now'),
         ];
     }

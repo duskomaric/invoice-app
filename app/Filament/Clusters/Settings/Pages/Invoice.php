@@ -2,15 +2,16 @@
 
 namespace App\Filament\Clusters\Settings\Pages;
 
-use App\Enums\InvoiceTemplate;
+use App\Enums\InvoiceTemplateEnum;
 use App\Enums\LanguageEnum;
 use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
 use App\Models\Invoice as InvoiceModel;
-use App\Services\InvoiceNumberingService;
+use App\Services\DocumentNumberingService;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -63,7 +64,7 @@ class Invoice extends Page
     {
         $this->form->fill([
             'invoice_pdf_filename_format' => (string) CompanySetting::get('invoice_pdf_filename_format'),
-            'default_invoice_template' => (string) CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value),
+            'default_invoice_template' => (string) CompanySetting::get('default_invoice_template', InvoiceTemplateEnum::Classic->value),
             'default_invoice_language' => (string) CompanySetting::get('default_invoice_language', LanguageEnum::English->value),
             'invoice_due_date_days' => (int) CompanySetting::get('default_invoice_due_days'),
             'invoice_default_currency' => (string) CompanySetting::get('default_invoice_currency'),
@@ -83,7 +84,7 @@ class Invoice extends Page
 
     protected function getFormSchema(): array
     {
-        $numbering = app(InvoiceNumberingService::class);
+        $numbering = app(DocumentNumberingService::class);
 
         return [
             Section::make('Invoice General Settings')
@@ -245,7 +246,11 @@ class Invoice extends Page
 
                     Placeholder::make('invoice_numbering_preview')
                         ->label('Next invoice number')
-                        ->content(fn () => $numbering->preview(null, now()))
+                        ->content(fn () => $numbering->assign(tap(new InvoiceModel(), function (InvoiceModel $invoice) {
+                            $invoice->company_id = Filament::getTenant()?->id;
+                            $invoice->currency = null;
+                            $invoice->date = now();
+                        }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true))
                         ->columnSpan(6),
                 ])
                 ->columns(12),
@@ -255,8 +260,8 @@ class Invoice extends Page
                 ->schema([
                     Select::make('default_invoice_template')
                         ->label('Default template')
-                        ->options(collect(InvoiceTemplate::cases())
-                            ->mapWithKeys(fn (InvoiceTemplate $t) => [$t->value => $t->getLabel()])
+                        ->options(collect(InvoiceTemplateEnum::cases())
+                            ->mapWithKeys(fn (InvoiceTemplateEnum $t) => [$t->value => $t->getLabel()])
                             ->toArray())
                         ->required()
                         ->columnSpanFull(),
@@ -283,7 +288,7 @@ class Invoice extends Page
     {
         $data = $this->form->getState();
 
-        CompanySetting::set('default_invoice_template', $data['default_invoice_template'] ?? InvoiceTemplate::Classic->value);
+        CompanySetting::set('default_invoice_template', $data['default_invoice_template'] ?? InvoiceTemplateEnum::Classic->value);
         CompanySetting::set('default_invoice_language', $data['default_invoice_language'] ?? LanguageEnum::English->value);
         CompanySetting::set('default_invoice_due_days', (int) ($data['invoice_due_date_days']));
         CompanySetting::set('default_invoice_currency', $data['invoice_default_currency']);

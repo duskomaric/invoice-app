@@ -23,7 +23,6 @@ class Company extends Model
         'website',
         'identification_number',
         'vat_number',
-        'bank_account',
         'town',
         // OFS Configuration
         'ofs_base_url',
@@ -40,11 +39,13 @@ class Company extends Model
         'smtp_encryption',
         'smtp_from_address',
         'smtp_from_name',
+        'is_small_business',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'subscription_ends_at' => 'datetime',
+        'is_small_business' => 'boolean',
     ];
 
     public function users(): BelongsToMany
@@ -80,5 +81,10 @@ class Company extends Model
     public function bankAccounts(): HasMany
     {
         return $this->hasMany(CompanyBankAccount::class);
+    }
+
+    public function incomeBookEntries(): HasMany
+    {
+        return $this->hasMany(IncomeBookEntry::class);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Invoices\Tables;
 
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use App\Mail\InvoiceMail;
 use App\Models\CompanySetting;
 use App\Models\Invoice;
@@ -80,7 +80,7 @@ class InvoiceTable
             ->defaultPaginationPageOption(CompanySetting::get('default_pagination_option'))
             ->filters([
                 SelectFilter::make('status')
-                    ->options(InvoiceStatus::class),
+                    ->options(InvoiceStatusEnum::class),
             ])
             ->actions([
                 Action::make('pdf')

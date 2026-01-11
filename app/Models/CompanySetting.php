@@ -25,6 +25,7 @@ class CompanySetting extends Model
         'modal_width' => 'string',
         'default_pagination_option' => 'integer',
         'top_navigation' => 'boolean',
+        'enabled_modules' => 'array',
         'primary_color' => 'string',
         'danger_color' => 'string',
         'gray_color' => 'string',

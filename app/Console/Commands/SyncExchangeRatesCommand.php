@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
-class SyncExchangeRates extends Command
+class SyncExchangeRatesCommand extends Command
 {
     protected $signature = 'sync:exchange-rates';
 

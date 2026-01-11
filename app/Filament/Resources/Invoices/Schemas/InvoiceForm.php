@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources\Invoices\Schemas;
 
-use App\Enums\InvoiceTemplate;
-use App\Enums\InvoiceFrequency;
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceTemplateEnum;
+use App\Enums\InvoiceFrequencyEnum;
+use App\Enums\InvoiceStatusEnum;
 use App\Enums\LanguageEnum;
 use App\Filament\Components\MoneyInput;
 use App\Models\Article;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
 use App\Models\Currency;
-use App\Services\InvoiceNumberingService;
+use App\Models\Invoice;
+use App\Services\DocumentNumberingService;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -42,7 +43,15 @@ class InvoiceForm
 
                         /* BASIC INVOICE INFO */
                         Section::make('Invoice')
-                            ->description(fn (Get $get) => app(InvoiceNumberingService::class)->preview($get('currency'), $get('date')))
+                            ->description(fn (Get $get) => app(DocumentNumberingService::class)->assign(
+                                tap(new Invoice(), function (Invoice $invoice) use ($get) {
+                                    $invoice->company_id = Filament::getTenant()?->id;
+                                    $invoice->currency = $get('currency');
+                                    $invoice->date = $get('date') ?? now();
+                                }),
+                                ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'],
+                                preview: true
+                            ))
                             ->schema([
                                 Select::make('client_id')
                                     ->relationship('client', 'name')
@@ -167,8 +176,8 @@ class InvoiceForm
                 Section::make('Info')
                     ->schema([
                         Select::make('status')
-                            ->options(InvoiceStatus::class)
-                            ->default(InvoiceStatus::Draft)
+                            ->options(InvoiceStatusEnum::class)
+                            ->default(InvoiceStatusEnum::Draft)
                             ->required(),
 
                         Select::make('bankAccounts')
@@ -210,17 +219,17 @@ class InvoiceForm
 
                         Select::make('invoice_template')
                             ->label('Template')
-                            ->options(collect(InvoiceTemplate::cases())
-                                ->mapWithKeys(fn (InvoiceTemplate $t) => [$t->value => $t->getLabel()])
+                            ->options(collect(InvoiceTemplateEnum::cases())
+                                ->mapWithKeys(fn (InvoiceTemplateEnum $t) => [$t->value => $t->getLabel()])
                                 ->toArray())
-                            ->default(fn () => CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value))
+                            ->default(fn () => CompanySetting::get('default_invoice_template', InvoiceTemplateEnum::Classic->value))
                             ->required(),
 
                         Toggle::make('is_recurring')
                             ->live(),
 
                         Select::make('frequency')
-                            ->options(InvoiceFrequency::class)
+                            ->options(InvoiceFrequencyEnum::class)
                             ->visible(fn (Get $get) => $get('is_recurring'))
                             ->required(fn (Get $get) => $get('is_recurring')),
                     ])

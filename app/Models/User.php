@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -45,7 +45,7 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
         'last_seen_at' => 'datetime',
         'password' => 'hashed',
         'role' => RoleEnum::class,
-        'status' => UserStatus::class,
+        'status' => UserStatusEnum::class,
     ];
 
     public function hasPermission(PermissionEnum $permission): bool
@@ -73,7 +73,7 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($this->status !== UserStatus::ACTIVE) {
+        if ($this->status !== UserStatusEnum::ACTIVE) {
             return false;
         }
 

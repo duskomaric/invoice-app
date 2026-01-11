@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum InvoiceFrequency: string implements HasLabel
+enum InvoiceFrequencyEnum: string implements HasLabel
 {
     case Weekly = 'weekly';
     case Monthly = 'monthly';

@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use App\Observers\EmailSignatureObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy([EmailSignatureObserver::class])]
 class EmailSignature extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'company_id',
         'name',
@@ -17,20 +24,7 @@ class EmailSignature extends Model
         'is_default' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($model) {
-            if ($model->is_default) {
-                static::where('company_id', $model->company_id)
-                    ->where('id', '!=', $model->id)
-                    ->update(['is_default' => false]);
-            }
-        });
-    }
-
-    public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }

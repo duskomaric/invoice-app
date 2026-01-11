@@ -16,6 +16,7 @@ class Client extends Model
         'name',
         'email',
         'is_active',
+        'invoice_due_days',
         'phone',
         'address',
         'city',
@@ -23,6 +24,11 @@ class Client extends Model
         'country',
         'tax_id',
         'vat_id',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'invoice_due_days' => 'integer',
     ];
 
     public function company(): BelongsTo

@@ -25,7 +25,7 @@ it('calculates balance correctly', function () {
     // Create directly to avoid factory's afterCreating hook
     $invoice1 = Invoice::create([
         'client_id' => $client->id,
-        'status' => \App\Enums\InvoiceStatus::Sent,
+        'status' => \App\Enums\InvoiceStatusEnum::Sent,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -39,7 +39,7 @@ it('calculates balance correctly', function () {
 
     $invoice2 = Invoice::create([
         'client_id' => $client->id,
-        'status' => \App\Enums\InvoiceStatus::Sent,
+        'status' => \App\Enums\InvoiceStatusEnum::Sent,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -77,7 +77,7 @@ it('calculates negative balance for overpayment', function () {
 
     $invoice = Invoice::create([
         'client_id' => $client->id,
-        'status' => \App\Enums\InvoiceStatus::Sent,
+        'status' => \App\Enums\InvoiceStatusEnum::Sent,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,

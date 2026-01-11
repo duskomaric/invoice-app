@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug')->nullable()->unique();
 
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_small_business')->default(false);
             $table->timestamp('subscription_ends_at')->nullable();
             
             // Address & Contact
@@ -31,7 +32,6 @@ return new class extends Migration
             // Legal
             $table->string('identification_number')->nullable(); // JIB
             $table->string('vat_number')->nullable(); // PDV ID
-            $table->string('bank_account')->nullable();
             
             // OFS / Fiscalization Configuration
             // These replace the global settings for multi-tenant setup

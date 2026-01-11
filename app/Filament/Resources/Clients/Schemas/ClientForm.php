@@ -112,6 +112,13 @@ class ClientForm
                             ->label('Active')
                             ->helperText('Inactive clients cannot be selected on invoices')
                             ->default(true),
+
+                        TextInput::make('invoice_due_days')
+                            ->label('Invoice due (days)')
+                            ->helperText('If set, invoices for this client will use this value instead of company default.')
+                            ->numeric()
+                            ->minValue(0)
+                            ->nullable(),
                     ])
                     ->columnSpan(3),
 

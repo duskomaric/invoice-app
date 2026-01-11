@@ -5,6 +5,7 @@ return [
     'modal_width' => 'max',
     'default_pagination_option' => 10,
     'top_navigation' => false,
+    'enabled_modules' => ['quotes', 'proformas', 'payments', 'reports'],
     'primary_color' => 'Amber',
     'danger_color' => 'Red',
     'gray_color' => 'Slate',

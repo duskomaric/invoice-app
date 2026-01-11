@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\InvoiceTemplate;
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceTemplateEnum;
+use App\Enums\InvoiceStatusEnum;
 use App\Mail\InvoiceMail;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
@@ -25,15 +25,21 @@ class InvoiceService
     public function getPdfViewName(Invoice $invoice): string
     {
         $template = $invoice->invoice_template
-            ?: CompanySetting::get('default_invoice_template', InvoiceTemplate::Classic->value);
+            ?: CompanySetting::get('default_invoice_template', InvoiceTemplateEnum::Classic->value);
 
-        return InvoiceTemplate::tryFrom($template)?->getViewName()
-            ?? InvoiceTemplate::Classic->getViewName();
+        return InvoiceTemplateEnum::tryFrom($template)?->getViewName()
+            ?? InvoiceTemplateEnum::Classic->getViewName();
     }
 
     public function getPdfHtml(Invoice $invoice): string
     {
-        app()->setLocale($invoice->language ?? 'en');
+        app()->setLocale($invoice->language->value ?? 'en');
+
+        $invoice->loadMissing([
+            'client',
+            'items',
+            'sourceable',
+        ]);
 
         $bankAccounts = $this->resolveBankAccounts($invoice);
         $bankAccount = $bankAccounts->first();
@@ -131,12 +137,12 @@ class InvoiceService
         $invoice->amount_paid = $paidAmount;
 
         if ($paidAmount >= $invoice->total) {
-            $invoice->status = InvoiceStatus::Paid;
+            $invoice->status = InvoiceStatusEnum::Paid;
         } elseif ($paidAmount > 0) {
-            $invoice->status = InvoiceStatus::Partial;
+            $invoice->status = InvoiceStatusEnum::Partial;
         } else {
             // Revert to Sent or Overdue based on due date
-            $invoice->status = $invoice->due_date < now() ? InvoiceStatus::Overdue : InvoiceStatus::Sent;
+            $invoice->status = $invoice->due_date < now() ? InvoiceStatusEnum::Overdue : InvoiceStatusEnum::Sent;
         }
 
         $invoice->save();

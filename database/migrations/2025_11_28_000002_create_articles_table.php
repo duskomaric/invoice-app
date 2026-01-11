@@ -16,6 +16,7 @@ return new class extends Migration
             $table->json('prices_meta')->nullable();
             $table->string('unit')->default('service');
             $table->string('tax_category')->nullable();
+            $table->string('type')->default('services');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

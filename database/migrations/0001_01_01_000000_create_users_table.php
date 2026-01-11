@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('invitation_code')->nullable();
             $table->string('password');
             $table->string('role');
-            $table->string('status')->default(UserStatus::PENDING);
+            $table->string('status')->default(UserStatusEnum::PENDING);
             $table->timestamp('last_seen_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

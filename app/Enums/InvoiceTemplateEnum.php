@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum InvoiceTemplate: string
+enum InvoiceTemplateEnum: string
 {
     case Classic = 'classic';
     case Modern = 'modern';

@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\InvoiceFrequency;
+use App\Enums\InvoiceFrequencyEnum;
 use App\Models\Invoice;
 use Illuminate\Console\Command;
 
-class GenerateRecurringInvoices extends Command
+class GenerateRecurringInvoicesCommand extends Command
 {
     protected $signature = 'invoices:generate-recurring';
 
@@ -23,7 +23,7 @@ class GenerateRecurringInvoices extends Command
             // This is a simplified example
             $newInvoice = $invoice->replicate(['is_recurring', 'frequency', 'next_invoice_date', 'parent_id', 'status', 'date', 'due_date']);
             $newInvoice->parent_id = $invoice->id;
-            $newInvoice->status = \App\Enums\InvoiceStatus::Draft;
+            $newInvoice->status = \App\Enums\InvoiceStatusEnum::Draft;
             $newInvoice->date = now();
             $newInvoice->due_date = now()->addDays(30);
             $newInvoice->save();
@@ -35,10 +35,10 @@ class GenerateRecurringInvoices extends Command
 
             // Update next date on parent
             $invoice->next_invoice_date = match ($invoice->frequency) {
-                InvoiceFrequency::Weekly => $invoice->next_invoice_date->addWeek(),
-                InvoiceFrequency::Monthly => $invoice->next_invoice_date->addMonth(),
-                InvoiceFrequency::Quarterly => $invoice->next_invoice_date->addQuarter(),
-                InvoiceFrequency::Yearly => $invoice->next_invoice_date->addYear(),
+                InvoiceFrequencyEnum::Weekly => $invoice->next_invoice_date->addWeek(),
+                InvoiceFrequencyEnum::Monthly => $invoice->next_invoice_date->addMonth(),
+                InvoiceFrequencyEnum::Quarterly => $invoice->next_invoice_date->addQuarter(),
+                InvoiceFrequencyEnum::Yearly => $invoice->next_invoice_date->addYear(),
                 default => $invoice->next_invoice_date->addMonth(),
             };
             $invoice->save();

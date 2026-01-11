@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Companies;
 use App\Models\Company;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -36,9 +37,14 @@ class CompanyResource extends Resource
                             ->unique(ignoreRecord: true),
                         DatePicker::make('subscription_ends_at')
                             ->label('Subscription Expires At')
+                            ->helperText('Leave empty for lifetime subscription')
                             ->native(false)
                             ->displayFormat('d.m.Y')
                             ->closeOnDateSelection(),
+                        Checkbox::make('is_small_business')
+                            ->label('Mali preduzetnik')
+                            ->helperText('Označite ako je kompanija mali preduzetnik (vodi se Knjiga prihoda)')
+                            ->default(false),
                     ])->columns(2),
 
                 Section::make('SMTP Settings')
@@ -77,15 +83,22 @@ class CompanyResource extends Resource
                     ->searchable(),
                 TextColumn::make('subscription_ends_at')
                     ->label('Subscription')
-                    ->date('d.m.Y')
+                    ->formatStateUsing(fn (Company $record) => $record->subscription_ends_at
+                        ? $record->subscription_ends_at->format('d.m.Y')
+                        : 'Lifetime'
+                    )
                     ->sortable()
                     ->description(fn (Company $record) => $record->subscription_ends_at
                         ? ($record->subscription_ends_at->isPast()
                             ? 'Expired ' . $record->subscription_ends_at->diffForHumans()
                             : 'Expires ' . $record->subscription_ends_at->diffForHumans())
-                        : 'No subscription set'
+                        : 'Unlimited access'
                     )
-                    ->color(fn (Company $record) => $record->subscription_ends_at?->isPast() ? 'danger' : 'success'),
+                    ->color(fn (Company $record) => match (true) {
+                        $record->subscription_ends_at === null => 'success', // Lifetime
+                        $record->subscription_ends_at->isPast() => 'danger', // Expired
+                        default => 'success', // Active
+                    }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

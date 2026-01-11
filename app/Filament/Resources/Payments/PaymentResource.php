@@ -18,7 +18,9 @@ class PaymentResource extends Resource
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $navigationLabel = 'Uplate/Isplate';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

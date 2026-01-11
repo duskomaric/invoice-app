@@ -60,9 +60,6 @@ class EditCompanyProfile extends EditTenantProfile
                         TextInput::make('vat_number')
                             ->label('VAT Number')
                             ->maxLength(20),
-                        TextInput::make('bank_account')
-                            ->label('Bank Account')
-                            ->maxLength(50),
                     ])->columns(2),
 
                 Section::make('Fiscalization (OFS)')

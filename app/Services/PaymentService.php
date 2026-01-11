@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use App\Models\Client;
 use App\Models\Invoice;
 
@@ -27,7 +27,7 @@ class PaymentService
 
         // 3. Distribute Remaining Payment to Invoices (FIFO)
         $invoices = $client->invoices()
-            ->where('status', '!=', InvoiceStatus::Draft) // Only consider finalized invoices
+            ->where('status', '!=', InvoiceStatusEnum::Draft) // Only consider finalized invoices
             ->orderBy('date')
             ->orderBy('id')
             ->get();
@@ -56,7 +56,7 @@ class PaymentService
     private function markAllInvoicesAsUnpaid(Client $client): void
     {
         $invoices = $client->invoices()
-            ->where('status', '!=', InvoiceStatus::Draft)
+            ->where('status', '!=', InvoiceStatusEnum::Draft)
             ->get();
 
         foreach ($invoices as $invoice) {

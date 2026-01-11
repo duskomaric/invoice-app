@@ -6,7 +6,7 @@ use App\Models\Payment;
 use App\Enums\RoleEnum;
 use App\Models\Invoice;
 use App\Services\PaymentService;
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -32,35 +32,35 @@ it('can create payment', function () {
 
 it('calculates client balance correctly with negative initial balance', function () {
     $client = Client::factory()->create();
-    
+
     // Initial debt
     Payment::factory()->create([
         'client_id' => $client->id,
         'amount' => -50000, // -500 KM debt
     ]);
-    
+
     // Payment received
     Payment::factory()->create([
         'client_id' => $client->id,
         'amount' => 40000, // +400 KM payment
     ]);
-    
+
     $totalPaid = $client->payments()->sum('amount');
     $balance = $totalPaid - 0; // No invoices
-    
+
     expect($balance)->toBe(-10000); // Still owes 100 KM
 });
 
 it('allocates payments to invoices using FIFO', function () {
     $client = Client::factory()->create();
-    
+
     // Create two invoices
     // Create two invoices manually to avoid factory overwriting totals
     $invoice1 = Invoice::create([
         'client_id' => $client->id,
         'date' => now()->subDays(2),
         'due_date' => now()->addDays(30),
-        'status' => InvoiceStatus::Sent,
+        'status' => InvoiceStatusEnum::Sent,
     ]);
     \App\Models\InvoiceItem::create([
         'invoice_id' => $invoice1->id,
@@ -69,12 +69,12 @@ it('allocates payments to invoices using FIFO', function () {
         'unit_price' => 10000,
         'total' => 10000,
     ]);
-    
+
     $invoice2 = Invoice::create([
         'client_id' => $client->id,
         'date' => now()->subDay(),
         'due_date' => now()->addDays(30),
-        'status' => InvoiceStatus::Sent,
+        'status' => InvoiceStatusEnum::Sent,
     ]);
     \App\Models\InvoiceItem::create([
         'invoice_id' => $invoice2->id,
@@ -83,33 +83,33 @@ it('allocates payments to invoices using FIFO', function () {
         'unit_price' => 5000,
         'total' => 5000,
     ]);
-    
+
     // Make a payment that partially covers both
     Payment::factory()->create([
         'client_id' => $client->id,
         'amount' => 12000,
     ]);
-    
+
     $service = new PaymentService();
     $service->allocatePayments($client);
-    
+
     $invoice1->refresh();
     $invoice2->refresh();
-    
+
     expect($invoice1->amount_paid)->toBe(10000) // Fully paid
-        ->and($invoice1->status)->toBe(InvoiceStatus::Paid)
+        ->and($invoice1->status)->toBe(InvoiceStatusEnum::Paid)
         ->and($invoice2->amount_paid)->toBe(2000) // Partially paid
-        ->and($invoice2->status)->toBe(InvoiceStatus::Partial);
+        ->and($invoice2->status)->toBe(InvoiceStatusEnum::Partial);
 });
 
 it('marks invoices as paid when payment covers all debts', function () {
     $client = Client::factory()->create();
-    
+
     $invoice = Invoice::create([
         'client_id' => $client->id,
         'date' => now(),
         'due_date' => now()->addDays(30),
-        'status' => InvoiceStatus::Sent,
+        'status' => InvoiceStatusEnum::Sent,
     ]);
     \App\Models\InvoiceItem::create([
         'invoice_id' => $invoice->id,
@@ -118,17 +118,17 @@ it('marks invoices as paid when payment covers all debts', function () {
         'unit_price' => 10000,
         'total' => 10000,
     ]);
-    
+
     Payment::factory()->create([
         'client_id' => $client->id,
         'amount' => 15000, // Overpayment
     ]);
-    
+
     $service = new PaymentService();
     $service->allocatePayments($client);
-    
+
     $invoice->refresh();
-    
+
     expect($invoice->amount_paid)->toBe(10000)
-        ->and($invoice->status)->toBe(InvoiceStatus::Paid);
+        ->and($invoice->status)->toBe(InvoiceStatusEnum::Paid);
 });
