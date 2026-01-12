@@ -33,7 +33,7 @@ class QuoteForm
                     ->schema([
                         Section::make('Ponuda')
                             ->description(fn (Get $get) => app(DocumentNumberingService::class)->assign(
-                                tap(new Quote(), function (Quote $quote) use ($get) {
+                                tap(new Quote, function (Quote $quote) use ($get) {
                                     $quote->company_id = Filament::getTenant()?->id;
                                     $quote->currency = $get('currency');
                                     $quote->date = $get('date') ?? now();

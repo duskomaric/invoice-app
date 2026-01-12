@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ExchangeRateFactory extends Factory
 {
     protected $model = ExchangeRate::class;
+
     public function definition(): array
     {
         $currencies = ['EUR', 'USD', 'GBP', 'CHF'];
@@ -28,4 +29,3 @@ class ExchangeRateFactory extends Factory
         ];
     }
 }
-

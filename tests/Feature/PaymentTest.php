@@ -1,12 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\Client;
-use App\Models\Payment;
-use App\Enums\RoleEnum;
-use App\Models\Invoice;
-use App\Services\PaymentService;
 use App\Enums\InvoiceStatusEnum;
+use App\Enums\RoleEnum;
+use App\Models\Client;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\User;
+use App\Services\PaymentService;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -90,7 +91,7 @@ it('allocates payments to invoices using FIFO', function () {
         'amount' => 12000,
     ]);
 
-    $service = new PaymentService();
+    $service = new PaymentService;
     $service->allocatePayments($client);
 
     $invoice1->refresh();
@@ -124,7 +125,7 @@ it('marks invoices as paid when payment covers all debts', function () {
         'amount' => 15000, // Overpayment
     ]);
 
-    $service = new PaymentService();
+    $service = new PaymentService;
     $service->allocatePayments($client);
 
     $invoice->refresh();

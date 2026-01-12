@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Article;
 use App\Models\Contract;
 use App\Models\ContractItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ContractItemFactory extends Factory
 {
     protected $model = ContractItem::class;
+
     public function definition(): array
     {
         $quantity = fake()->numberBetween(1, 5);
@@ -27,4 +27,3 @@ class ContractItemFactory extends Factory
         ];
     }
 }
-

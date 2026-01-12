@@ -25,149 +25,21 @@
         <div class="xl:col-span-2 space-y-4">
             {{-- Client Selection --}}
             <div class="stagger-1 page-enter opacity-0 relative z-50" style="animation-fill-mode: forwards;">
-                <x-app.card>
-                    <x-app.section-header 
-                        title="Client Information" 
-                        subtitle="Select or add a client" 
-                        icon="user" 
-                        variant="primary" 
-                    />
-
-                    <div class="relative" x-data="{ open: false, search: '' }" @click.away="open = false">
-                        <div class="relative" x-show="!selectedClient">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                            <input type="text" x-model="search" @focus="open = true" @click="open = true" placeholder="Search or select a client..." class="w-full h-9 pl-9 pr-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
-                        </div>
-                            <div x-show="open && !selectedClient" x-transition class="absolute left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-[100] max-h-64 overflow-y-auto" x-cloak>
-                                <a href="{{ route('app.clients.create', $company) }}" class="flex items-center gap-2.5 px-3 py-2 hover:bg-violet-50 dark:hover:bg-violet-900/20 border-b border-slate-100 dark:border-slate-700 text-violet-600 dark:text-violet-400">
-                                    <div class="w-8 h-8 rounded-lg border-2 border-dashed border-violet-300 dark:border-violet-600 flex items-center justify-center">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                    </div>
-                                    <span class="font-medium text-xs">Add new client</span>
-                                </a>
-                                <template x-for="client in filteredClients" :key="client.id">
-                                    <button type="button" @click="selectClient(client)" class="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 text-left">
-                                        <div class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-600 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300" x-text="client.name.substring(0, 2).toUpperCase()"></div>
-                                        <div>
-                                            <p class="font-medium text-slate-700 dark:text-white text-xs" x-text="client.name"></p>
-                                            <p class="text-[10px] text-slate-400 dark:text-slate-500" x-text="client.email"></p>
-                                        </div>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-
-                        {{-- Selected Client Card --}}
-                        <div x-show="selectedClient" class="p-3 rounded-xl bg-violet-50/50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-between" x-cloak>
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-sm font-bold text-violet-600 dark:text-violet-400 border border-violet-100 dark:border-violet-500/20" x-text="selectedClient?.name.substring(0, 2).toUpperCase()"></div>
-                                <div>
-                                    <input type="hidden" name="client_id" :value="selectedClient?.id">
-                                    <h4 class="text-xs font-bold text-slate-900 dark:text-white" x-text="selectedClient?.name"></h4>
-                                    <p class="text-[10px] text-slate-500 dark:text-slate-400" x-text="selectedClient?.email"></p>
-                                </div>
-                            </div>
-                            <button type="button" @click="selectedClient = null" class="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition-colors shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </x-app.card>
+                <x-documents.client-information />
             </div>
 
             {{-- Invoice Items --}}
             <div class="stagger-2 page-enter opacity-0 relative z-10" style="animation-fill-mode: forwards;">
-                <x-app.card>
-                    <x-app.section-header 
-                        title="Invoice Items" 
-                        subtitle="Add products or services" 
-                        icon="clipboard-document-list" 
-                        variant="info" 
-                    />
-
-                    {{-- Items Header --}}
-                    <div class="hidden lg:grid lg:grid-cols-12 gap-3 mb-2 px-1">
-                        <div class="col-span-5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            Article
-                        </div>
-                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty</div>
-                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Price</div>
-                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Total</div>
-                        <div class="col-span-1"></div>
-                    </div>
-
-                    {{-- Items --}}
-                    <div class="space-y-2">
-                        <template x-for="(item, index) in items" :key="index">
-                            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/40">
-                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
-                                    <div class="lg:col-span-12 mb-2">
-                                        <div class="relative">
-                                            <select :name="'items['+index+'][article_id]'" x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all shadow-sm">
-                                                <option value="">Select an article or type custom name below...</option>
-                                                <template x-for="article in articles" :key="article.id">
-                                                    <option :value="article.id" x-text="article.name"></option>
-                                                </template>
-                                            </select>
-                                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="lg:col-span-5">
-                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Item Name</label>
-                                        <input type="text" :name="'items['+index+'][name]'" x-model="item.name" placeholder="Item name" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
-                                    </div>
-                                    <div class="lg:col-span-2">
-                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Qty</label>
-                                        <input type="number" :name="'items['+index+'][quantity]'" x-model="item.quantity" placeholder="1" class="w-full h-9 px-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all text-center">
-                                    </div>
-                                    <div class="lg:col-span-2">
-                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Price</label>
-                                        <div class="relative">
-                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 dark:text-slate-500" x-text="currencySymbol"></span>
-                                            <input type="number" step="0.01" :name="'items['+index+'][unit_price]'" x-model="item.price" placeholder="0.00" class="w-full h-9 pl-7 pr-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all text-right">
-                                        </div>
-                                    </div>
-                                    <div class="lg:col-span-2 flex items-center justify-between gap-2">
-                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-auto">Total</label>
-                                        <div class="text-xs font-bold text-slate-900 dark:text-white" x-text="formatMoney(item.quantity * item.price)"></div>
-                                        <button type="button" @click="removeItem(index)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    {{-- Add Item Button --}}
-                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600/60 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Item
-                    </button>
-                </x-app.card>
+                <x-documents.items items="items" currency="currency" title="Invoice Items" />
             </div>
 
-            {{-- Notes --}}
+            {{-- Danger Zone --}}
             <div class="stagger-3 page-enter opacity-0" style="animation-fill-mode: forwards;">
-                <x-app.card>
-                    <x-app.section-header 
-                        title="Notes & Terms" 
-                        subtitle="Additional information" 
-                        icon="document-text" 
-                        variant="amber" 
-                    />
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Notes to Client</label>
-                            <textarea rows="2" placeholder="Add any notes..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm resize-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Payment Terms</label>
-                            <textarea rows="2" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm resize-none">Payment is due within 30 days of invoice date.</textarea>
-                        </div>
-                    </div>
-                </x-app.card>
+                <x-documents.danger-zone 
+                    text="Delete this invoice" 
+                    subtext="Once deleted, this cannot be undone" 
+                    button-text="Delete Invoice" 
+                />
             </div>
         </div>
 
@@ -175,83 +47,20 @@
         <div class="space-y-4">
             {{-- Invoice Details --}}
             <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
-                <x-app.card>
-                    <x-app.section-header 
-                        title="Document Settings" 
-                        subtitle="Configuration & defaults" 
-                        icon="cog-6-tooth" 
-                        variant="primary" 
-                    />
-                    
-                    <div class="space-y-4">
-                        <x-app.input label="Date" type="date" name="date" x-model="date" />
-                        <x-app.input label="Due Date" type="date" name="due_date" x-model="dueDate" />
-                        
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
-                            <select name="currency" x-model="currency" class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
-                                @foreach($currencies as $curr)
-                                    <option value="{{ $curr->code }}">{{ $curr->code }} - {{ $curr->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Language</label>
-                            <select name="language" x-model="language" class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
-                                <option value="en">English (US)</option>
-                                <option value="ba">Bosnian (BA)</option>
-                                <option value="de">German (DE)</option>
-                            </select>
-                        </div>
-                    </div>
-                </x-app.card>
+                <x-documents.settings 
+                    :preview-number="$previewNumber" 
+                    :currencies="$currencies" 
+                />
             </div>
 
             {{-- Summary --}}
             <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
-                <div class="rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-5 text-white shadow-xl shadow-violet-500/30">
-                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                        Summary
-                    </h3>
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-violet-200 text-sm">Subtotal</span>
-                            <span class="font-semibold" x-text="formatMoney(subtotal)"></span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-violet-200 text-sm">Tax (17%)</span>
-                            <span class="font-semibold" x-text="formatMoney(tax)"></span>
-                        </div>
-                        <div class="border-t border-white/20 pt-3 mt-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-base font-bold">Total</span>
-                                <span class="text-2xl font-bold" x-text="formatMoney(total)"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <x-documents.summary />
             </div>
 
-            {{-- Quick Actions --}}
-            <div class="stagger-3 page-enter opacity-0" style="animation-fill-mode: forwards;">
-                <x-app.card>
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Quick Actions
-                    </h3>
-                    <div class="space-y-2">
-                        <x-app.button @click="showPreview = true" variant="secondary" size="sm" class="w-full justify-center">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            Preview Invoice
-                        </x-app.button>
-                        <x-app.button @click="saveAsDraft()" variant="ghost" size="sm" class="w-full justify-center">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                            Save as Draft
-                        </x-app.button>
-                    </div>
-                </x-app.card>
+            {{-- Activity --}}
+            <div class="stagger-3 page-enter opacity-0 pb-24 lg:pb-0" style="animation-fill-mode: forwards;">
+                <x-documents.activity />
             </div>
         </div>
     </div>
@@ -347,7 +156,7 @@ function invoiceForm() {
     return {
         selectedClient: null,
         search: '',
-        open: false,
+        open: true,
         draftSaved: false,
         clients: @json($clients),
         articles: @json($articles),
@@ -365,6 +174,13 @@ function invoiceForm() {
             ).slice(0, 10);
         },
 
+        filteredArticles(query) {
+            if (!query) return this.articles.slice(0, 10);
+            return this.articles.filter(a => 
+                a.name.toLowerCase().includes(query.toLowerCase())
+            ).slice(0, 10);
+        },
+
         get currencySymbol() {
             const symbols = { 'EUR': '€', 'USD': '$', 'BAM': 'KM' };
             return symbols[this.currency] || '';
@@ -378,7 +194,7 @@ function invoiceForm() {
 
         addItem() {
             this.items.push({
-                article: '',
+                article: null,
                 name: '',
                 description: '',
                 quantity: 1,
@@ -390,13 +206,27 @@ function invoiceForm() {
             this.items.splice(index, 1);
         },
 
-        selectArticle(index, articleId) {
-            const article = this.articles.find(a => a.id == articleId);
-            if (article) {
-                this.items[index].article = article.id;
-                this.items[index].name = article.name;
-                this.items[index].price = article.unit_price / 100; // Assuming storage in cents
-            }
+        selectArticle(index, article) {
+            this.items[index].article = article.id;
+            this.items[index].name = article.name;
+            // Use prices_meta if available, otherwise assume 0 or fallback
+            // price is stored in prices_meta as 'CURRENCY' => float
+            this.items[index].price = article.prices_meta?.[this.currency] || 0; 
+            
+            // Close the search dropdown for this item (handled by click event on parent)
+        },
+
+        updateCurrency(newCurrency) {
+            this.currency = newCurrency;
+            // Update prices for all selected articles
+            this.items.forEach(item => {
+                if (item.article) {
+                    const article = this.articles.find(a => a.id == item.article);
+                    if (article) {
+                        item.price = article.prices_meta?.[this.currency] || 0;
+                    }
+                }
+            });
         },
 
         get subtotal() {
@@ -414,10 +244,18 @@ function invoiceForm() {
         formatMoney(amount) {
             return this.currencySymbol + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         },
+        
+        formatPrice(amount) {
+            return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
 
         saveAsDraft() {
             this.draftSaved = true;
             setTimeout(() => { this.draftSaved = false; }, 3000);
+        },
+
+        init() {
+            this.addItem(); // Add one empty item by default
         }
     }
 }

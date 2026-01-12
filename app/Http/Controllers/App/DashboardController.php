@@ -4,10 +4,10 @@ namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Invoice;
-use App\Models\Quote;
-use App\Models\Proforma;
 use App\Models\Contract;
+use App\Models\Invoice;
+use App\Models\Proforma;
+use App\Models\Quote;
 
 class DashboardController extends Controller
 {

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +18,7 @@ class InvoicePdfTest extends TestCase
 
         $invoice = Invoice::factory()->create();
 
-        $html = (new \App\Services\InvoiceService())->getPdfHtml($invoice);
+        $html = (new \App\Services\InvoiceService)->getPdfHtml($invoice);
 
         $this->assertStringContainsString('Test Company', $html);
         $this->assertStringContainsString('123 Test St', $html);
@@ -29,7 +28,7 @@ class InvoicePdfTest extends TestCase
     {
         $invoice = Invoice::factory()->create(['language' => 'sr']);
 
-        $html = (new \App\Services\InvoiceService())->getPdfHtml($invoice);
+        $html = (new \App\Services\InvoiceService)->getPdfHtml($invoice);
 
         // Check for Serbian terms
         $this->assertStringContainsString('Faktura', $html); // Invoice
@@ -41,7 +40,7 @@ class InvoicePdfTest extends TestCase
     {
         $invoice = Invoice::factory()->create(['language' => 'en']);
 
-        $html = (new \App\Services\InvoiceService())->getPdfHtml($invoice);
+        $html = (new \App\Services\InvoiceService)->getPdfHtml($invoice);
 
         // Check for English terms
         $this->assertStringContainsString('Invoice', $html);

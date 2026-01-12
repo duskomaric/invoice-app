@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use App\Models\CompanySetting;
 use App\Filament\Clusters\Settings\Pages\Appearance as AppearanceSettingsPage;
 use App\Filament\Clusters\Settings\Pages\Email as EmailSettingsPage;
 use App\Filament\Clusters\Settings\Pages\Fiscalization as FiscalizationSettingsPage;
@@ -13,17 +12,18 @@ use App\Filament\Clusters\Settings\Resources\CompanyBankAccounts\CompanyBankAcco
 use App\Filament\Clusters\Settings\Resources\Currencies\CurrencyResource;
 use App\Filament\Clusters\Settings\Resources\EmailSignature\EmailSignatureResource;
 use App\Filament\Clusters\Settings\Resources\EmailTemplateResource\EmailTemplateResource;
+use App\Models\CompanySetting;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
-use Filament\Widgets\Widget;
 use Filament\Support\Icons\Heroicon;
+use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
@@ -33,7 +33,7 @@ class GettingStartedWidget extends Widget implements HasForms
 
     protected string $view = 'filament.widgets.getting-started-widget';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public ?array $data = [];
 
@@ -59,7 +59,7 @@ class GettingStartedWidget extends Widget implements HasForms
     {
         $steps = $this->steps();
 
-        return array_map(function (array $step, int $index) use ($steps, $tenantId) {
+        return array_map(function (array $step, int $index) use ($tenantId) {
             return Step::make($step['title'])
                 ->icon($step['icon'])
                 ->completedIcon(Heroicon::OutlinedCheckCircle)
@@ -68,7 +68,7 @@ class GettingStartedWidget extends Widget implements HasForms
                         ->icon(Heroicon::OutlinedExclamationTriangle)
                         ->iconColor('warning')
                         ->schema([
-                            Placeholder::make($step['key'] . '_info')
+                            Placeholder::make($step['key'].'_info')
                                 ->label('')
                                 ->content($step['description'])
                                 ->hint('This step is required before issuing invoices')
@@ -103,7 +103,6 @@ class GettingStartedWidget extends Widget implements HasForms
                 });
         }, $steps, array_keys($steps));
     }
-
 
     public static function canView(): bool
     {
@@ -203,7 +202,6 @@ class GettingStartedWidget extends Widget implements HasForms
                 return false;
             }
         }
-
 
         return true;
     }

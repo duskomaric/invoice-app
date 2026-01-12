@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Invoice; // Added for the relationship
+
+// Added for the relationship
 
 class InvoiceEmailLog extends Model
 {

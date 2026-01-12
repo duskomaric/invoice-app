@@ -18,8 +18,9 @@ class EmailTemplateResource extends Resource
 {
     protected static ?string $model = EmailTemplate::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
-    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Company Settings';
 
     protected static ?string $cluster = SettingsCluster::class;
 

@@ -15,25 +15,25 @@ use App\Http\Controllers\App\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('templates')->name('templates.')->group(function () {
-    Route::get('/invoice1', fn() => view('app.invoice1.index'))->name('invoice1.index');
-    Route::get('/invoice1/create', fn() => view('app.invoice1.create'))->name('invoice1.create');
-    Route::get('/invoice1/show', fn() => view('app.invoice1.show'))->name('invoice1.show');
+    Route::get('/invoice1', fn () => view('app.invoice1.index'))->name('invoice1.index');
+    Route::get('/invoice1/create', fn () => view('app.invoice1.create'))->name('invoice1.create');
+    Route::get('/invoice1/show', fn () => view('app.invoice1.show'))->name('invoice1.show');
 
-    Route::get('/invoice2', fn() => view('app.invoice2.index'))->name('invoice2.index');
+    Route::get('/invoice2', fn () => view('app.invoice2.index'))->name('invoice2.index');
 
-    Route::get('/invoice3', fn() => view('app.invoice3.index'))->name('invoice3.index');
-    Route::get('/invoice3/create', fn() => view('app.invoice3.create'))->name('invoice3.create');
-    Route::get('/invoice3/{id}', fn() => view('app.invoice3.show'))->name('invoice3.show');
+    Route::get('/invoice3', fn () => view('app.invoice3.index'))->name('invoice3.index');
+    Route::get('/invoice3/create', fn () => view('app.invoice3.create'))->name('invoice3.create');
+    Route::get('/invoice3/{id}', fn () => view('app.invoice3.show'))->name('invoice3.show');
 
-    Route::get('/invoice4', fn() => view('app.invoice4.index'))->name('invoice4.index');
-    Route::get('/invoice4/create', fn() => view('app.invoice4.create'))->name('invoice4.create');
-    Route::get('/invoice4/{id}', fn() => view('app.invoice4.show'))->name('invoice4.show');
-    Route::get('/invoice4/{id}/edit', fn() => view('app.invoice4.edit'))->name('invoice4.edit');
+    Route::get('/invoice4', fn () => view('app.invoice4.index'))->name('invoice4.index');
+    Route::get('/invoice4/create', fn () => view('app.invoice4.create'))->name('invoice4.create');
+    Route::get('/invoice4/{id}', fn () => view('app.invoice4.show'))->name('invoice4.show');
+    Route::get('/invoice4/{id}/edit', fn () => view('app.invoice4.edit'))->name('invoice4.edit');
 
-    Route::get('/invoice5', fn() => view('app.invoice5.index'))->name('invoice5.index');
-    Route::get('/invoice5/create', fn() => view('app.invoice5.create'))->name('invoice5.create');
-    Route::get('/invoice5/{id}', fn() => view('app.invoice5.show'))->name('invoice5.show');
-    Route::get('/invoice5/{id}/edit', fn() => view('app.invoice5.edit'))->name('invoice5.edit');
+    Route::get('/invoice5', fn () => view('app.invoice5.index'))->name('invoice5.index');
+    Route::get('/invoice5/create', fn () => view('app.invoice5.create'))->name('invoice5.create');
+    Route::get('/invoice5/{id}', fn () => view('app.invoice5.show'))->name('invoice5.show');
+    Route::get('/invoice5/{id}/edit', fn () => view('app.invoice5.edit'))->name('invoice5.edit');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(function () {
@@ -90,7 +90,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
                 Route::delete('/bank-accounts/{bankAccount}', [SettingsController::class, 'deleteBankAccount'])->name('bank-accounts.destroy');
                 Route::get('/email-templates', [SettingsController::class, 'emailTemplates'])->name('email-templates');
                 Route::get('/email-signatures', [SettingsController::class, 'emailSignatures'])->name('email-signatures');
-                
+
                 Route::get('/fiscalization', [SettingsController::class, 'fiscalization'])->name('fiscalization');
                 Route::get('/appearance', [SettingsController::class, 'appearance'])->name('appearance');
                 Route::get('/email', [SettingsController::class, 'email'])->name('email');

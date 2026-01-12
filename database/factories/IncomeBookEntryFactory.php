@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class IncomeBookEntryFactory extends Factory
 {
     protected $model = IncomeBookEntry::class;
+
     public function definition(): array
     {
         $incomeProducts = fake()->numberBetween(0, 100000);
@@ -55,4 +56,3 @@ class IncomeBookEntryFactory extends Factory
         ]);
     }
 }
-

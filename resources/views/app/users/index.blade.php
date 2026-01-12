@@ -70,14 +70,11 @@
                         <span class="text-xs text-slate-700 dark:text-slate-300">{{ $user->created_at->format('M d, Y') }}</span>
                     </x-app.table-td>
                     <x-app.table-td class="text-right">
-                        <div class="flex items-center justify-end gap-1">
-                            <x-app.button href="{{ route('app.users.show', [$company, $user]) }}" variant="secondary" size="icon-sm" tooltip="View Profile">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            </x-app.button>
-                            <x-app.button href="{{ route('app.users.edit', [$company, $user]) }}" variant="secondary" size="icon-sm" tooltip="Edit Permissions">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                            </x-app.button>
-                        </div>
+                        <x-app.action-buttons 
+                            :show-route="route('app.users.show', [$company, $user])"
+                            :edit-route="route('app.users.edit', [$company, $user])"
+                            size="icon-sm"
+                        />
                     </x-app.table-td>
                 </x-app.table-tr>
             @endforeach

@@ -18,12 +18,10 @@ class EditInvoice extends EditRecord
         ];
     }
 
-
-
     protected function afterSave(): void
     {
         $invoice = $this->record;
-        $service = new PaymentService();
+        $service = new PaymentService;
         $service->allocatePayments($invoice->client);
     }
 }

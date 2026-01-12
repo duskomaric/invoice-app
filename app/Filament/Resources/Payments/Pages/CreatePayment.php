@@ -13,7 +13,7 @@ class CreatePayment extends CreateRecord
     protected function afterCreate(): void
     {
         $payment = $this->record;
-        $service = new PaymentService();
+        $service = new PaymentService;
         $service->allocatePayments($payment->client);
     }
 }

@@ -18,7 +18,7 @@ class ArticleTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->description(fn ($record) => new HtmlString("<small>" . nl2br(e($record->description)) . "</small>"))
+                    ->description(fn ($record) => new HtmlString('<small>'.nl2br(e($record->description)).'</small>'))
                     ->searchable()
                     ->sortable(),
 
@@ -26,13 +26,12 @@ class ArticleTable
                 ...collect(Filament::getTenant()->currencies()->pluck('code'))
                     ->map(function ($currency) {
                         return TextColumn::make("prices_meta.$currency")
-                        ->label("Price ($currency)")
+                            ->label("Price ($currency)")
                             ->getStateUsing(function ($record) use ($currency) {
                                 // Get value if exists, otherwise null
                                 return $record->prices_meta[$currency] ?? null;
                             })
-                            ->formatStateUsing(fn ($state) =>
-                            $state !== null
+                            ->formatStateUsing(fn ($state) => $state !== null
                                 ? number_format((float) $state, 2, '.', '')
                                 : '—'
                             )

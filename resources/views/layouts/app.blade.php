@@ -159,6 +159,8 @@
     
     @include('app.partials.mobile-nav')
     
+    <x-app.toast />
+
     @stack('scripts')
     <script>
     function appState() {

@@ -1,3 +1,10 @@
+@extends('layouts.app')
+
+@section('title', 'Fiscalization - ' . $company->name)
+@section('page-title', 'Fiscalization')
+@section('page-subtitle', 'Configure digital certificates and fiscal parameters')
+
+@section('content')
 <x-app.settings-layout :company="$company" active="fiscal">
     <x-app.card>
         <x-app.section-header title="Fiscal Settings" subtitle="Configure your digital certificates and fiscal parameters" icon="ticket" variant="primary" />
@@ -39,3 +46,4 @@
         </div>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

@@ -1,4 +1,11 @@
-<x-app.settings-layout :company="$company" active="email">
+@extends('layouts.app')
+
+@section('title', 'Email Signatures - ' . $company->name)
+@section('page-title', 'Email Signatures')
+@section('page-subtitle', 'Manage your professional email endings')
+
+@section('content')
+<x-app.settings-layout :company="$company" active="signatures">
     <x-app.card>
         <div class="flex items-center justify-between mb-8">
             <x-app.section-header title="Email Signatures" subtitle="Manage your professional email endings" icon="pencil-square" variant="secondary" />
@@ -38,3 +45,4 @@
         </div>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

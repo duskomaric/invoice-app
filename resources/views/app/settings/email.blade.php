@@ -1,3 +1,10 @@
+@extends('layouts.app')
+
+@section('title', 'Email Settings - ' . $company->name)
+@section('page-title', 'Email Settings')
+@section('page-subtitle', 'Configure how the application sends emails')
+
+@section('content')
 <x-app.settings-layout :company="$company" active="email">
     <div class="space-y-6">
         <x-app.card>
@@ -52,3 +59,4 @@
         </x-app.card>
     </div>
 </x-app.settings-layout>
+@endsection

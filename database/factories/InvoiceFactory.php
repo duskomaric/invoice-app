@@ -42,6 +42,7 @@ class InvoiceFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             $total = $attributes['amount_paid'] ?? 0;
+
             return [
                 'amount_paid' => $total > 0 ? $total : fake()->numberBetween(1000, 100000),
             ];

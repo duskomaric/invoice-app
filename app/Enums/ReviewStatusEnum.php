@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum ReviewStatusEnum: string implements HasLabel, HasColor
+enum ReviewStatusEnum: string implements HasColor, HasLabel
 {
     case PENDING = 'pending';
     case REVIEWED = 'reviewed';
@@ -13,7 +13,7 @@ enum ReviewStatusEnum: string implements HasLabel, HasColor
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'Čeka pregled',
             self::REVIEWED => 'Pregledano',
             self::AUTO => 'Automatski',
@@ -22,7 +22,7 @@ enum ReviewStatusEnum: string implements HasLabel, HasColor
 
     public function getColor(): string|array|null
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'warning',
             self::REVIEWED => 'success',
             self::AUTO => 'info',

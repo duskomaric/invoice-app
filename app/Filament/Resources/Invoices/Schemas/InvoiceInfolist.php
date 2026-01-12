@@ -7,8 +7,8 @@ use App\Filament\Resources\Quotes\QuoteResource;
 use App\Models\Proforma;
 use App\Models\Quote;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class InvoiceInfolist
@@ -28,11 +28,11 @@ class InvoiceInfolist
                         TextEntry::make('due_date')
                             ->date(),
                         TextEntry::make('language'),
-//                            ->formatStateUsing(fn (string $state): string => match ($state) {
-//                                'en' => 'English',
-//                                'sr' => 'Serbian (Latin)',
-//                                default => $state,
-//                            }),
+                        //                            ->formatStateUsing(fn (string $state): string => match ($state) {
+                        //                                'en' => 'English',
+                        //                                'sr' => 'Serbian (Latin)',
+                        //                                default => $state,
+                        //                            }),
 
                         TextEntry::make('source_quote')
                             ->label('Ponuda')
@@ -51,7 +51,6 @@ class InvoiceInfolist
                                 : null)
                             ->openUrlInNewTab()
                             ->visible(fn ($record) => $record->sourceable instanceof Proforma),
-
 
                     ])->columns(6)->columnSpanFull(),
 

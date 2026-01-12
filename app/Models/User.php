@@ -7,17 +7,16 @@ use App\Enums\RoleEnum;
 use App\Enums\UserStatusEnum;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
+use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-use Filament\Models\Contracts\HasTenants;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 
-class User extends Authenticatable implements FilamentUser, HasName, MustVerifyEmail, HasTenants
+class User extends Authenticatable implements FilamentUser, HasName, HasTenants, MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -77,9 +76,9 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
             return false;
         }
 
-//        if ($this->role === RoleEnum::SuperAdmin) {
-//            return true;
-//        }
+        //        if ($this->role === RoleEnum::SuperAdmin) {
+        //            return true;
+        //        }
 
         $hasAnyCompany = $this->companies()->exists();
 
@@ -112,7 +111,7 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
         // Regular users only see companies with valid subscription
         return $this->companies->filter(function ($company) {
-             return $company->subscription_ends_at === null || $company->subscription_ends_at->isFuture();
+            return $company->subscription_ends_at === null || $company->subscription_ends_at->isFuture();
         });
     }
 

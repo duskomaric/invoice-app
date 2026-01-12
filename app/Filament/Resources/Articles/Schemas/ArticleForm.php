@@ -132,8 +132,7 @@ class ArticleForm
                                             )
 
                                             ->formatStateUsing(
-                                                fn ($state, Get $get, $record) =>
-                                                    $record?->prices_meta[$currency] ?? 0
+                                                fn ($state, Get $get, $record) => $record?->prices_meta[$currency] ?? 0
                                             );
                                     })
                                     ->toArray(),

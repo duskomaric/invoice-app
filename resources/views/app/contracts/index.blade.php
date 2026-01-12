@@ -43,24 +43,24 @@
         />
     </x-app.stats-grid>
 
+@php
+$statusColors = [
+    'draft' => 'bg-slate-500',
+    'active' => 'bg-emerald-500',
+    'cancelled' => 'bg-rose-500',
+    'expired' => 'bg-slate-400',
+];
+$statusVariants = [
+    'draft' => 'slate',
+    'active' => 'emerald',
+    'cancelled' => 'rose',
+    'expired' => 'slate',
+];
+@endphp
+
     <x-app.filter-bar placeholder="Search contracts...">
         <x-app.dropdown label="Status" icon="funnel" variant="secondary" size="sm" class="shadow-sm">
-            <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ !request('status') ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                <span class="w-4 h-4 rounded border flex items-center justify-center {{ !request('status') ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                    @if(!request('status'))<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                </span>
-                All Statuses
-            </a>
-            @foreach(['draft', 'active', 'cancelled', 'expired'] as $status)
-                <a href="{{ request()->fullUrlWithQuery(['status' => $status]) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ request('status') == $status ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                    <span class="w-4 h-4 rounded border flex items-center justify-center {{ request('status') == $status ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                        @if(request('status') == $status)<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                    </span>
-                    @php $dotColors = ['draft' => 'bg-slate-500', 'active' => 'bg-emerald-500', 'cancelled' => 'bg-rose-500', 'expired' => 'bg-slate-400']; @endphp
-                    <span class="w-2 h-2 rounded-full {{ $dotColors[$status] }}"></span>
-                    {{ ucfirst($status) }}
-                </a>
-            @endforeach
+            <x-app.status-filter :statuses="['draft', 'active', 'cancelled', 'expired']" :colors="$statusColors" />
         </x-app.dropdown>
     </x-app.filter-bar>
 
@@ -93,24 +93,16 @@
                             <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">{{ $contract->date->format('M d, Y') }}</span>
                         </x-app.table-td>
                         <x-app.table-td>
-                            <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $contract->currency === 'EUR' ? '€' : ($contract->currency === 'USD' ? '$' : $contract->currency) }}{{ number_format($contract->total_amount / 100, 2) }}</span>
+                            <x-app.currency :amount="$contract->total_amount" :currency="$contract->currency" class="text-sm font-bold text-slate-900 dark:text-white" />
                         </x-app.table-td>
                         <x-app.table-td>
-                            @php
-                                $statusColors = ['draft' => 'slate', 'active' => 'emerald', 'cancelled' => 'rose', 'expired' => 'slate'];
-                                $color = $statusColors[strtolower($contract->status)] ?? 'violet';
-                            @endphp
-                            <x-app.status-badge :status="$contract->status" :variant="$color" size="sm" dot />
+                            <x-app.status-badge :status="$contract->status" :variant="$statusVariants[strtolower($contract->status)] ?? 'slate'" size="sm" dot />
                         </x-app.table-td>
                         <x-app.table-td class="text-right">
-                            <div class="flex items-center justify-end gap-1">
-                                <x-app.button href="{{ route('app.contracts.show', [$company, $contract]) }}" variant="ghost" size="icon-xs" title="View">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </x-app.button>
-                                <x-app.button href="{{ route('app.contracts.edit', [$company, $contract]) }}" variant="ghost" size="icon-xs" title="Edit">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                </x-app.button>
-                            </div>
+                            <x-app.action-buttons 
+                                :show-route="route('app.contracts.show', [$company, $contract])"
+                                :edit-route="route('app.contracts.edit', [$company, $contract])"
+                            />
                         </x-app.table-td>
                     </x-app.table-tr>
                 @empty
@@ -129,22 +121,17 @@
                             <a href="{{ route('app.contracts.show', [$company, $contract]) }}" class="font-bold text-violet-600 dark:text-violet-400 text-sm">#{{ $contract->contract_prefix }}{{ $contract->id }}</a>
                             <p class="text-xs text-slate-500 dark:text-slate-400">{{ $contract->client->name }}</p>
                         </div>
-                        @php
-                            $statusColors = ['draft' => 'slate', 'active' => 'emerald', 'cancelled' => 'rose', 'expired' => 'slate'];
-                            $color = $statusColors[strtolower($contract->status)] ?? 'violet';
-                        @endphp
-                        <x-app.status-badge :status="$contract->status" :variant="$color" size="xs" dot />
+                        <x-app.status-badge :status="$contract->status" :variant="$statusVariants[strtolower($contract->status)] ?? 'slate'" size="xs" dot />
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/50">
                         <div>
-                            <p class="text-xl font-bold text-slate-900 dark:text-white">{{ $contract->currency === 'EUR' ? '€' : ($contract->currency === 'USD' ? '$' : $contract->currency) }}{{ number_format($contract->total_amount / 100, 2) }}</p>
+                            <x-app.currency :amount="$contract->total_amount" :currency="$contract->currency" class="text-xl font-bold text-slate-900 dark:text-white" />
                             <p class="text-[10px] text-slate-400 dark:text-slate-500">Started: {{ $contract->date->format('M d, Y') }}</p>
                         </div>
-                        <div class="flex items-center gap-1">
-                            <x-app.button href="{{ route('app.contracts.show', [$company, $contract]) }}" variant="ghost" size="icon-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </x-app.button>
-                        </div>
+                        <x-app.action-buttons 
+                            :show-route="route('app.contracts.show', [$company, $contract])"
+                            size="icon-sm"
+                        />
                     </div>
                 </x-app.card>
             @endforeach

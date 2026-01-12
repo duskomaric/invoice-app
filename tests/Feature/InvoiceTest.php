@@ -1,11 +1,12 @@
 <?php
 
-use App\Models\User;
-use App\Models\Client;
-use App\Models\Article;
-use App\Models\Invoice;
 use App\Enums\InvoiceStatusEnum;
 use App\Enums\RoleEnum;
+use App\Models\Article;
+use App\Models\Client;
+use App\Models\Invoice;
+use App\Models\User;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {

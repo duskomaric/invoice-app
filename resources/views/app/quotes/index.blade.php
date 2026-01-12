@@ -14,6 +14,23 @@
 </div>
 @endsection
 
+@php
+$statusColors = [
+    'draft' => 'bg-slate-500',
+    'sent' => 'bg-amber-500',
+    'accepted' => 'bg-emerald-500',
+    'declined' => 'bg-rose-500',
+    'expired' => 'bg-slate-400',
+];
+$statusVariants = [
+    'draft' => 'slate',
+    'sent' => 'amber',
+    'accepted' => 'emerald',
+    'declined' => 'rose',
+    'expired' => 'slate',
+];
+@endphp
+
 @section('content')
 <div class="space-y-5">
     <x-app.stats-grid>
@@ -45,22 +62,7 @@
 
     <x-app.filter-bar placeholder="Search quotes...">
         <x-app.dropdown label="Status" icon="funnel" variant="secondary" size="sm" class="shadow-sm">
-            <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ !request('status') ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                <span class="w-4 h-4 rounded border flex items-center justify-center {{ !request('status') ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                    @if(!request('status'))<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                </span>
-                All Statuses
-            </a>
-            @foreach(['draft', 'sent', 'accepted', 'declined', 'expired'] as $status)
-                <a href="{{ request()->fullUrlWithQuery(['status' => $status]) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ request('status') == $status ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                    <span class="w-4 h-4 rounded border flex items-center justify-center {{ request('status') == $status ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                        @if(request('status') == $status)<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                    </span>
-                    @php $dotColors = ['draft' => 'bg-slate-500', 'sent' => 'bg-amber-500', 'accepted' => 'bg-emerald-500', 'declined' => 'bg-rose-500', 'expired' => 'bg-slate-400']; @endphp
-                    <span class="w-2 h-2 rounded-full {{ $dotColors[$status] }}"></span>
-                    {{ ucfirst($status) }}
-                </a>
-            @endforeach
+            <x-app.status-filter :statuses="['draft', 'sent', 'accepted', 'declined', 'expired']" :colors="$statusColors" />
         </x-app.dropdown>
     </x-app.filter-bar>
 
@@ -68,79 +70,51 @@
         <x-slot:desktop>
             <x-app.table>
                 <x-slot:head>
-                    <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Quote
-                        </div>
-                    </th>
-                    <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            Client
-                        </div>
-                    </th>
-                    <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Amount
-                        </div>
-                    </th>
-                    <th class="text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th class="text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
-                        <div class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            Valid Until
-                        </div>
-                    </th>
-                    <th class="text-right text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <x-app.table-th icon="document-text">Quote</x-app.table-th>
+                    <x-app.table-th icon="user">Client</x-app.table-th>
+                    <x-app.table-th icon="currency-dollar">Amount</x-app.table-th>
+                    <x-app.table-th>Status</x-app.table-th>
+                    <x-app.table-th icon="calendar">Valid Until</x-app.table-th>
+                    <x-app.table-th align="right">Actions</x-app.table-th>
                 </x-slot:head>
 
-                @foreach($quotes as $quote)
-                <tr class="group hover:bg-violet-50/30 dark:hover:bg-violet-900/10 transition-colors">
-                    <td class="px-4 py-3">
-                        <a href="{{ route('app.quotes.show', [$company, $quote]) }}" class="font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 text-xs">
-                            {{ $quote->quote_prefix }}{{ $quote->id }}
-                        </a>
-                    </td>
-                    <td class="px-4 py-3">
-                        <div class="flex items-center gap-2.5">
-                            <x-app.avatar :name="$quote->client->name" size="sm" />
-                            <div>
-                                <p class="font-medium text-slate-800 dark:text-white text-xs">{{ $quote->client->name }}</p>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500">{{ $quote->client->email }}</p>
+                @forelse($quotes as $quote)
+                    <x-app.table-tr hover>
+                        <x-app.table-td>
+                            <a href="{{ route('app.quotes.show', [$company, $quote]) }}" class="font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 text-xs">
+                                {{ $quote->quote_prefix }}{{ $quote->id }}
+                            </a>
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <div class="flex items-center gap-2.5">
+                                <x-app.avatar :name="$quote->client->name" size="sm" />
+                                <div>
+                                    <p class="font-medium text-slate-800 dark:text-white text-xs">{{ $quote->client->name }}</p>
+                                    <p class="text-[10px] text-slate-400 dark:text-slate-500">{{ $quote->client->email }}</p>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3">
-                        <span class="font-bold text-slate-900 dark:text-white text-sm">{{ $quote->currency === 'EUR' ? '€' : ($quote->currency === 'USD' ? '$' : $quote->currency) }}{{ number_format($quote->total_amount / 100, 2) }}</span>
-                    </td>
-                    <td class="px-4 py-3">
-                        @php
-                            $statusColors = [
-                                'draft' => 'slate',
-                                'sent' => 'amber',
-                                'accepted' => 'emerald',
-                                'declined' => 'rose',
-                                'expired' => 'slate',
-                            ];
-                            $color = $statusColors[strtolower($quote->status->value)] ?? 'violet';
-                        @endphp
-                        <x-app.status-badge :status="$quote->status->value" :variant="$color" size="sm" dot pulse="{{ strtolower($quote->status->value) === 'sent' }}" />
-                    </td>
-                    <td class="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs">{{ $quote->valid_until->format('M d, Y') }}</td>
-                    <td class="px-4 py-3 text-right">
-                        <div class="flex items-center justify-end gap-1">
-                            <x-app.button href="{{ route('app.quotes.show', [$company, $quote]) }}" variant="ghost" size="icon-xs" title="View">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            </x-app.button>
-                            <x-app.button href="{{ route('app.quotes.edit', [$company, $quote]) }}" variant="ghost" size="icon-xs" title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </x-app.button>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <x-app.currency :amount="$quote->total_amount" :currency="$quote->currency" class="font-bold text-slate-900 dark:text-white text-sm" />
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <x-app.status-badge :status="$quote->status->value" :variant="$statusVariants[strtolower($quote->status->value)] ?? 'slate'" size="sm" dot :pulse="strtolower($quote->status->value) === 'sent'" />
+                        </x-app.table-td>
+                        <x-app.table-td class="text-slate-500 dark:text-slate-400 text-xs">
+                            {{ $quote->valid_until->format('M d, Y') }}
+                        </x-app.table-td>
+                        <x-app.table-td class="text-right">
+                            <x-app.action-buttons 
+                                :show-route="route('app.quotes.show', [$company, $quote])"
+                                :edit-route="route('app.quotes.edit', [$company, $quote])"
+                            />
+                        </x-app.table-td>
+                    </x-app.table-tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400 italic text-xs">No quotes found</td>
+                    </tr>
+                @endforelse
             </x-app.table>
         </x-slot:desktop>
         
@@ -152,31 +126,18 @@
                         <a href="{{ route('app.quotes.show', [$company, $quote]) }}" class="font-bold text-violet-600 dark:text-violet-400 text-sm">#{{ $quote->quote_prefix }}{{ $quote->id }}</a>
                         <p class="text-xs text-slate-500 dark:text-slate-400">{{ $quote->client->name }}</p>
                     </div>
-                    @php
-                        $statusColors = [
-                            'draft' => 'slate',
-                            'sent' => 'amber',
-                            'accepted' => 'emerald',
-                            'declined' => 'rose',
-                            'expired' => 'slate',
-                        ];
-                        $color = $statusColors[strtolower($quote->status->value)] ?? 'violet';
-                    @endphp
-                    <x-app.status-badge :status="$quote->status->value" :variant="$color" size="xs" dot />
+                    <x-app.status-badge :status="$quote->status->value" :variant="$statusVariants[strtolower($quote->status->value)] ?? 'slate'" size="xs" dot />
                 </div>
                 <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/50">
                     <div>
-                        <p class="text-xl font-bold text-slate-900 dark:text-white">{{ $quote->currency === 'EUR' ? '€' : ($quote->currency === 'USD' ? '$' : $quote->currency) }}{{ number_format($quote->total_amount / 100, 2) }}</p>
+                        <x-app.currency :amount="$quote->total_amount" :currency="$quote->currency" class="text-xl font-bold text-slate-900 dark:text-white" />
                         <p class="text-[10px] text-slate-400 dark:text-slate-500">Until: {{ $quote->valid_until->format('M d') }}</p>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <x-app.button href="{{ route('app.quotes.show', [$company, $quote]) }}" variant="ghost" size="icon-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        </x-app.button>
-                        <x-app.button href="{{ route('app.quotes.edit', [$company, $quote]) }}" variant="ghost" size="icon-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </x-app.button>
-                    </div>
+                    <x-app.action-buttons 
+                        :show-route="route('app.quotes.show', [$company, $quote])"
+                        :edit-route="route('app.quotes.edit', [$company, $quote])"
+                        size="icon-sm"
+                    />
                 </div>
             </x-app.card>
             @endforeach

@@ -20,10 +20,10 @@ class EditArticle extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
 
-//        foreach ($data['prices'] as $currency => $price) {
-//            //cast to float
-//            $data['prices'][$currency] = number_format($price, 2, '.', '');
-//        }
+        //        foreach ($data['prices'] as $currency => $price) {
+        //            //cast to float
+        //            $data['prices'][$currency] = number_format($price, 2, '.', '');
+        //        }
 
         $data['price'] = 111;
         $data['prices_meta'] = $data['prices'] ?? [];

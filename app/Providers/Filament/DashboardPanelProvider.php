@@ -2,9 +2,9 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\GettingStartedWidget;
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\RequestPasswordReset;
+use App\Filament\Widgets\GettingStartedWidget;
 use App\Http\Middleware\CheckForDashboardMaintenanceMiddleware;
 use App\Http\Middleware\UpdateUserLastSeenAtMiddleware;
 use App\Models\CompanySetting;
@@ -16,7 +16,6 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
-use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
@@ -36,9 +35,9 @@ class DashboardPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-//        if (app()->isLocal()) {
-//            URL::forceScheme('https');
-//        }
+        //        if (app()->isLocal()) {
+        //            URL::forceScheme('https');
+        //        }
 
         return $panel
             ->default()
@@ -93,7 +92,7 @@ class DashboardPanelProvider extends PanelProvider
                 Css::make('custom-stylesheet', resource_path('css/custom.css')),
             ])
 
-            //->strictAuthorization()
+            // ->strictAuthorization()
             ->defaultThemeMode(ThemeMode::Light)
 
             ->navigationGroups([
@@ -102,13 +101,13 @@ class DashboardPanelProvider extends PanelProvider
                 'Administration',
             ])
             ->navigationGroups([
-//                NavigationGroup::make()
-//                    ->label('Management'),
-//                NavigationGroup::make()
-//                    ->label('Administration'),
-//                NavigationGroup::make()
-//                    ->label(fn (): string => __('navigation.settings'))
-//                    ->collapsed(),
+                //                NavigationGroup::make()
+                //                    ->label('Management'),
+                //                NavigationGroup::make()
+                //                    ->label('Administration'),
+                //                NavigationGroup::make()
+                //                    ->label(fn (): string => __('navigation.settings'))
+                //                    ->collapsed(),
             ])
 
             ->middleware([

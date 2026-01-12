@@ -19,7 +19,7 @@ it('has invoice relationship', function () {
 it('has article relationship', function () {
     $article = Article::factory()->create();
     $invoice = Invoice::factory()->create();
-    
+
     $item = $invoice->items()->create([
         'article_id' => $article->id,
         'description' => 'Test Item',

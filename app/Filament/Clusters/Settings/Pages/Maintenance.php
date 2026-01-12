@@ -25,14 +25,16 @@ class Maintenance extends Page
 
     protected static ?string $navigationLabel = 'Maintenance';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administration';
 
     protected static ?int $navigationSort = 7;
 
     protected string $view = 'filament.pages.settings';
 
     public bool $dashboard_under_maintenance;
+
     public string $dashboard_under_maintenance_title;
+
     public mixed $dashboard_under_maintenance_text;
 
     public function mount(): void

@@ -6,12 +6,11 @@ namespace App\Services;
 
 use App\Enums\InvoiceStatusEnum;
 use App\Models\Client;
-use App\Models\Invoice;
 
 class PaymentService
 {
     public function __construct(
-        protected InvoiceService $invoiceService = new InvoiceService(),
+        protected InvoiceService $invoiceService = new InvoiceService,
     ) {}
 
     public function allocatePayments(Client $client): void
@@ -22,6 +21,7 @@ class PaymentService
         // If net balance is negative or zero, all invoices are unpaid
         if ($remainingPayment <= 0) {
             $this->markAllInvoicesAsUnpaid($client);
+
             return;
         }
 
@@ -36,6 +36,7 @@ class PaymentService
             if ($remainingPayment <= 0) {
                 // No more money, mark as unpaid (or reset to 0 paid)
                 $this->invoiceService->updateStatus($invoice, 0);
+
                 continue;
             }
 
@@ -64,4 +65,3 @@ class PaymentService
         }
     }
 }
-

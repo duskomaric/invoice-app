@@ -7,8 +7,8 @@ use App\Models\CompanySetting;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Services\DocumentNumberingService;
-use Filament\Facades\Filament;
 use Filament\Actions\CreateAction;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,11 +27,11 @@ class ListInvoices extends ListRecords
         if ($prefixSetting !== 'currency') {
             return [
                 CreateAction::make('create')
-                    ->label(fn () => 'New Invoice (' . $numbering->assign(tap(new Invoice(), function (Invoice $invoice) {
+                    ->label(fn () => 'New Invoice ('.$numbering->assign(tap(new Invoice, function (Invoice $invoice) {
                         $invoice->company_id = Filament::getTenant()?->id;
                         $invoice->currency = null;
                         $invoice->date = now();
-                    }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true) . ')')
+                    }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true).')')
                     ->icon('heroicon-o-plus-circle')
                     ->color('primary')
                     ->url(fn (): string => static::getResource()::getUrl('create')),
@@ -46,11 +46,11 @@ class ListInvoices extends ListRecords
         if ($currencies === []) {
             return [
                 CreateAction::make('create')
-                    ->label(fn () => 'New Invoice (' . $numbering->assign(tap(new Invoice(), function (Invoice $invoice) {
+                    ->label(fn () => 'New Invoice ('.$numbering->assign(tap(new Invoice, function (Invoice $invoice) {
                         $invoice->company_id = Filament::getTenant()?->id;
                         $invoice->currency = null;
                         $invoice->date = now();
-                    }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true) . ')')
+                    }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true).')')
                     ->icon('heroicon-o-plus-circle')
                     ->color('primary')
                     ->url(fn (): string => static::getResource()::getUrl('create')),
@@ -59,12 +59,12 @@ class ListInvoices extends ListRecords
 
         $actions = [];
         foreach ($currencies as $currency) {
-            $actions[] = CreateAction::make('create_' . strtolower($currency))
-                ->label(fn () => 'New ' . $currency . ' (' . $numbering->assign(tap(new Invoice(), function (Invoice $invoice) use ($currency) {
+            $actions[] = CreateAction::make('create_'.strtolower($currency))
+                ->label(fn () => 'New '.$currency.' ('.$numbering->assign(tap(new Invoice, function (Invoice $invoice) use ($currency) {
                     $invoice->company_id = Filament::getTenant()?->id;
                     $invoice->currency = $currency;
                     $invoice->date = now();
-                }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true) . ')')
+                }), ['prefix' => 'invoice_prefix', 'year' => 'invoice_year', 'number' => 'invoice_number'], preview: true).')')
                 ->icon('heroicon-o-plus-circle')
                 ->color('primary')
                 ->url(fn (): string => static::getResource()::getUrl('create', ['currency' => $currency]));

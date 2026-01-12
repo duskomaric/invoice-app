@@ -46,14 +46,14 @@ return [
     'ofs_seller_town' => 'Pranjvor',
 
     // Invoice Numbering Settings
-//    'invoice_prefixes' => [
-//        'BAM' => 'BAM',
-//        'EUR' => 'EUR',
-//    ],
-//    'invoice_sequences' => [
-//        'BAM' => [],
-//        'EUR' => [],
-//    ],
-//    'invoice_default_currency' => 'BAM',
+    //    'invoice_prefixes' => [
+    //        'BAM' => 'BAM',
+    //        'EUR' => 'EUR',
+    //    ],
+    //    'invoice_sequences' => [
+    //        'BAM' => [],
+    //        'EUR' => [],
+    //    ],
+    //    'invoice_default_currency' => 'BAM',
 
 ];

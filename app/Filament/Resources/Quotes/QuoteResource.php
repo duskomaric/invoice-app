@@ -11,8 +11,8 @@ use App\Filament\Resources\Quotes\Tables\QuoteTable;
 use App\Models\Currency;
 use App\Models\Quote;
 use Filament\Facades\Filament;
-use Filament\Resources\Resource;
 use Filament\Resources\Components\Tab;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
@@ -21,13 +21,13 @@ class QuoteResource extends Resource
     protected static ?string $model = Quote::class;
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-duplicate';
-    
+
     protected static ?string $navigationLabel = 'Ponude';
-    
+
     protected static ?string $modelLabel = 'Ponuda';
-    
+
     protected static ?string $pluralModelLabel = 'Ponude';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function shouldRegisterNavigation(): bool

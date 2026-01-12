@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 class SyncTaxCategoriesCommand extends Command
 {
     protected $signature = 'ofs:sync-tax-categories';
+
     protected $description = 'Fetch tax categories from OFS /api/status and store them in settings table';
 
     public function handle(OFSService $ofs)
@@ -18,7 +19,8 @@ class SyncTaxCategoriesCommand extends Command
         $response = $ofs->getStatus(); // or getSettings() if your service uses that
 
         if (! $response->successful()) {
-            $this->error('Failed to fetch OFS status: ' . $response->status());
+            $this->error('Failed to fetch OFS status: '.$response->status());
+
             return Command::FAILURE;
         }
 
@@ -46,7 +48,7 @@ class SyncTaxCategoriesCommand extends Command
                 if (! array_key_exists($label, $ratesByLabel)) {
                     $ratesByLabel[$label] = [
                         'label' => $label,
-                        'rate'  => $value,
+                        'rate' => $value,
                     ];
                 }
             }
@@ -61,7 +63,7 @@ class SyncTaxCategoriesCommand extends Command
             ['value' => json_encode($clean, JSON_UNESCAPED_UNICODE)]
         );
 
-        $this->info('Synced ' . count($clean) . ' tax rates.');
+        $this->info('Synced '.count($clean).' tax rates.');
         $this->line(json_encode($clean, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         return Command::SUCCESS;

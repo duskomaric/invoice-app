@@ -2,15 +2,13 @@
 
 namespace App\Policies;
 
+use App\Enums\RoleEnum;
 use App\Models\Company;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
-
-use App\Enums\RoleEnum;
 
 class CompanyPolicy
 {
-    public function before(User $user, string $ability): bool|null
+    public function before(User $user, string $ability): ?bool
     {
         if ($user->role === RoleEnum::SuperAdmin) {
             return true;

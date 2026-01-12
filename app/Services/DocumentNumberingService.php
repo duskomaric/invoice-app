@@ -6,10 +6,6 @@ namespace App\Services;
 
 use App\Models\Company;
 use App\Models\CompanySetting;
-use App\Models\Contract;
-use App\Models\Invoice;
-use App\Models\Proforma;
-use App\Models\Quote;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -39,7 +35,7 @@ class DocumentNumberingService
 
         $last = $query
             ->where($yearColumn, $year)
-            ->orderByRaw('CAST(' . $numberColumn . ' AS UNSIGNED) DESC')
+            ->orderByRaw('CAST('.$numberColumn.' AS UNSIGNED) DESC')
             ->value($numberColumn);
 
         $next = max(is_numeric($last) ? (int) $last : 0, $start - 1) + 1;
@@ -50,7 +46,7 @@ class DocumentNumberingService
             ? "{$padded}/{$displayYear}"
             : "{$prefix}-{$padded}/{$displayYear}";
 
-        if (!$preview) {
+        if (! $preview) {
             $model->currency = $currency;
             $model->{$prefixColumn} = $prefix;
             $model->{$yearColumn} = $year;
@@ -80,7 +76,7 @@ class DocumentNumberingService
 
         $last = $query
             ->where($yearColumn, $year)
-            ->orderByRaw('CAST(' . $numberColumn . ' AS UNSIGNED) DESC')
+            ->orderByRaw('CAST('.$numberColumn.' AS UNSIGNED) DESC')
             ->value($numberColumn);
 
         $next = max(is_numeric($last) ? (int) $last : 0, $start - 1) + 1;

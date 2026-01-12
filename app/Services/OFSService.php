@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\Log;
 class OFSService
 {
     protected $baseUrl;
+
     protected ?Company $company = null;
 
     public function __construct(?Company $company = null)
     {
         // Resolve company/tenant
         $this->company = $company;
-        if (!$this->company) {
+        if (! $this->company) {
             try {
                 $tenant = Filament::getTenant();
                 if ($tenant instanceof Company) {
@@ -37,16 +38,17 @@ class OFSService
      */
     protected function getConf(string $key, string $default = ''): string
     {
-        if ($this->company && !empty($this->company->$key)) {
+        if ($this->company && ! empty($this->company->$key)) {
             return $this->company->$key;
         }
+
         return Setting::get($key, $default);
     }
 
     protected function headers()
     {
         return [
-            'Authorization' => 'Bearer ' . $this->getConf('ofs_api_key'),
+            'Authorization' => 'Bearer '.$this->getConf('ofs_api_key'),
             'X-Teron-SerialNumber' => $this->getConf('ofs_serial_number'),
             'X-PAC' => $this->getConf('ofs_pac'),
             'Content-Type' => 'application/json',
@@ -56,7 +58,7 @@ class OFSService
 
     public function getStatus()
     {
-        $endpoint = $this->baseUrl . '/api/status';
+        $endpoint = $this->baseUrl.'/api/status';
 
         Log::info('OFS getStatus - Request', [
             'url' => $endpoint,
@@ -66,14 +68,13 @@ class OFSService
         $response = Http::withHeaders($this->headers())->get($endpoint);
 
         Log::info('OFS getStatus - Response', [
-            'status'     => $response->status(),
+            'status' => $response->status(),
             'successful' => $response->successful(),
-            'json'       => $response->json(),
+            'json' => $response->json(),
         ]);
 
         return $response;
     }
-
 
     /**
      * Test API availability (GET /api/attention)
@@ -81,7 +82,7 @@ class OFSService
      */
     public function testAttention()
     {
-        $endpoint = $this->baseUrl . '/api/attention';
+        $endpoint = $this->baseUrl.'/api/attention';
 
         Log::info('OFS testAttention - Request', [
             'url' => $endpoint,
@@ -104,7 +105,7 @@ class OFSService
     public function createInvoice(array $payload)
     {
         // API endpoint: https://pos.ofs.ba/api/invoices
-        $endpoint = $this->baseUrl . '/api/invoices';
+        $endpoint = $this->baseUrl.'/api/invoices';
 
         Log::info('OFS createInvoice - Request', [
             'url' => $endpoint,
@@ -129,7 +130,7 @@ class OFSService
     public function printInvoice(array $payload)
     {
         // API endpoint: https://pos.ofs.ba/api/print
-        $endpoint = $this->baseUrl . '/api/print';
+        $endpoint = $this->baseUrl.'/api/print';
 
         Log::info('OFS printInvoice - Request', [
             'url' => $endpoint,
@@ -154,7 +155,7 @@ class OFSService
     public function getSettings()
     {
         // API endpoint: https://pos.ofs.ba/api/settings
-        $endpoint = $this->baseUrl . '/api/settings';
+        $endpoint = $this->baseUrl.'/api/settings';
 
         Log::info('OFS getSettings - Request', [
             'url' => $endpoint,

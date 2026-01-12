@@ -5,14 +5,14 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum PaymentTypeEnum: string implements HasLabel, HasColor
+enum PaymentTypeEnum: string implements HasColor, HasLabel
 {
     case INCOME = 'income';
     case EXPENSE = 'expense';
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::INCOME => 'Uplata',
             self::EXPENSE => 'Isplata',
         };
@@ -20,7 +20,7 @@ enum PaymentTypeEnum: string implements HasLabel, HasColor
 
     public function getColor(): string|array|null
     {
-        return match($this) {
+        return match ($this) {
             self::INCOME => 'success',
             self::EXPENSE => 'danger',
         };

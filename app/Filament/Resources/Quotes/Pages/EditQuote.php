@@ -24,7 +24,7 @@ class EditQuote extends EditRecord
                 ->requiresConfirmation()
                 ->action(function (DocumentConversionService $service) {
                     $proforma = $service->convertQuoteToProforma($this->record);
-                    
+
                     $this->redirect(ProformaResource::getUrl('edit', ['record' => $proforma]));
                 }),
             Actions\Action::make('convert_to_invoice')
@@ -34,7 +34,7 @@ class EditQuote extends EditRecord
                 ->requiresConfirmation()
                 ->action(function (DocumentConversionService $service) {
                     $invoice = $service->convertQuoteToInvoice($this->record);
-                    
+
                     $this->redirect(InvoiceResource::getUrl('edit', ['record' => $invoice]));
                 }),
         ];

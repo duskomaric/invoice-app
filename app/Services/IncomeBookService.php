@@ -6,12 +6,12 @@ use App\Enums\ArticleTypeEnum;
 use App\Enums\InvoiceStatusEnum;
 use App\Enums\PaymentTypeEnum;
 use App\Enums\ReviewStatusEnum;
+use App\Models\Article;
 use App\Models\IncomeBookEntry;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\Article;
-use App\Models\Quote;
 use App\Models\Proforma;
+use App\Models\Quote;
 
 class IncomeBookService
 {
@@ -70,7 +70,7 @@ class IncomeBookService
         return IncomeBookEntry::create([
             'company_id' => $payment->company_id,
             'booking_date' => $payment->payment_date,
-            'description' => "Uplata po fakturi br. {$invoice->formatted_number}" .
+            'description' => "Uplata po fakturi br. {$invoice->formatted_number}".
                             ($payment->document_number ? " - {$payment->document_number}" : ''),
 
             'income_products' => $categorizedIncome['products'],
@@ -93,7 +93,7 @@ class IncomeBookService
             'company_id' => $payment->company_id,
             'booking_date' => $payment->payment_date,
             'description' => $incomeData['description'] ??
-                            "Uplata bez fakture" .
+                            'Uplata bez fakture'.
                             ($payment->document_number ? " - {$payment->document_number}" : ''),
 
             'income_products' => $incomeData['income_products'] ?? 0,
@@ -119,7 +119,7 @@ class IncomeBookService
         return IncomeBookEntry::create([
             'company_id' => $payment->company_id,
             'booking_date' => $payment->payment_date,
-            'description' => "Uplata po ponudi br. {$quote->formatted_number}" .
+            'description' => "Uplata po ponudi br. {$quote->formatted_number}".
                             ($payment->document_number ? " - {$payment->document_number}" : ''),
 
             'income_products' => $categorizedIncome['products'],
@@ -145,7 +145,7 @@ class IncomeBookService
         return IncomeBookEntry::create([
             'company_id' => $payment->company_id,
             'booking_date' => $payment->payment_date,
-            'description' => "Uplata po predračunu br. {$proforma->formatted_number}" .
+            'description' => "Uplata po predračunu br. {$proforma->formatted_number}".
                             ($payment->document_number ? " - {$payment->document_number}" : ''),
 
             'income_products' => $categorizedIncome['products'],
@@ -252,11 +252,11 @@ class IncomeBookService
 
     private function getArticleCategory(?Article $article): string
     {
-        if (!$article || !$article->type) {
+        if (! $article || ! $article->type) {
             return 'other';
         }
 
-        return match($article->type) {
+        return match ($article->type) {
             ArticleTypeEnum::GOODS => 'goods',
             ArticleTypeEnum::SERVICES => 'services',
             ArticleTypeEnum::PRODUCTS => 'products',
@@ -293,6 +293,7 @@ class IncomeBookService
             ->get()
             ->map(function ($invoice) {
                 $balance = $this->getInvoiceBalance($invoice);
+
                 return [
                     'id' => $invoice->id,
                     'number' => $invoice->formatted_number,

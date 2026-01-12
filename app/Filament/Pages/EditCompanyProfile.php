@@ -23,8 +23,8 @@ class EditCompanyProfile extends EditTenantProfile
                         \Filament\Forms\Components\Placeholder::make('subscription_info')
                             ->label('Valid Until')
                             ->content(fn ($record) => $record->subscription_ends_at
-                                ? $record->subscription_ends_at->format('d.m.Y') .
-                                  ' (' . ($record->subscription_ends_at->isPast() ? 'Expired' : $record->subscription_ends_at->diffForHumans()) . ')'
+                                ? $record->subscription_ends_at->format('d.m.Y').
+                                  ' ('.($record->subscription_ends_at->isPast() ? 'Expired' : $record->subscription_ends_at->diffForHumans()).')'
                                 : 'Lifetime Subscription (Unlimited)'
                             )
                             ->columnSpanFull(),

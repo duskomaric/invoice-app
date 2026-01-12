@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum ArticleTypeEnum: string implements HasLabel, HasColor
+enum ArticleTypeEnum: string implements HasColor, HasLabel
 {
     case GOODS = 'goods';
     case SERVICES = 'services';
@@ -13,7 +13,7 @@ enum ArticleTypeEnum: string implements HasLabel, HasColor
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::GOODS => 'Roba',
             self::SERVICES => 'Usluge',
             self::PRODUCTS => 'Proizvodi',
@@ -22,7 +22,7 @@ enum ArticleTypeEnum: string implements HasLabel, HasColor
 
     public function getColor(): string|array|null
     {
-        return match($this) {
+        return match ($this) {
             self::GOODS => 'info',
             self::SERVICES => 'success',
             self::PRODUCTS => 'warning',

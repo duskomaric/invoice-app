@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Article;
 use App\Models\Proforma;
 use App\Models\ProformaItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProformaItemFactory extends Factory
 {
     protected $model = ProformaItem::class;
+
     public function definition(): array
     {
         $quantity = fake()->numberBetween(1, 5);
@@ -27,4 +27,3 @@ class ProformaItemFactory extends Factory
         ];
     }
 }
-

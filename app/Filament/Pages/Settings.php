@@ -85,33 +85,48 @@ class Settings extends Page
 
     public string $warning_color;
 
-
-
     public $invoice_pdf_filename_format;
 
     public $company_name;
+
     public $company_address;
+
     public $company_email;
+
     public $company_phone;
+
     public $company_vat_id;
 
     // SMTP Settings
     public $smtp_host;
+
     public $smtp_port;
+
     public $smtp_username;
+
     public $smtp_password;
+
     public $smtp_encryption;
+
     public $smtp_from_address;
+
     public $smtp_from_name;
 
     // OFS Fiscalization Settings
     public $ofs_base_url;
+
     public $ofs_api_key;
+
     public $ofs_serial_number;
+
     public $ofs_pac;
+
     public $ofs_seller_tin;
+
     public $ofs_seller_name;
+
     public $ofs_seller_address;
+
     public $ofs_seller_town;
 
     public ?string $selectedRole;
@@ -397,7 +412,7 @@ class Settings extends Page
                         ])
                         ->columns(2),
                 ])
-                ->icon('heroicon-o-envelope'),
+                    ->icon('heroicon-o-envelope'),
 
                 // -----------------------
                 // Notifications
@@ -590,11 +605,10 @@ class Settings extends Page
         Setting::set('success_color', $data['success_color'] ?? Color::Green->value);
         Setting::set('warning_color', $data['warning_color'] ?? Color::Yellow->value);
 
-
         Setting::set('invoice_pdf_filename_format', $data['invoice_pdf_filename_format'] ?? '');
 
         Setting::set('company_name', $data['company_name'] ?? '');
-        
+
         // SMTP Settings
         Setting::set('smtp_host', $data['smtp_host'] ?? '');
         Setting::set('smtp_port', $data['smtp_port'] ?? '');

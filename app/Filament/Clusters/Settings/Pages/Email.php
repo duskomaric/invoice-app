@@ -22,18 +22,24 @@ class Email extends Page
 
     protected static ?string $navigationLabel = 'Email';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Company Settings';
 
     protected static ?int $navigationSort = 5;
 
     protected string $view = 'filament.pages.settings';
 
     public string $smtp_host;
+
     public string $smtp_port;
+
     public string $smtp_username;
+
     public string $smtp_password;
+
     public string $smtp_encryption;
+
     public string $smtp_from_address;
+
     public string $smtp_from_name;
 
     public function mount(): void

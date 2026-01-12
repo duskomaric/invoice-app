@@ -77,7 +77,7 @@ class CompanySetting extends Model
 
     private static function settings(int $companyId): array
     {
-        $cacheKey = self::$cacheKey . '_' . $companyId;
+        $cacheKey = self::$cacheKey.'_'.$companyId;
 
         return self::$cachedSettings[$cacheKey] ??= Cache::remember($cacheKey, now()->addMinutes(3), function () use ($companyId) {
             try {
@@ -149,7 +149,7 @@ class CompanySetting extends Model
             ['value' => $stored],
         );
 
-        $cacheKey = self::$cacheKey . '_' . $resolvedCompanyId;
+        $cacheKey = self::$cacheKey.'_'.$resolvedCompanyId;
         Cache::forget($cacheKey);
         unset(self::$cachedSettings[$cacheKey]);
     }
@@ -162,7 +162,7 @@ class CompanySetting extends Model
             return;
         }
 
-        $cacheKey = self::$cacheKey . '_' . $resolvedCompanyId;
+        $cacheKey = self::$cacheKey.'_'.$resolvedCompanyId;
         Cache::forget($cacheKey);
         unset(self::$cachedSettings[$cacheKey]);
     }

@@ -18,8 +18,9 @@ class CompanyResource extends Resource
 {
     protected static ?string $model = Company::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
-    protected static string | \UnitEnum | null $navigationGroup = 'Administration';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Administration';
 
     protected static bool $isScopedToTenant = false;
 
@@ -90,8 +91,8 @@ class CompanyResource extends Resource
                     ->sortable()
                     ->description(fn (Company $record) => $record->subscription_ends_at
                         ? ($record->subscription_ends_at->isPast()
-                            ? 'Expired ' . $record->subscription_ends_at->diffForHumans()
-                            : 'Expires ' . $record->subscription_ends_at->diffForHumans())
+                            ? 'Expired '.$record->subscription_ends_at->diffForHumans()
+                            : 'Expires '.$record->subscription_ends_at->diffForHumans())
                         : 'Unlimited access'
                     )
                     ->color(fn (Company $record) => match (true) {
@@ -112,9 +113,9 @@ class CompanyResource extends Resource
                 DeleteAction::make(),
             ])
             ->bulkActions([
-//                \Filament\Tables\Actions\BulkActionGroup::make([
-//                    \Filament\Tables\Actions\DeleteBulkAction::make(),
-//                ]),
+                //                \Filament\Tables\Actions\BulkActionGroup::make([
+                //                    \Filament\Tables\Actions\DeleteBulkAction::make(),
+                //                ]),
             ]);
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CompanySettingFactory extends Factory
 {
     protected $model = CompanySetting::class;
+
     public function definition(): array
     {
         return [
@@ -18,4 +19,3 @@ class CompanySettingFactory extends Factory
         ];
     }
 }
-

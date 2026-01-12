@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class InvoiceEmailLogFactory extends Factory
 {
     protected $model = InvoiceEmailLog::class;
+
     public function definition(): array
     {
         return [
@@ -18,4 +19,3 @@ class InvoiceEmailLogFactory extends Factory
         ];
     }
 }
-

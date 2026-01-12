@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_small_business')->default(false);
             $table->timestamp('subscription_ends_at')->nullable();
-            
+
             // Address & Contact
             $table->string('address')->nullable();
             $table->string('city')->nullable();
@@ -28,11 +28,11 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('website')->nullable();
-            
+
             // Legal
             $table->string('identification_number')->nullable(); // JIB
             $table->string('vat_number')->nullable(); // PDV ID
-            
+
             // OFS / Fiscalization Configuration
             // These replace the global settings for multi-tenant setup
             $table->string('ofs_base_url')->default('https://pos.ofs.ba');
@@ -48,7 +48,7 @@ return new class extends Migration
             $table->string('smtp_encryption')->nullable();
             $table->string('smtp_from_address')->nullable();
             $table->string('smtp_from_name')->nullable();
-            
+
             $table->timestamps();
         });
 
@@ -58,7 +58,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             $table->unique(['company_id', 'user_id']);
         });
     }

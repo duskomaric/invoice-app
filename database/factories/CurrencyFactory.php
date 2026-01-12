@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;
+
     public function definition(): array
     {
         $currencies = [
@@ -64,4 +65,3 @@ class CurrencyFactory extends Factory
         ]);
     }
 }
-

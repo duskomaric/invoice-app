@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\InvoiceTemplateEnum;
 use App\Enums\InvoiceStatusEnum;
+use App\Enums\InvoiceTemplateEnum;
 use App\Mail\InvoiceMail;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
 use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceService
 {
     public function generatePdf(Invoice $invoice): string
     {
         $html = $this->getPdfHtml($invoice);
+
         return Pdf::loadHTML($html)->output();
     }
 

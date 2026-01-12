@@ -1,8 +1,9 @@
 <?php
 
 use App\Enums\RoleEnum;
-use App\Models\User;
 use App\Models\Article;
+use App\Models\User;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -47,7 +48,7 @@ it('can edit article', function () {
         ->assertHasNoFormErrors();
 
     $article->refresh();
-    
+
     expect($article->name)->toBe('Updated Name')
         ->and($article->price)->toBe(200000); // 20.00 in input = 2000 cents, MoneyInput * 100
 });

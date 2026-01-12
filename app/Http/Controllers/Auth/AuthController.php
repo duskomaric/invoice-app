@@ -90,17 +90,18 @@ class AuthController extends Controller
             return redirect()->route('app.company.select');
         }
 
-        if (!$user->invitation_code) {
+        if (! $user->invitation_code) {
             return redirect()->route('login')->with('error', 'Invalid or expired invitation link.');
         }
 
         $invitedUser = $user;
+
         return view('auth.register', compact('invitedUser'));
     }
 
     public function register(Request $request, User $user)
     {
-        if (!$user->invitation_code) {
+        if (! $user->invitation_code) {
             return redirect()->route('login')->with('error', 'Invalid or expired invitation link.');
         }
 

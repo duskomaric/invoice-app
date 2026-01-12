@@ -119,15 +119,15 @@ enum PermissionEnum: string
     {
         return match ($this) {
             self::DASHBOARD_VIEW => 'Dashboard',
-            
+
             self::USER_CREATE, self::USER_EDIT, self::USER_LIST, self::USER_VIEW, self::USER_DELETE => 'Users',
-            
+
             self::CLIENT_CREATE, self::CLIENT_EDIT, self::CLIENT_LIST, self::CLIENT_VIEW, self::CLIENT_DELETE => 'Clients',
-            
+
             self::INVOICE_CREATE, self::INVOICE_EDIT, self::INVOICE_LIST, self::INVOICE_VIEW, self::INVOICE_DELETE => 'Invoices',
-            
+
             self::ARTICLE_CREATE, self::ARTICLE_EDIT, self::ARTICLE_LIST, self::ARTICLE_VIEW, self::ARTICLE_DELETE => 'Articles',
-            
+
             self::PAYMENT_CREATE, self::PAYMENT_EDIT, self::PAYMENT_LIST, self::PAYMENT_VIEW, self::PAYMENT_DELETE => 'Payments',
         };
     }

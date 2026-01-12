@@ -1,3 +1,10 @@
+@extends('layouts.app')
+
+@section('title', 'Appearance - ' . $company->name)
+@section('page-title', 'Appearance')
+@section('page-subtitle', 'Customize how your application looks')
+
+@section('content')
 <x-app.settings-layout :company="$company" active="appearance">
     <x-app.card>
         <x-app.section-header title="Appearance & Branding" subtitle="Customize how your application looks" icon="swatch" variant="secondary" />
@@ -64,3 +71,4 @@
         </form>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

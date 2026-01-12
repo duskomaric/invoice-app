@@ -22,7 +22,7 @@ class Fiscalization extends Page
 
     protected static ?string $navigationLabel = 'Fiscalization';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Company Settings';
 
     protected static ?int $navigationSort = 3;
 

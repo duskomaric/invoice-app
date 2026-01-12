@@ -33,7 +33,7 @@ class ProformaForm
                     ->schema([
                         Section::make('Predračun')
                             ->description(fn (Get $get) => app(DocumentNumberingService::class)->assign(
-                                tap(new Proforma(), function (Proforma $proforma) use ($get) {
+                                tap(new Proforma, function (Proforma $proforma) use ($get) {
                                     $proforma->company_id = Filament::getTenant()?->id;
                                     $proforma->currency = $get('currency');
                                     $proforma->date = $get('date') ?? now();

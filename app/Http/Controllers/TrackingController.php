@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class TrackingController extends Controller
 {
     public function pixel($id)
@@ -26,11 +24,11 @@ class TrackingController extends Controller
             if (! $log->clicked_at) {
                 $log->update(['clicked_at' => now()]);
             }
-            
+
             // Redirect to download PDF
             return response()->streamDownload(function () use ($log) {
-                echo (new \App\Services\InvoiceService())->generatePdf($log->invoice);
-            }, (new \App\Services\InvoiceService())->getPdfFilename($log->invoice), [
+                echo (new \App\Services\InvoiceService)->generatePdf($log->invoice);
+            }, (new \App\Services\InvoiceService)->getPdfFilename($log->invoice), [
                 'Content-Type' => 'application/pdf',
             ]);
         }

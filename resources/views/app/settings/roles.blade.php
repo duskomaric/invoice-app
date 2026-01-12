@@ -1,3 +1,10 @@
+@extends('layouts.app')
+
+@section('title', 'Roles & Permissions - ' . $company->name)
+@section('page-title', 'Roles & Permissions')
+@section('page-subtitle', 'Control who can access what in your company')
+
+@section('content')
 <x-app.settings-layout :company="$company" active="roles">
     <x-app.card>
         <div class="flex items-center justify-between mb-8">
@@ -84,3 +91,4 @@
         </div>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

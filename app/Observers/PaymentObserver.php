@@ -23,18 +23,20 @@ class PaymentObserver
 
         if ($payment->type !== PaymentTypeEnum::INCOME) {
             \Log::info('Payment is not INCOME type, skipping');
+
             return;
         }
 
-        if (!$payment->company) {
+        if (! $payment->company) {
             \Log::warning('Payment has no company, skipping');
+
             return;
         }
 
-//        if (!$payment->company->is_small_business) {
-//            \Log::info('Company is not small business, skipping');
-//            return;
-//        }
+        //        if (!$payment->company->is_small_business) {
+        //            \Log::info('Company is not small business, skipping');
+        //            return;
+        //        }
 
         \Log::info('Creating IncomeBookEntry', [
             'invoice_id' => $payment->invoice_id,

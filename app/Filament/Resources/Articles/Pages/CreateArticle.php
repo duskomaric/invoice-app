@@ -12,8 +12,8 @@ class CreateArticle extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         foreach ($data['prices'] as $currency => $price) {
-            //cast to float
-            $data['prices'][$currency] = (float)$price;
+            // cast to float
+            $data['prices'][$currency] = (float) $price;
         }
 
         $data['price'] = 111;
@@ -21,5 +21,4 @@ class CreateArticle extends CreateRecord
 
         return $data;
     }
-
 }

@@ -69,17 +69,16 @@ class Contract extends Model
 
     public function getFormattedNumberAttribute(): string
     {
-        if (!$this->contract_number) {
+        if (! $this->contract_number) {
             return "ID-{$this->id}";
         }
 
         $year = $this->contract_year ?: (int) ($this->date?->year ?? now()->year);
 
-        if (!$this->contract_prefix) {
+        if (! $this->contract_prefix) {
             return "{$this->contract_number}/{$year}";
         }
 
         return "{$this->contract_prefix}-{$this->contract_number}/{$year}";
     }
 }
-

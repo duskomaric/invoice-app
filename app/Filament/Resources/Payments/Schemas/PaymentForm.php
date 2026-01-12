@@ -48,13 +48,13 @@ class PaymentForm
                             ->content(function ($get, $record) {
                                 $clientId = $get('client_id') ?? $record?->client_id;
 
-                                if (!$clientId) {
+                                if (! $clientId) {
                                     return 'Select a client first';
                                 }
 
                                 $client = \App\Models\Client::find($clientId);
 
-                                if (!$client) {
+                                if (! $client) {
                                     return 'N/A';
                                 }
 
@@ -62,7 +62,7 @@ class PaymentForm
                                 $totalPaid = $client->payments()->sum('amount');
                                 $balance = $totalPaid - $totalInvoiced;
 
-                                return number_format($balance / 100, 2, ',', '.') . ' KM';
+                                return number_format($balance / 100, 2, ',', '.').' KM';
                             }),
                         \App\Filament\Components\MoneyInput::make('amount')
                             ->required()

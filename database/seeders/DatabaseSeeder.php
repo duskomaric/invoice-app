@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\LanguageEnum;
+use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
 use App\Enums\UserStatusEnum;
 use App\Models\Article;
@@ -18,15 +18,14 @@ use App\Models\IncomeBookEntry;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Payment;
+use App\Models\Permission;
+use App\Models\PermissionRoleEnum;
 use App\Models\Proforma;
 use App\Models\ProformaItem;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use App\Enums\PermissionEnum;
-use App\Models\Permission;
-use App\Models\PermissionRoleEnum;
 
 class DatabaseSeeder extends Seeder
 {

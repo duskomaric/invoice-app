@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CompanyBankAccountFactory extends Factory
 {
     protected $model = CompanyBankAccount::class;
+
     public function definition(): array
     {
         return [
             'company_id' => Company::factory(),
-            'bank_name' => fake()->company() . ' Bank',
+            'bank_name' => fake()->company().' Bank',
             'account_number' => fake()->numerify('##########'),
             'swift' => fake()->optional()->regexify('[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}[A-Z0-9]{3}'),
             'is_default' => false,
@@ -27,4 +28,3 @@ class CompanyBankAccountFactory extends Factory
         ]);
     }
 }
-

@@ -11,8 +11,8 @@ use App\Filament\Resources\Proformas\Tables\ProformaTable;
 use App\Models\Currency;
 use App\Models\Proforma;
 use Filament\Facades\Filament;
-use Filament\Resources\Resource;
 use Filament\Resources\Components\Tab;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
@@ -21,13 +21,13 @@ class ProformaResource extends Resource
     protected static ?string $model = Proforma::class;
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-chart-bar';
-    
+
     protected static ?string $navigationLabel = 'Predračuni';
-    
+
     protected static ?string $modelLabel = 'Predračun';
-    
+
     protected static ?string $pluralModelLabel = 'Predračuni';
-    
+
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool

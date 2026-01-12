@@ -29,7 +29,7 @@ class InvoiceServiceTest extends TestCase
             'total' => 10000,
         ]);
 
-        $service = new InvoiceService();
+        $service = new InvoiceService;
         $service->updateStatus($invoice, 10000);
 
         $this->assertEquals(10000, $invoice->amount_paid);
@@ -53,7 +53,7 @@ class InvoiceServiceTest extends TestCase
             'total' => 10000,
         ]);
 
-        $service = new InvoiceService();
+        $service = new InvoiceService;
         $service->updateStatus($invoice, 5000);
 
         $this->assertEquals(5000, $invoice->amount_paid);
@@ -77,7 +77,7 @@ class InvoiceServiceTest extends TestCase
             'total' => 10000,
         ]);
 
-        $service = new InvoiceService();
+        $service = new InvoiceService;
         $service->updateStatus($invoice, 0);
 
         $this->assertEquals(0, $invoice->amount_paid);
@@ -101,7 +101,7 @@ class InvoiceServiceTest extends TestCase
             'total' => 10000,
         ]);
 
-        $service = new InvoiceService();
+        $service = new InvoiceService;
         $service->updateStatus($invoice, 0);
 
         $this->assertEquals(0, $invoice->amount_paid);

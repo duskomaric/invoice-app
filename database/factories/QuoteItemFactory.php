@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Article;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class QuoteItemFactory extends Factory
 {
     protected $model = QuoteItem::class;
+
     public function definition(): array
     {
         $quantity = fake()->numberBetween(1, 5);
@@ -27,4 +27,3 @@ class QuoteItemFactory extends Factory
         ];
     }
 }
-

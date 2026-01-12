@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\InvoiceStatusEnum;
 use App\Enums\LanguageEnum;
-use App\Models\CompanySetting;
 use App\Services\DocumentNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,7 +41,7 @@ class Quote extends Model
         parent::boot();
 
         static::creating(function ($quote) {
-            if (!$quote->quote_number) {
+            if (! $quote->quote_number) {
                 $quote->generateQuoteNumber();
             }
         });
@@ -59,7 +58,7 @@ class Quote extends Model
 
     public function getFormattedNumberAttribute(): string
     {
-        if (!$this->quote_number) {
+        if (! $this->quote_number) {
             return "ID-{$this->id}";
         }
 

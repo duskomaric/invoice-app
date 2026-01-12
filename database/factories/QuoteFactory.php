@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class QuoteFactory extends Factory
 {
     protected $model = Quote::class;
+
     public function definition(): array
     {
         return [
@@ -28,4 +29,3 @@ class QuoteFactory extends Factory
         ];
     }
 }
-

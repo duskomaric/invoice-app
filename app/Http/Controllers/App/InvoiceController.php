@@ -20,9 +20,10 @@ class InvoiceController extends Controller
 
         $query = Invoice::where('company_id', $company->id)->with('client');
 
-        if ($activeCurrency) {
-            $query->where('currency', $activeCurrency);
-        }
+        // filter
+        //        if ($activeCurrency) {
+        //            $query->where('currency', $activeCurrency);
+        //        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
@@ -31,8 +32,8 @@ class InvoiceController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->whereHas('client', fn($c) => $c->where('name', 'like', "%{$search}%"))
-                  ->orWhereRaw("CONCAT(COALESCE(invoice_prefix, ''), '-', invoice_number, '/', invoice_year) LIKE ?", ["%{$search}%"]);
+                $q->whereHas('client', fn ($c) => $c->where('name', 'like', "%{$search}%"))
+                    ->orWhereRaw("CONCAT(COALESCE(invoice_prefix, ''), '-', invoice_number, '/', invoice_year) LIKE ?", ["%{$search}%"]);
             });
         }
 
@@ -86,7 +87,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::create([
             'company_id' => $company->id,
             'client_id' => $validated['client_id'],
-            'status' => 'unpaid',
+            //            'status' => 'unpaid',
             'date' => $validated['date'],
             'due_date' => $validated['due_date'] ?? now()->addDays((int) CompanySetting::get('default_invoice_due_days', 14, $company->id)),
             'currency' => $validated['currency'],
@@ -97,7 +98,7 @@ class InvoiceController extends Controller
         foreach ($validated['items'] as $item) {
             $unitPriceCents = (int) round($item['unit_price'] * 100);
             $taxRate = $item['tax_rate'] ?? 17;
-            
+
             $invoice->items()->create([
                 'article_id' => $item['article_id'] ?? null,
                 'name' => $item['name'],

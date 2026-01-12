@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\InvoiceStatusEnum;
 use App\Enums\LanguageEnum;
-use App\Models\CompanySetting;
 use App\Services\DocumentNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +44,7 @@ class Proforma extends Model
         parent::boot();
 
         static::creating(function ($proforma) {
-            if (!$proforma->proforma_number) {
+            if (! $proforma->proforma_number) {
                 $proforma->generateProformaNumber();
             }
         });
@@ -62,7 +61,7 @@ class Proforma extends Model
 
     public function getFormattedNumberAttribute(): string
     {
-        if (!$this->proforma_number) {
+        if (! $this->proforma_number) {
             return "ID-{$this->id}";
         }
 

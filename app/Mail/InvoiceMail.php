@@ -2,12 +2,11 @@
 
 namespace App\Mail;
 
-use App\Services\InvoiceService;
 use App\Models\CompanySetting;
 use App\Models\Invoice;
+use App\Services\InvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -28,6 +27,7 @@ class InvoiceMail extends Mailable
     {
         if ($this->customSubject) {
             $subject = str_replace('{{ number }}', $this->invoice->id, $this->customSubject);
+
             return new Envelope(subject: $subject);
         }
 
@@ -53,8 +53,9 @@ class InvoiceMail extends Mailable
         $clickUrl = route('email.click', $log->id);
 
         if ($this->customBody) {
-             $body = $this->replacePlaceholders($this->customBody);
-             return new Content(
+            $body = $this->replacePlaceholders($this->customBody);
+
+            return new Content(
                 markdown: 'emails.invoice',
                 with: [
                     'body' => $body,
@@ -69,7 +70,7 @@ class InvoiceMail extends Mailable
 
         $bodyKey = $locale === 'sr' ? 'invoice_email_body_sr' : 'invoice_email_body';
         $body = (string) CompanySetting::get($bodyKey, '');
-        
+
         $body = $this->replacePlaceholders($body);
 
         return new Content(
@@ -89,9 +90,9 @@ class InvoiceMail extends Mailable
             [
                 $this->invoice->client->name,
                 $this->invoice->id,
-                number_format($this->invoice->total / 100, 2) . ' BAM',
+                number_format($this->invoice->total / 100, 2).' BAM',
                 $this->invoice->due_date->format('M d, Y'),
-                CompanySetting::get('company_name', config('app.name'))
+                CompanySetting::get('company_name', config('app.name')),
             ],
             $content
         );

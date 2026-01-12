@@ -39,7 +39,7 @@ return new class extends Migration
             $table->string('frequency')->nullable(); // weekly, monthly, etc.
             $table->date('next_invoice_date')->nullable();
             $table->foreignId('parent_id')->nullable()->constrained('invoices')->nullOnDelete();
-            
+
             // Source document (polymorphic)
             $table->nullableMorphs('sourceable');
 

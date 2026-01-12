@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class EmailSignatureFactory extends Factory
 {
     protected $model = EmailSignature::class;
+
     public function definition(): array
     {
         return [
@@ -26,4 +27,3 @@ class EmailSignatureFactory extends Factory
         ]);
     }
 }
-

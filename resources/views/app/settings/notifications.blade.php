@@ -1,3 +1,10 @@
+@extends('layouts.app')
+
+@section('title', 'Notifications - ' . $company->name)
+@section('page-title', 'Notifications')
+@section('page-subtitle', 'Manage notification preferences')
+
+@section('content')
 <x-app.settings-layout :company="$company" active="notifications">
     <x-app.card>
         <x-app.section-header title="Notification Preferences" subtitle="Stay updated with important document events" icon="bell" variant="primary" />
@@ -61,3 +68,4 @@
         </form>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

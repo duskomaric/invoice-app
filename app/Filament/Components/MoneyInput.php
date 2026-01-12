@@ -31,6 +31,7 @@ class MoneyInput extends TextInput
 
                 $state = str_replace('.', '', $state); // remove thousand separator
                 $state = str_replace(',', '.', $state); // replace comma with dot for decimal
+
                 return (int) round(((float) $state) * 100);
             });
     }

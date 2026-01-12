@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Invoices\Schemas;
 
-use App\Enums\InvoiceTemplateEnum;
 use App\Enums\InvoiceFrequencyEnum;
 use App\Enums\InvoiceStatusEnum;
+use App\Enums\InvoiceTemplateEnum;
 use App\Enums\LanguageEnum;
 use App\Filament\Components\MoneyInput;
 use App\Models\Article;
-use App\Models\CompanyBankAccount;
 use App\Models\CompanySetting;
 use App\Models\Currency;
 use App\Models\Invoice;
@@ -16,7 +15,6 @@ use App\Services\DocumentNumberingService;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -44,7 +42,7 @@ class InvoiceForm
                         /* BASIC INVOICE INFO */
                         Section::make('Invoice')
                             ->description(fn (Get $get) => app(DocumentNumberingService::class)->assign(
-                                tap(new Invoice(), function (Invoice $invoice) use ($get) {
+                                tap(new Invoice, function (Invoice $invoice) use ($get) {
                                     $invoice->company_id = Filament::getTenant()?->id;
                                     $invoice->currency = $get('currency');
                                     $invoice->date = $get('date') ?? now();
@@ -117,8 +115,6 @@ class InvoiceForm
                                                 $set('description', $article->description);
                                             })
                                             ->columnSpan(5),
-
-
 
                                         Hidden::make('name'),
                                         Hidden::make('description'),

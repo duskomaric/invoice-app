@@ -21,7 +21,7 @@ class EditPayment extends EditRecord
     protected function afterSave(): void
     {
         $payment = $this->record;
-        $service = new PaymentService();
+        $service = new PaymentService;
         $service->allocatePayments($payment->client);
     }
 }

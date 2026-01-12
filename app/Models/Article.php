@@ -36,12 +36,14 @@ class Article extends Model
     public function getPriceInCents(string $currency): int
     {
         $price = $this->prices_meta[$currency] ?? 0;
+
         return (int) round($price * 100);
     }
 
     public function getFormattedPrice(string $currency): string
     {
         $price = $this->prices_meta[$currency] ?? 0;
+
         return number_format($price, 2);
     }
 

@@ -23,7 +23,7 @@ class EditProforma extends EditRecord
                 ->requiresConfirmation()
                 ->action(function (DocumentConversionService $service) {
                     $invoice = $service->convertProformaToInvoice($this->record);
-                    
+
                     $this->redirect(InvoiceResource::getUrl('edit', ['record' => $invoice]));
                 }),
         ];

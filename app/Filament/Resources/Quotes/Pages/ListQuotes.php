@@ -25,11 +25,11 @@ class ListQuotes extends ListRecords
         if ($prefixSetting !== 'currency') {
             return [
                 CreateAction::make('create')
-                    ->label(fn () => 'Nova ponuda (' . $numbering->assign(tap(new Quote(), function (Quote $quote) {
+                    ->label(fn () => 'Nova ponuda ('.$numbering->assign(tap(new Quote, function (Quote $quote) {
                         $quote->company_id = Filament::getTenant()?->id;
                         $quote->currency = null;
                         $quote->date = now();
-                    }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true) . ')')
+                    }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true).')')
                     ->icon('heroicon-o-plus-circle')
                     ->color('primary')
                     ->url(fn (): string => static::getResource()::getUrl('create')),
@@ -44,11 +44,11 @@ class ListQuotes extends ListRecords
         if ($currencies === []) {
             return [
                 CreateAction::make('create')
-                    ->label(fn () => 'Nova ponuda (' . $numbering->assign(tap(new Quote(), function (Quote $quote) {
+                    ->label(fn () => 'Nova ponuda ('.$numbering->assign(tap(new Quote, function (Quote $quote) {
                         $quote->company_id = Filament::getTenant()?->id;
                         $quote->currency = null;
                         $quote->date = now();
-                    }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true) . ')')
+                    }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true).')')
                     ->icon('heroicon-o-plus-circle')
                     ->color('primary')
                     ->url(fn (): string => static::getResource()::getUrl('create')),
@@ -57,12 +57,12 @@ class ListQuotes extends ListRecords
 
         $actions = [];
         foreach ($currencies as $currency) {
-            $actions[] = CreateAction::make('create_' . strtolower($currency))
-                ->label(fn () => 'Nova ' . $currency . ' (' . $numbering->assign(tap(new Quote(), function (Quote $quote) use ($currency) {
+            $actions[] = CreateAction::make('create_'.strtolower($currency))
+                ->label(fn () => 'Nova '.$currency.' ('.$numbering->assign(tap(new Quote, function (Quote $quote) use ($currency) {
                     $quote->company_id = Filament::getTenant()?->id;
                     $quote->currency = $currency;
                     $quote->date = now();
-                }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true) . ')')
+                }), ['prefix' => 'quote_prefix', 'year' => 'quote_year', 'number' => 'quote_number'], preview: true).')')
                 ->icon('heroicon-o-plus-circle')
                 ->color('primary')
                 ->url(fn (): string => static::getResource()::getUrl('create', ['currency' => $currency]));

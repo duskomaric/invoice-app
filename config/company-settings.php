@@ -43,7 +43,7 @@ return [
     'invoice_numbering_reset_yearly' => true,
     'invoice_numbering_pad_zeros' => 3,
     'invoice_numbering_starting_number' => 1,
-    'invoice_numbering_prefix' => '',//''currency',
+    'invoice_numbering_prefix' => '', // ''currency',
 
     'getting_started_checklist' => [],
 

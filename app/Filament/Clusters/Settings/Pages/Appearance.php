@@ -26,21 +26,30 @@ class Appearance extends Page
 
     protected static ?string $navigationLabel = 'Appearance';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Company Settings';
 
     protected static ?int $navigationSort = 1;
 
     protected string $view = 'filament.pages.settings';
 
     public array $pagination = [];
+
     public string $modal_width = '';
+
     public string $default_pagination_option = '';
+
     public bool $top_navigation = false;
+
     public string $primary_color = '';
+
     public string $danger_color = '';
+
     public string $gray_color = '';
+
     public string $info_color = '';
+
     public string $success_color = '';
+
     public string $warning_color = '';
 
     public function mount(): void

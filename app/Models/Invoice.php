@@ -47,8 +47,6 @@ class Invoice extends Model
         'fiscal_meta',
     ];
 
-
-
     protected $casts = [
         'status' => InvoiceStatusEnum::class,
         'frequency' => InvoiceFrequencyEnum::class,
@@ -69,7 +67,7 @@ class Invoice extends Model
         parent::boot();
 
         static::creating(function ($invoice) {
-            if (!$invoice->invoice_number) {
+            if (! $invoice->invoice_number) {
                 $invoice->generateInvoiceNumber();
             }
         });

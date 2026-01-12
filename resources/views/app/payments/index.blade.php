@@ -43,22 +43,18 @@
         />
     </x-app.stats-grid>
 
+@php
+$methodColors = [
+    'bank_transfer' => 'bg-blue-500',
+    'cash' => 'bg-emerald-500',
+    'credit_card' => 'bg-violet-500',
+    'paypal' => 'bg-amber-500',
+];
+@endphp
+
     <x-app.filter-bar placeholder="Search payments...">
         <x-app.dropdown label="Method" icon="funnel" variant="secondary" size="sm" class="shadow-sm">
-            <a href="{{ request()->fullUrlWithQuery(['method' => '']) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ !request('method') ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                <span class="w-4 h-4 rounded border flex items-center justify-center {{ !request('method') ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                    @if(!request('method'))<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                </span>
-                All Methods
-            </a>
-            @foreach(['bank_transfer', 'cash', 'credit_card', 'paypal'] as $method)
-                <a href="{{ request()->fullUrlWithQuery(['method' => $method]) }}" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 {{ request('method') == $method ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20' : 'text-slate-600 dark:text-slate-400' }}">
-                    <span class="w-4 h-4 rounded border flex items-center justify-center {{ request('method') == $method ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600' }}">
-                        @if(request('method') == $method)<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>@endif
-                    </span>
-                    {{ ucfirst(str_replace('_', ' ', $method)) }}
-                </a>
-            @endforeach
+            <x-app.status-filter :statuses="['bank_transfer', 'cash', 'credit_card', 'paypal']" :colors="$methodColors" paramName="method" allLabel="All Methods" />
         </x-app.dropdown>
     </x-app.filter-bar>
 
@@ -100,21 +96,15 @@
 {{--                            ->format('M d, Y')--}}
                         </x-app.table-td>
                         <x-app.table-td>
-                            <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">+{{ $payment->currency === 'EUR' ? '€' : ($payment->currency === 'USD' ? '$' : $payment->currency) }}{{ number_format($payment->amount / 100, 2) }}</span>
+                            <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">+<x-app.currency :amount="$payment->amount" :currency="$payment->currency" /></span>
                         </x-app.table-td>
                         <x-app.table-td>
                             <x-app.status-badge :status="ucfirst(str_replace('_', ' ', $payment->method))" variant="slate" size="sm" />
                         </x-app.table-td>
                         <x-app.table-td class="text-right">
-                            <div class="flex items-center justify-end gap-1">
-                                <form action="{{ route('app.payments.destroy', [$company, $payment]) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-app.button type="submit" variant="ghost" size="icon-xs" title="Delete" class="text-rose-500 hover:text-rose-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </x-app.button>
-                                </form>
-                            </div>
+                            <x-app.action-buttons 
+                                :delete-route="route('app.payments.destroy', [$company, $payment])"
+                            />
                         </x-app.table-td>
                     </x-app.table-tr>
                 @empty
@@ -137,7 +127,7 @@
                     </div>
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/50">
                         <div>
-                            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">+{{ $payment->currency === 'EUR' ? '€' : ($payment->currency === 'USD' ? '$' : $payment->currency) }}{{ number_format($payment->amount / 100, 2) }}</p>
+                            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">+<x-app.currency :amount="$payment->amount" :currency="$payment->currency" /></p>
                             <p class="text-[10px] text-slate-400 dark:text-slate-500">{{ $payment->date }}</p>
 {{--                            ->format('M d, Y')--}}
                         </div>

@@ -31,17 +31,17 @@ class ReportController extends Controller
         $totals = [
             'cash' => IncomeBookEntry::where('company_id', $company->id)
                 ->whereYear('date', $year)
-                ->when($month, fn($q) => $q->whereMonth('date', $month))
+                ->when($month, fn ($q) => $q->whereMonth('date', $month))
                 ->where('payment_method', 'cash')
                 ->sum('amount'),
             'bank' => IncomeBookEntry::where('company_id', $company->id)
                 ->whereYear('date', $year)
-                ->when($month, fn($q) => $q->whereMonth('date', $month))
+                ->when($month, fn ($q) => $q->whereMonth('date', $month))
                 ->where('payment_method', 'bank')
                 ->sum('amount'),
             'total' => IncomeBookEntry::where('company_id', $company->id)
                 ->whereYear('date', $year)
-                ->when($month, fn($q) => $q->whereMonth('date', $month))
+                ->when($month, fn ($q) => $q->whereMonth('date', $month))
                 ->sum('amount'),
         ];
 

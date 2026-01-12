@@ -1,4 +1,11 @@
-<x-app.settings-layout :company="$company" active="email">
+@extends('layouts.app')
+
+@section('title', 'Email Templates - ' . $company->name)
+@section('page-title', 'Email Templates')
+@section('page-subtitle', 'Manage your outgoing document messages')
+
+@section('content')
+<x-app.settings-layout :company="$company" active="templates">
     <x-app.card>
         <div class="flex items-center justify-between mb-8">
             <x-app.section-header title="Email Templates" subtitle="Manage your outgoing document messages" icon="document-text" variant="primary" />
@@ -38,3 +45,4 @@
         </div>
     </x-app.card>
 </x-app.settings-layout>
+@endsection

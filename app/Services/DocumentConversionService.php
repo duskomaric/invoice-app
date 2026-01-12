@@ -98,6 +98,7 @@ class DocumentConversionService
 
         return $invoice;
     }
+
     public function convertContractToInvoice(Contract $contract): Invoice
     {
         $invoice = Invoice::create([

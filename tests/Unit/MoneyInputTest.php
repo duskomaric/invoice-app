@@ -16,7 +16,7 @@ it('formats state correctly', function () {
     // Extract the inner callback from the closure's used variables
     $hydrateReflection = new \ReflectionFunction($hydrateClosure);
     $usedVars = $hydrateReflection->getClosureUsedVariables();
-    
+
     expect($usedVars)->toHaveKey('callback');
     $formatStateUsing = $usedVars['callback'];
 
@@ -29,7 +29,7 @@ it('formats state correctly', function () {
 
     // Test zero
     expect($formatStateUsing(0))->toBe('0,00');
-    
+
     // Test small number
     // 50 cents = 0,50
     expect($formatStateUsing(50))->toBe('0,50');
@@ -45,7 +45,7 @@ it('dehydrates state correctly', function () {
     $dehydrateStateUsing = $property->getValue($component);
 
     expect($dehydrateStateUsing)->not->toBeNull();
-    
+
     // Test null
     expect($dehydrateStateUsing(null))->toBeNull();
 
@@ -59,7 +59,7 @@ it('dehydrates state correctly', function () {
 
     // Test zero
     expect($dehydrateStateUsing('0,00'))->toBe(0);
-    
+
     // Test small number
     expect($dehydrateStateUsing('0,50'))->toBe(50);
 });
@@ -67,7 +67,7 @@ it('dehydrates state correctly', function () {
 it('has correct mask', function () {
     $component = MoneyInput::make('price');
     $mask = $component->getMask();
-    
+
     expect($mask)->toBeInstanceOf(\Filament\Support\RawJs::class)
         ->and((string) $mask)->toContain('$money($input');
 });

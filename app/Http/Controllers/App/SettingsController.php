@@ -111,8 +111,10 @@ class SettingsController extends Controller
 
     public function deleteCurrency(Company $company, Currency $currency)
     {
-        if ($currency->company_id !== $company->id) abort(403);
-        
+        if ($currency->company_id !== $company->id) {
+            abort(403);
+        }
+
         $currency->delete();
 
         return redirect()
@@ -147,7 +149,9 @@ class SettingsController extends Controller
 
     public function updateBankAccount(Request $request, Company $company, CompanyBankAccount $bankAccount)
     {
-        if ($bankAccount->company_id !== $company->id) abort(403);
+        if ($bankAccount->company_id !== $company->id) {
+            abort(403);
+        }
 
         $validated = $request->validate([
             'bank_name' => 'required|string|max:255',
@@ -166,7 +170,9 @@ class SettingsController extends Controller
 
     public function deleteBankAccount(Company $company, CompanyBankAccount $bankAccount)
     {
-        if ($bankAccount->company_id !== $company->id) abort(403);
+        if ($bankAccount->company_id !== $company->id) {
+            abort(403);
+        }
 
         $bankAccount->delete();
 
@@ -185,6 +191,7 @@ class SettingsController extends Controller
     public function emailSignatures(Company $company)
     {
         $signatures = EmailSignature::where('company_id', $company->id)->orderBy('name')->get();
+
         return view('app.settings.email-signatures', compact('company', 'signatures'));
     }
 

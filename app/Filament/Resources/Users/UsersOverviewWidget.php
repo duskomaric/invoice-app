@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class UsersOverviewWidget extends StatsOverviewWidget
 {
-    public function getColumns(): int | array
+    public function getColumns(): int|array
     {
         return [
             'md' => 4,
@@ -59,7 +59,7 @@ class UsersOverviewWidget extends StatsOverviewWidget
                 return Stat::make($status->getLabel(), $count)
                     ->description(
                         $total
-                            ? round(($count / $total) * 100) . '% of users'
+                            ? round(($count / $total) * 100).'% of users'
                             : '0%'
                     )
                     ->color($status->getColor())

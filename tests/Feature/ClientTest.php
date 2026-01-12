@@ -1,10 +1,11 @@
 <?php
 
 use App\Enums\RoleEnum;
-use App\Models\User;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\User;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {

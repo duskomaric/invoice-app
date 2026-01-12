@@ -6,10 +6,8 @@ use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Services\OFSService;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
@@ -33,13 +31,13 @@ class ViewInvoice extends ViewRecord
                 ->modalContent(function ($record) {
                     $base64 = $record->fiscal_meta['invoiceImagePngBase64'] ?? null;
 
-                    if (!$base64) {
+                    if (! $base64) {
                         return new HtmlString('<p>No invoice image available</p>');
                     }
 
                     return new HtmlString(
-                        '<div style="text-align: center;">' .
-                        '<img src="data:image/png;base64,' . $base64 . '" alt="Fiscal Invoice" style="max-width:100%; height:auto;" />' .
+                        '<div style="text-align: center;">'.
+                        '<img src="data:image/png;base64,'.$base64.'" alt="Fiscal Invoice" style="max-width:100%; height:auto;" />'.
                         '</div>'
                     );
                 }),
@@ -50,7 +48,7 @@ class ViewInvoice extends ViewRecord
                 ->color('info')
                 ->action(function () {
                     try {
-                        $ofs = new OFSService();
+                        $ofs = new OFSService;
                         $response = $ofs->testAttention();
 
                         logger('OFS Attention Response:', [
@@ -62,13 +60,13 @@ class ViewInvoice extends ViewRecord
                         if ($response->successful()) {
                             Notification::make()
                                 ->title('✅ API dostupan!')
-                                ->body('Status: ' . $response->status() . ' - OFS ESIR API je dostupan i pravilno konfigurisan.')
+                                ->body('Status: '.$response->status().' - OFS ESIR API je dostupan i pravilno konfigurisan.')
                                 ->success()
                                 ->send();
                         } else {
                             Notification::make()
                                 ->title('❌ API nije dostupan')
-                                ->body('Status: ' . $response->status() . "\n" . $response->body())
+                                ->body('Status: '.$response->status()."\n".$response->body())
                                 ->danger()
                                 ->send();
                         }
@@ -86,7 +84,7 @@ class ViewInvoice extends ViewRecord
                 ->color('info')
                 ->action(function () {
                     try {
-                        $ofs = new OFSService();
+                        $ofs = new OFSService;
                         $response = $ofs->getSettings();
 
                         if ($response->successful()) {
@@ -95,13 +93,13 @@ class ViewInvoice extends ViewRecord
                             logger('OFS Settings:', $data);
                             Notification::make()
                                 ->title('Settings uspješno učitani!')
-                                ->body('Printer: ' . ($data['printerName'] ?? 'N/A') . "\nLPFR URL: " . ($data['lpfrUrl'] ?? 'N/A'))
+                                ->body('Printer: '.($data['printerName'] ?? 'N/A')."\nLPFR URL: ".($data['lpfrUrl'] ?? 'N/A'))
                                 ->success()
                                 ->send();
                         } else {
                             Notification::make()
                                 ->title('❌ Greška pri učitavanju settings-a')
-                                ->body('Status: ' . $response->status() . "\n" . $response->body())
+                                ->body('Status: '.$response->status()."\n".$response->body())
                                 ->danger()
                                 ->send();
                         }
@@ -121,7 +119,7 @@ class ViewInvoice extends ViewRecord
                 ->color('success')
                 ->action(function ($record) {
                     try {
-                        $ofs = new OFSService();
+                        $ofs = new OFSService;
 
                         Log::info('Starting fiscalization for invoice', [
                             'invoice_id' => $record->id,
@@ -140,7 +138,7 @@ class ViewInvoice extends ViewRecord
                             $taxCategory = $item->article->tax_category;
 
                             $items[] = [
-                                'name' => $item->name . ' / ' . $item->article->unit,
+                                'name' => $item->name.' / '.$item->article->unit,
                                 'quantity' => $itemQuantity,
                                 'unitPrice' => $itemUnitPrice,
                                 'totalAmount' => $itemTotal, // REQUIRED by API
@@ -158,7 +156,7 @@ class ViewInvoice extends ViewRecord
 
                         // Build the OFS ESIR API payload - MUST be wrapped in "invoiceRequest"
                         $payload = [
-                            //"renderReceiptImage": true,
+                            // "renderReceiptImage": true,
                             //                "receiptImageFormat": "Png",
                             //                "receiptLayout": "Slip",
                             'renderReceiptImage' => true,
@@ -169,8 +167,6 @@ class ViewInvoice extends ViewRecord
                             'receiptHeaderTextLines' => ['receiptHeaderTextLines 123', 'receiptHeaderTextLines 456'],
                             'receiptFooterTextLines' => ['receiptFooterTextLines 123', 'receiptFooterTextLines 456'],
                             'buyerId' => null, // Default to null, may be overridden for wholesale below
-
-
 
                             'invoiceRequest' => [
                                 'language' => 'en-US', // en-US, sr-Cyrl-RS, sr-RS
@@ -212,9 +208,8 @@ class ViewInvoice extends ViewRecord
                                 $payload['invoiceRequest']['buyerId'] = 'VP:9999999999999';
 
                             } else {
-                                $payload['invoiceRequest']['buyerId'] = 'VP:' . $record->client->jib;
+                                $payload['invoiceRequest']['buyerId'] = 'VP:'.$record->client->jib;
                             }
-
 
                         }
 
@@ -250,9 +245,9 @@ class ViewInvoice extends ViewRecord
                             Notification::make()
                                 ->title('✅ Račun uspješno fiskalizovan!')
                                 ->body(
-                                    'Fiskalni broj: ' . ($data['invoiceNumber'] ?? 'N/A') . "\n" .
-                                    'Brojač: ' . ($data['invoiceCounter'] ?? 'N/A') . "\n" .
-                                    'Ukupno: ' . number_format($totalAmount, 2, ',', '.') . ' KM'
+                                    'Fiskalni broj: '.($data['invoiceNumber'] ?? 'N/A')."\n".
+                                    'Brojač: '.($data['invoiceCounter'] ?? 'N/A')."\n".
+                                    'Ukupno: '.number_format($totalAmount, 2, ',', '.').' KM'
                                 )
                                 ->success()
                                 ->send();
@@ -265,7 +260,7 @@ class ViewInvoice extends ViewRecord
 
                             Notification::make()
                                 ->title('Greška prilikom fiskalizacije')
-                                ->body('Status: ' . $response->status() . "\n" . $response->body())
+                                ->body('Status: '.$response->status()."\n".$response->body())
                                 ->danger()
                                 ->send();
                         }
@@ -277,7 +272,7 @@ class ViewInvoice extends ViewRecord
 
                         Notification::make()
                             ->title('Greška!')
-                            ->body('Exception: ' . $e->getMessage())
+                            ->body('Exception: '.$e->getMessage())
                             ->danger()
                             ->send();
                     }

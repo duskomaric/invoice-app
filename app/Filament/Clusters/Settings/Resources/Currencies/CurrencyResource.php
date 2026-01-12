@@ -21,7 +21,7 @@ class CurrencyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentCurrencyEuro;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Company Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Company Settings';
 
     protected static ?string $cluster = SettingsCluster::class;
 

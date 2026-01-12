@@ -19,8 +19,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-4">
-    {{-- Status Banner --}}
-    @if($invoice->status->value === 'paid')
+    {{-- EXAMPLE: Payment Received --}}
     <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
         <div class="rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 p-4 text-white shadow-xl shadow-emerald-500/30 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -29,7 +28,7 @@
                 </div>
                 <div>
                     <p class="font-bold text-lg">Payment Received</p>
-                    <p class="text-emerald-100 text-sm">Amount fully paid</p>
+                    <p class="text-emerald-100 text-sm">Paid on {{ \Carbon\Carbon::now()->format('F d, Y') }}</p>
                 </div>
             </div>
             <x-app.button variant="secondary" size="sm" class="bg-white/20 border-white/30 text-white hover:bg-white/30">
@@ -38,21 +37,30 @@
             </x-app.button>
         </div>
     </div>
-    @elseif($invoice->status->value === 'overdue')
-    <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
-        <div class="rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-4 text-white shadow-xl shadow-rose-500/30 flex items-center justify-between">
+
+    {{-- EXAMPLE: Payment Not Received --}}
+    <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards; animation-delay: 0.2s;">
+        <div class="rounded-2xl bg-gradient-to-r from-slate-600 to-slate-700 dark:from-slate-700 dark:to-slate-800 p-4 text-white shadow-xl shadow-slate-500/20 dark:shadow-black/40 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
-                    <p class="font-bold text-lg">Invoice Overdue</p>
-                    <p class="text-rose-100 text-sm">Payment was due on {{ $invoice->due_date?->format('F d, Y') }}</p>
+                    <p class="font-bold text-lg">Payment Not Received</p>
+                    <p class="text-slate-200 text-sm">Awaiting payment from client</p>
                 </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <x-app.button variant="secondary" size="sm" class="bg-white/20 border-white/30 text-white hover:bg-white/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Send Reminder
+                </x-app.button>
+                <x-app.button variant="secondary" size="sm" class="bg-white/20 border-white/30 text-white hover:bg-white/30">
+                    Mark as Paid
+                </x-app.button>
             </div>
         </div>
     </div>
-    @endif
 
     {{-- Invoice Document --}}
     <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
@@ -77,7 +85,7 @@
                         <p class="text-3xl font-bold mb-2">INVOICE</p>
                         <p class="text-violet-200 text-lg">#{{ $invoice->formatted_number }}</p>
                         <div class="mt-3 flex justify-end">
-                            <x-app.status-badge :status="$invoice->status->label()" :variant="$invoice->status->color()" />
+                            <x-app.status-badge :status="$invoice->status->getLabel()" :variant="$invoice->status->getColor()" />
                         </div>
                     </div>
                 </div>

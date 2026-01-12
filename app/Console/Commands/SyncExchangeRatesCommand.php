@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\Currency;
 use App\Models\ExchangeRate;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
 
 class SyncExchangeRatesCommand extends Command
 {
@@ -20,6 +20,7 @@ class SyncExchangeRatesCommand extends Command
 
         if (! $apiKey) {
             $this->error('FIXER_API_KEY is missing');
+
             return self::FAILURE;
         }
 
@@ -27,12 +28,13 @@ class SyncExchangeRatesCommand extends Command
 
         $response = Http::get('http://data.fixer.io/api/latest', [
             'access_key' => $apiKey,
-//            'symbols' => 'BAM,EUR,USD',
+            //            'symbols' => 'BAM,EUR,USD',
             'symbols' => implode(',', $currencies),
         ]);
 
         if (! $response->successful()) {
             $this->error('Failed to fetch Fixer data');
+
             return self::FAILURE;
         }
 
@@ -40,6 +42,7 @@ class SyncExchangeRatesCommand extends Command
 
         if (! ($data['success'] ?? false)) {
             $this->error('Fixer API error');
+
             return self::FAILURE;
         }
 
@@ -70,7 +73,7 @@ class SyncExchangeRatesCommand extends Command
             $this->line("{$currency} → {$rateToBam}");
         }
 
-// Upis BAM
+        // Upis BAM
         ExchangeRate::updateOrCreate(
             ['currency' => 'BAM'],
             [
@@ -78,7 +81,6 @@ class SyncExchangeRatesCommand extends Command
                 'rate_date' => $date,
             ]
         );
-
 
         $this->info('Fixer exchange rates synced successfully.');
 
