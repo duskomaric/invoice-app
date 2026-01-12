@@ -1,43 +1,42 @@
-<x-app-layout>
-    <x-slot name="title">Company Settings - {{ $company->name }}</x-slot>
+@extends('layouts.app')
 
-    <x-pines.page-header 
-        title="Company Settings" 
-        :breadcrumbs="[
-            ['label' => 'Settings', 'url' => route('app.settings.index', $company)],
-            ['label' => 'Company']
-        ]"
-    />
+@section('title', 'Company Settings - ' . $company->name)
+@section('page-title', 'Company Profile')
+@section('page-subtitle', 'Manage your business identity and contact information')
 
-    <form action="{{ route('app.settings.company.update', $company) }}" method="POST">
-        @csrf @method('PUT')
-        <div class="max-w-2xl space-y-6">
-            <x-pines.form-section title="Basic Information" :columns="2">
-                <div class="col-span-2">
-                    <x-pines.input label="Company Name" name="name" :value="$company->name" required />
-                </div>
-                <x-pines.input type="email" label="Email" name="email" :value="$company->email" />
-                <x-pines.input label="Phone" name="phone" :value="$company->phone" />
-                <div class="col-span-2">
-                    <x-pines.input label="VAT Number" name="vat_number" :value="$company->vat_number" />
-                </div>
-            </x-pines.form-section>
-
-            <x-pines.form-section title="Address" :columns="2">
-                <div class="col-span-2">
-                    <x-pines.input label="Address" name="address" :value="$company->address" />
-                </div>
-                <x-pines.input label="City" name="city" :value="$company->city" />
-                <x-pines.input label="Postal Code" name="postal_code" :value="$company->postal_code" />
-                <div class="col-span-2">
-                    <x-pines.input label="Country" name="country" :value="$company->country" />
-                </div>
-            </x-pines.form-section>
-
-            <div class="flex justify-end gap-3">
-                <x-pines.button variant="secondary" href="{{ route('app.settings.index', $company) }}">Cancel</x-pines.button>
-                <x-pines.button type="submit">Save Changes</x-pines.button>
+@section('content')
+<x-app.settings-layout :company="$company" active="company">
+    <form action="{{ route('app.settings.company.update', $company) }}" method="POST" class="max-w-4xl">
+        @csrf
+        @method('PUT')
+        
+        <x-app.card>
+            <div class="flex items-center justify-between mb-6">
+                <x-app.section-header title="Business Information" subtitle="Publicly shared details on your documents" icon="building-office-2" variant="primary" />
+                <x-app.button type="submit" variant="primary" size="sm">
+                    Save Changes
+                </x-app.button>
             </div>
-        </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="md:col-span-2">
+                    <x-app.input label="Company Legal Name" name="name" value="{{ old('name', $company->name) }}" placeholder="e.g. Acme Corporation LLC" required />
+                </div>
+
+                <x-app.input label="Business Email" name="email" type="email" value="{{ old('email', $company->email) }}" placeholder="contact@company.com" />
+                <x-app.input label="Phone Number" name="phone" value="{{ old('phone', $company->phone) }}" placeholder="+1 (555) 000-0000" />
+
+                <div class="md:col-span-2">
+                    <x-app.input label="Street Address" name="address" value="{{ old('address', $company->address) }}" placeholder="123 Business St" />
+                </div>
+
+                <x-app.input label="City" name="city" value="{{ old('city', $company->city) }}" placeholder="New York" />
+                <x-app.input label="Postal / Zip Code" name="postal_code" value="{{ old('postal_code', $company->postal_code) }}" placeholder="10001" />
+
+                <x-app.input label="Country" name="country" value="{{ old('country', $company->country) }}" placeholder="United States" />
+                <x-app.input label="VAT / Tax Number" name="vat_number" value="{{ old('vat_number', $company->vat_number) }}" placeholder="US123456789" />
+            </div>
+        </x-app.card>
     </form>
-</x-app-layout>
+</x-app.settings-layout>
+@endsection

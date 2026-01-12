@@ -1,77 +1,126 @@
-<x-app-layout>
-    <x-slot name="title">Income Book - {{ $company->name }}</x-slot>
+@extends('layouts.app')
 
-    <div class="mb-6">
-        <nav class="flex mb-2 text-sm text-gray-500">
-            <a href="{{ route('app.reports.index', $company) }}" class="hover:text-gray-700">Reports</a>
-            <span class="mx-1">/</span>
-            <span class="text-gray-900">Income Book</span>
-        </nav>
-        <h1 class="text-2xl font-semibold text-gray-900">Income Book (KPI)</h1>
-    </div>
+@section('title', 'Income Book - Reports - App')
+@section('page-title', 'Income Book')
+@section('page-subtitle', 'Official record of issued invoices and earned income')
 
-    <div class="mb-6 flex items-center space-x-4">
-        <form action="" method="GET" class="flex items-center space-x-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Year</label>
-                <select name="year" onchange="this.form.submit()" class="h-10 px-3 text-sm border rounded-md border-neutral-300">
-                    @for($y = now()->year; $y >= now()->year - 5; $y--)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
-                </select>
+@section('header-actions')
+<div class="flex items-center gap-2">
+    <x-app.button href="{{ route('app.reports.index', $company) }}" variant="secondary" size="sm" class="hidden sm:flex">
+        Back to Reports
+    </x-app.button>
+    <x-app.button variant="primary" size="sm" onclick="window.print()">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        Print Report
+    </x-app.button>
+</div>
+@endsection
+
+@section('content')
+<div class="space-y-6">
+    {{-- Filter Toolbar --}}
+    <x-app.card class="no-padding">
+        <div class="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <form action="{{ route('app.reports.income-book', $company) }}" method="GET" class="flex flex-wrap items-center gap-4">
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Fiscal Year</label>
+                    <select name="year" onchange="this.form.submit()" class="h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-violet-500 transition-all text-sm font-bold">
+                        @for($y = now()->year; $y >= now()->year - 5; $y--)
+                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month (Optional)</label>
+                    <select name="month" onchange="this.form.submit()" class="h-10 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-violet-500 transition-all text-sm">
+                        <option value="">All Months</option>
+                        @foreach(range(1, 12) as $m)
+                            <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+
+            <div class="flex gap-4">
+                <div class="text-right">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Cash</div>
+                    <div class="text-lg font-bold text-slate-900 dark:text-white">{{ number_format($totals['cash'], 2) }}</div>
+                </div>
+                <div class="text-right border-l border-slate-100 dark:border-slate-800 pl-4">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Bank</div>
+                    <div class="text-lg font-bold text-slate-900 dark:text-white">{{ number_format($totals['bank'], 2) }}</div>
+                </div>
+                <div class="text-right border-l border-slate-100 dark:border-slate-800 pl-4">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Grand Total</div>
+                    <div class="text-lg font-bold text-violet-600 dark:text-violet-400">{{ number_format($totals['total'], 2) }}</div>
+                </div>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Month</label>
-                <select name="month" onchange="this.form.submit()" class="h-10 px-3 text-sm border rounded-md border-neutral-300">
-                    <option value="">All months</option>
-                    @for($m = 1; $m <= 12; $m++)
-                        <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                    @endfor
-                </select>
-            </div>
-        </form>
-    </div>
+        </div>
+    </x-app.card>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white shadow rounded-lg p-4">
-            <div class="text-sm text-gray-500">Cash</div>
-            <div class="text-2xl font-semibold text-gray-900">{{ number_format($totals['cash'] / 100, 2) }}</div>
-        </div>
-        <div class="bg-white shadow rounded-lg p-4">
-            <div class="text-sm text-gray-500">Bank</div>
-            <div class="text-2xl font-semibold text-gray-900">{{ number_format($totals['bank'] / 100, 2) }}</div>
-        </div>
-        <div class="bg-white shadow rounded-lg p-4">
-            <div class="text-sm text-gray-500">Total</div>
-            <div class="text-2xl font-semibold text-green-600">{{ number_format($totals['total'] / 100, 2) }}</div>
-        </div>
-    </div>
+    {{-- Report Table --}}
+    <x-app.card class="no-padding overflow-hidden">
+        <x-app.table>
+            <x-slot name="head">
+                <x-app.table-th class="w-12">#</x-app.table-th>
+                <x-app.table-th>Date</x-app.table-th>
+                <x-app.table-th>Document</x-app.table-th>
+                <x-app.table-th>Client</x-app.table-th>
+                <x-app.table-th class="text-right">Cash Amount</x-app.table-th>
+                <x-app.table-th class="text-right">Bank Amount</x-app.table-th>
+                <x-app.table-th class="text-right">Total</x-app.table-th>
+            </x-slot>
 
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            @php $counter = ($entries->currentPage() - 1) * $entries->perPage() + 1; @endphp
+            @forelse($entries as $entry)
+                <x-app.table-tr>
+                    <x-app.table-td class="font-mono text-[10px] text-slate-400">{{ $counter++ }}</x-app.table-td>
+                    <x-app.table-td class="text-xs font-medium">{{ $entry->date->format('d.m.Y') }}</x-app.table-td>
+                    <x-app.table-td>
+                        <span class="text-xs font-bold text-slate-900 dark:text-white">{{ $entry->document_number }}</span>
+                    </x-app.table-td>
+                    <x-app.table-td class="text-xs text-slate-600 dark:text-slate-400">{{ $entry->client_name }}</x-app.table-td>
+                    <x-app.table-td class="text-right font-mono text-xs">
+                        {{ $entry->payment_method === 'cash' ? number_format($entry->amount, 2) : '-' }}
+                    </x-app.table-td>
+                    <x-app.table-td class="text-right font-mono text-xs">
+                        {{ $entry->payment_method === 'bank' ? number_format($entry->amount, 2) : '-' }}
+                    </x-app.table-td>
+                    <x-app.table-td class="text-right font-bold text-xs text-slate-900 dark:text-white">
+                        {{ number_format($entry->amount, 2) }}
+                    </x-app.table-td>
+                </x-app.table-tr>
+            @empty
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <td colspan="7" class="py-12 text-center text-slate-400 italic text-sm">
+                        No entries found for the selected period.
+                    </td>
                 </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @forelse($entries as $entry)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-900">{{ $entry->date?->format('d.m.Y') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $entry->document_number ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $entry->description ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $entry->payment_method ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-right text-green-600">{{ number_format($entry->amount / 100, 2) }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">No entries for this period.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-        @if($entries->hasPages())<div class="px-6 py-4 border-t">{{ $entries->links() }}</div>@endif
-    </div>
-</x-app-layout>
+            @endforelse
+        </x-app.table>
+
+        @if($entries->hasPages())
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800">
+                {{ $entries->links() }}
+            </div>
+        @endif
+    </x-app.card>
+</div>
+
+<style>
+    @media print {
+        header, .sidebar, .header-actions, .filter-toolbar button, .filter-toolbar select, .page-subtitle, .page-badge {
+            display: none !important;
+        }
+        body {
+            background: white !important;
+            padding: 0 !important;
+        }
+        .x-app-card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+@endsection

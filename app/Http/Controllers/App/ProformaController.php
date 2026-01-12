@@ -49,9 +49,12 @@ class ProformaController extends Controller
             'language' => 'required|string',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
+            'items.*.article_id' => 'nullable|exists:articles,id',
             'items.*.name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.description' => 'nullable|string',
+            'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.tax_rate' => 'required|numeric|min:0',
         ]);
 
         $proforma = Proforma::create([
@@ -66,14 +69,15 @@ class ProformaController extends Controller
         ]);
 
         foreach ($validated['items'] as $item) {
-            $unitPrice = (int) round($item['unit_price'] * 100);
+            $unitPriceInCents = (int) round($item['unit_price'] * 100);
             $proforma->items()->create([
+                'article_id' => $item['article_id'] ?? null,
                 'name' => $item['name'],
                 'description' => $item['description'] ?? null,
                 'quantity' => $item['quantity'],
-                'unit_price' => $unitPrice,
-                'total' => $unitPrice * $item['quantity'],
-                'tax_rate' => $item['tax_rate'] ?? 0,
+                'unit_price' => $unitPriceInCents,
+                'total' => $unitPriceInCents * $item['quantity'],
+                'tax_rate' => $item['tax_rate'],
             ]);
         }
 
@@ -109,9 +113,12 @@ class ProformaController extends Controller
             'status' => 'required|string',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
+            'items.*.article_id' => 'nullable|exists:articles,id',
             'items.*.name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.description' => 'nullable|string',
+            'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.tax_rate' => 'required|numeric|min:0',
         ]);
 
         $proforma->update([
@@ -127,14 +134,15 @@ class ProformaController extends Controller
         $proforma->items()->delete();
 
         foreach ($validated['items'] as $item) {
-            $unitPrice = (int) round($item['unit_price'] * 100);
+            $unitPriceInCents = (int) round($item['unit_price'] * 100);
             $proforma->items()->create([
+                'article_id' => $item['article_id'] ?? null,
                 'name' => $item['name'],
                 'description' => $item['description'] ?? null,
                 'quantity' => $item['quantity'],
-                'unit_price' => $unitPrice,
-                'total' => $unitPrice * $item['quantity'],
-                'tax_rate' => $item['tax_rate'] ?? 0,
+                'unit_price' => $unitPriceInCents,
+                'total' => $unitPriceInCents * $item['quantity'],
+                'tax_rate' => $item['tax_rate'],
             ]);
         }
 

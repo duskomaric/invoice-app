@@ -23,17 +23,14 @@
         {{-- Main Content --}}
         <div class="xl:col-span-2 space-y-4">
             {{-- Client Selection --}}
-            <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
+            <div class="stagger-1 page-enter opacity-0 relative z-50" style="animation-fill-mode: forwards;">
                 <x-invoice5.card>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Client Information</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Select or add a client</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Client Information" 
+                        subtitle="Select or add a client" 
+                        icon="user" 
+                        variant="primary" 
+                    />
 
                     <div class="relative" x-data="{ open: false, search: '' }" @click.away="open = false">
                         <div class="relative" x-show="!selectedClient">
@@ -83,17 +80,14 @@
             </div>
 
             {{-- Invoice Items --}}
-            <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
+            <div class="stagger-2 page-enter opacity-0 relative z-10" style="animation-fill-mode: forwards;">
                 <x-invoice5.card>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Invoice Items</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Add products or services</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Invoice Items" 
+                        subtitle="Add products or services" 
+                        icon="clipboard-document-list" 
+                        variant="info" 
+                    />
 
                     {{-- Items Header --}}
                     <div class="hidden lg:grid lg:grid-cols-12 gap-3 mb-2 px-1">
@@ -150,7 +144,7 @@
                     </div>
 
                     {{-- Add Item Button --}}
-                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-medium transition-all flex items-center justify-center gap-2">
+                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600/60 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Add Item
                     </button>
@@ -160,23 +154,20 @@
             {{-- Notes --}}
             <div class="stagger-3 page-enter opacity-0" style="animation-fill-mode: forwards;">
                 <x-invoice5.card>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Notes & Terms</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Additional information</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Notes & Terms" 
+                        subtitle="Additional information" 
+                        icon="document-text" 
+                        variant="amber" 
+                    />
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Notes to Client</label>
-                            <textarea rows="2" placeholder="Add any notes..." class="w-full px-3 py-2 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all resize-none"></textarea>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Notes to Client</label>
+                            <textarea rows="2" placeholder="Add any notes..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm resize-none"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Payment Terms</label>
-                            <textarea rows="2" class="w-full px-3 py-2 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all resize-none">Payment is due within 30 days of invoice date.</textarea>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Payment Terms</label>
+                            <textarea rows="2" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm resize-none">Payment is due within 30 days of invoice date.</textarea>
                         </div>
                     </div>
                 </x-invoice5.card>
@@ -197,8 +188,8 @@
                         <x-invoice5.input label="Issue Date" type="date" :value="date('Y-m-d')" />
                         <x-invoice5.input label="Due Date" type="date" :value="date('Y-m-d', strtotime('+30 days'))" />
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
-                            <select class="w-full h-10 px-3 rounded-xl bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-600/60 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
+                            <select class="w-full h-10 px-3 rounded-xl bg-white dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
                                 <option value="EUR">EUR - Euro</option>
                                 <option value="USD">USD - US Dollar</option>
                                 <option value="GBP">GBP - British Pound</option>

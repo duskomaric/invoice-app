@@ -106,8 +106,8 @@ $items = [
                         <div class="flex items-start gap-3">
                             <x-invoice5.avatar :name="$invoice['client']" size="md" />
                             <div>
-                                <p class="font-bold text-slate-900 dark:text-white">{{ $invoice['client'] }}</p>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">{{ $invoice['email'] }}</p>
+                                <p class="font-extrabold text-slate-900 dark:text-white">{{ $invoice['client'] }}</p>
+                                <p class="text-sm font-medium text-slate-600 dark:text-slate-400">{{ $invoice['email'] }}</p>
                                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ $invoice['address'] }}</p>
                             </div>
                         </div>
@@ -138,11 +138,11 @@ $items = [
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                             @foreach($items as $item)
-                            <tr>
-                                <td class="px-4 py-4 text-sm text-slate-800 dark:text-slate-200">{{ $item['description'] }}</td>
-                                <td class="px-4 py-4 text-sm text-slate-600 dark:text-slate-400 text-center">{{ $item['quantity'] }}</td>
-                                <td class="px-4 py-4 text-sm text-slate-600 dark:text-slate-400 text-right">€{{ number_format($item['price'], 2) }}</td>
-                                <td class="px-4 py-4 text-sm font-semibold text-slate-900 dark:text-white text-right">€{{ number_format($item['quantity'] * $item['price'], 2) }}</td>
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="px-4 py-4 text-sm font-medium text-slate-900 dark:text-slate-200">{{ $item['description'] }}</td>
+                                <td class="px-4 py-4 text-sm text-slate-700 dark:text-slate-400 text-center">{{ $item['quantity'] }}</td>
+                                <td class="px-4 py-4 text-sm text-slate-700 dark:text-slate-400 text-right">€{{ number_format($item['price'], 2) }}</td>
+                                <td class="px-4 py-4 text-sm font-bold text-slate-900 dark:text-white text-right">€{{ number_format($item['quantity'] * $item['price'], 2) }}</td>
                             </tr>
                             @endforeach
                         </tbody>

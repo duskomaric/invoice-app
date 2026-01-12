@@ -94,11 +94,85 @@ class SettingsController extends Controller
         return view('app.settings.currencies', compact('company', 'currencies'));
     }
 
+    public function storeCurrency(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:10',
+            'name' => 'required|string|max:255',
+            'prefix' => 'nullable|string|max:10',
+        ]);
+
+        $company->currencies()->create($validated);
+
+        return redirect()
+            ->route('app.settings.currencies', $company)
+            ->with('success', 'Currency added successfully.');
+    }
+
+    public function deleteCurrency(Company $company, Currency $currency)
+    {
+        if ($currency->company_id !== $company->id) abort(403);
+        
+        $currency->delete();
+
+        return redirect()
+            ->route('app.settings.currencies', $company)
+            ->with('success', 'Currency deleted successfully.');
+    }
+
     public function bankAccounts(Company $company)
     {
         $bankAccounts = CompanyBankAccount::where('company_id', $company->id)->get();
+        $currencies = Currency::where('company_id', $company->id)->orderBy('code')->get();
 
-        return view('app.settings.bank-accounts', compact('company', 'bankAccounts'));
+        return view('app.settings.bank-accounts', compact('company', 'bankAccounts', 'currencies'));
+    }
+
+    public function storeBankAccount(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:255',
+            'currency' => 'required|string',
+            'swift' => 'nullable|string|max:255',
+            'iban' => 'nullable|string|max:255',
+        ]);
+
+        $company->bankAccounts()->create($validated);
+
+        return redirect()
+            ->route('app.settings.bank-accounts', $company)
+            ->with('success', 'Bank account added successfully.');
+    }
+
+    public function updateBankAccount(Request $request, Company $company, CompanyBankAccount $bankAccount)
+    {
+        if ($bankAccount->company_id !== $company->id) abort(403);
+
+        $validated = $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:255',
+            'currency' => 'required|string',
+            'swift' => 'nullable|string|max:255',
+            'iban' => 'nullable|string|max:255',
+        ]);
+
+        $bankAccount->update($validated);
+
+        return redirect()
+            ->route('app.settings.bank-accounts', $company)
+            ->with('success', 'Bank account updated successfully.');
+    }
+
+    public function deleteBankAccount(Company $company, CompanyBankAccount $bankAccount)
+    {
+        if ($bankAccount->company_id !== $company->id) abort(403);
+
+        $bankAccount->delete();
+
+        return redirect()
+            ->route('app.settings.bank-accounts', $company)
+            ->with('success', 'Bank account deleted successfully.');
     }
 
     public function emailTemplates(Company $company)
@@ -111,7 +185,31 @@ class SettingsController extends Controller
     public function emailSignatures(Company $company)
     {
         $signatures = EmailSignature::where('company_id', $company->id)->orderBy('name')->get();
-
         return view('app.settings.email-signatures', compact('company', 'signatures'));
+    }
+
+    public function fiscalization(Company $company)
+    {
+        return view('app.settings.fiscalization', compact('company'));
+    }
+
+    public function appearance(Company $company)
+    {
+        return view('app.settings.appearance', compact('company'));
+    }
+
+    public function email(Company $company)
+    {
+        return view('app.settings.email', compact('company'));
+    }
+
+    public function notifications(Company $company)
+    {
+        return view('app.settings.notifications', compact('company'));
+    }
+
+    public function roles(Company $company)
+    {
+        return view('app.settings.roles', compact('company'));
     }
 }

@@ -17,10 +17,10 @@
         {{-- Company Switcher --}}
         <div class="p-2 border-b border-slate-200/60 dark:border-slate-700/50" x-show="!sidebarCollapsed">
             <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" class="w-full flex items-center gap-2 p-2 rounded-lg bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/80 dark:border-slate-600/50 hover:border-violet-400/60 dark:hover:border-violet-500/40 transition-all">
+                <button @click="open = !open" class="w-full flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 hover:border-violet-400 dark:hover:border-violet-500/40 transition-all shadow-sm">
                     <x-invoice5.avatar :name="'Acme Corp'" size="xs" />
                     <div class="flex-1 text-left min-w-0">
-                        <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 truncate" x-text="currentCompany"></p>
+                        <p class="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate" x-text="currentCompany"></p>
                         <p class="text-[9px] text-slate-500 dark:text-slate-400">Switch company</p>
                     </div>
                     <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -46,9 +46,9 @@
         {{-- Navigation --}}
         <nav class="flex-1 overflow-y-auto custom-scrollbar py-2 px-1.5">
             <div class="mb-3">
-                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Main</p>
-                <a href="#" class="group flex items-center rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/50" :class="sidebarCollapsed ? 'justify-center p-2' : 'gap-2 px-2 py-1.5'" data-tip="Dashboard" :data-tip="sidebarCollapsed ? 'Dashboard' : ''">
-                    <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 transition-colors" :class="sidebarCollapsed && 'tooltip'">
+                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Main</p>
+                <a href="#" class="group flex items-center rounded-lg transition-all duration-200 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50" :class="sidebarCollapsed ? 'justify-center p-2' : 'gap-2 px-2 py-1.5'" data-tip="Dashboard" :data-tip="sidebarCollapsed ? 'Dashboard' : ''">
+                    <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors" :class="sidebarCollapsed && 'tooltip'">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5z"/></svg>
                     </div>
                     <span x-show="!sidebarCollapsed" class="text-[11px] font-medium">Dashboard</span>
@@ -56,15 +56,15 @@
             </div>
 
             <div class="mb-3">
-                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Documents</p>
+                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Documents</p>
                 
                 {{-- Invoices Menu --}}
                 <div>
-                    <button @click="sidebarCollapsed ? null : toggleMenu('invoices')" class="w-full group flex items-center rounded-lg transition-all duration-200 bg-violet-100/80 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Invoices">
+                    <button @click="sidebarCollapsed ? null : toggleMenu('invoices')" class="w-full group flex items-center rounded-lg transition-all duration-200 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Invoices">
                         <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-md shadow-violet-500/25 group-hover:scale-105 transition-transform">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
-                        <span x-show="!sidebarCollapsed" class="flex-1 text-left text-[11px] font-medium">Invoices</span>
+                        <span x-show="!sidebarCollapsed" class="flex-1 text-left text-[11px] font-bold">Invoices</span>
                         <svg x-show="!sidebarCollapsed" class="w-3 h-3 transition-transform duration-200" :class="menuOpen.invoices && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div x-show="menuOpen.invoices && !sidebarCollapsed" x-transition x-collapse class="ml-9 mt-0.5 space-y-0.5" x-cloak>
@@ -92,16 +92,16 @@
             </div>
 
             <div class="mb-3">
-                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Management</p>
-                <a href="#" class="group flex items-center rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Clients">
-                    <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 transition-colors">
+                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Management</p>
+                <a href="#" class="group flex items-center rounded-lg text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Clients">
+                    <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
                     <span x-show="!sidebarCollapsed" class="text-[11px] font-medium">Clients</span>
                 </a>
                 <div class="mt-0.5">
-                    <a href="#" class="group flex items-center rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Articles">
-                        <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 transition-colors">
+                    <a href="#" class="group flex items-center rounded-lg text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Articles">
+                        <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                         </div>
                         <span x-show="!sidebarCollapsed" class="text-[11px] font-medium">Articles</span>
@@ -110,11 +110,11 @@
             </div>
 
             <div>
-                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">System</p>
+                <p x-show="!sidebarCollapsed" class="px-2 mb-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">System</p>
                 {{-- Settings with 3 levels --}}
                 <div>
-                    <button @click="sidebarCollapsed ? null : toggleMenu('settings')" class="w-full group flex items-center rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Settings">
-                        <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 transition-colors">
+                    <button @click="sidebarCollapsed ? null : toggleMenu('settings')" class="w-full group flex items-center rounded-lg text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all duration-200" :class="sidebarCollapsed ? 'justify-center p-2 tooltip' : 'gap-2 px-2 py-1.5'" data-tip="Settings">
+                        <div class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
                         <span x-show="!sidebarCollapsed" class="flex-1 text-left text-[11px] font-medium">Settings</span>

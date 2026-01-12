@@ -1,135 +1,110 @@
-<x-app-layout>
-    <x-slot name="title">Edit Invoice {{ $invoice->formatted_number }} - {{ $company->name }}</x-slot>
+@extends('layouts.app')
 
-    <div class="mb-6">
-        <nav class="flex mb-2" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 text-sm text-gray-500">
-                <li><a href="{{ route('app.invoices.index', $company) }}" class="hover:text-gray-700">Invoices</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li><a href="{{ route('app.invoices.show', [$company, $invoice]) }}" class="hover:text-gray-700">{{ $invoice->formatted_number }}</a></li>
-                <li><span class="mx-1">/</span></li>
-                <li class="text-gray-900">Edit</li>
-            </ol>
-        </nav>
-        <h1 class="text-2xl font-semibold text-gray-900">Edit Invoice {{ $invoice->formatted_number }}</h1>
-    </div>
+@section('title', 'Edit Invoice INV-2024-0042 - InvoicePro')
+@section('page-title', 'Edit Invoice')
+@section('page-subtitle', 'INV-2024-0042')
 
-    <form action="{{ route('app.invoices.update', [$company, $invoice]) }}" method="POST" 
-          x-data="invoiceForm({{ json_encode($invoice->items->map(fn($i) => ['name' => $i->name, 'quantity' => $i->quantity, 'unit_price' => $i->unit_price / 100, 'total' => $i->total / 100])) }})">
-        @csrf
-        @method('PUT')
+@section('header-actions')
+<div class="flex items-center gap-2">
+    <x-app.button href="/templates/invoice5/1" variant="secondary" size="sm" class="hidden sm:flex">
+        Cancel
+    </x-app.button>
+    <x-app.button type="submit" form="invoice-form" variant="primary" size="sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Update Invoice
+    </x-app.button>
+</div>
+@endsection
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Invoice Details</h3>
+@section('content')
+<form id="invoice-form" x-data="invoiceForm()" class="space-y-4">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        {{-- Main Content --}}
+        <div class="xl:col-span-2 space-y-4">
+            {{-- Client Selection --}}
+            <div class="stagger-1 page-enter opacity-0 relative z-50" style="animation-fill-mode: forwards;">
+                <x-app.card>
+                    <x-app.section-header 
+                        title="Client Information" 
+                        subtitle="Update client details" 
+                        icon="user" 
+                        variant="primary" 
+                    />
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="client_id" class="block text-sm font-medium text-gray-700 mb-1">Client</label>
-                            <select name="client_id" id="client_id" required
-                                    class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                                @foreach($clients as $client)
-                                    <option value="{{ $client->id }}" {{ $invoice->client_id == $client->id ? 'selected' : '' }}>
-                                        {{ $client->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select name="status" id="status" required
-                                    class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                                <option value="draft" {{ $invoice->status->value === 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="sent" {{ $invoice->status->value === 'sent' ? 'selected' : '' }}>Sent</option>
-                                <option value="paid" {{ $invoice->status->value === 'paid' ? 'selected' : '' }}>Paid</option>
-                                <option value="overdue" {{ $invoice->status->value === 'overdue' ? 'selected' : '' }}>Overdue</option>
-                                <option value="cancelled" {{ $invoice->status->value === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                            <input type="date" name="date" id="date" value="{{ $invoice->date?->format('Y-m-d') }}" required
-                                   class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                        </div>
-
-                        <div>
-                            <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                            <input type="date" name="due_date" id="due_date" value="{{ $invoice->due_date?->format('Y-m-d') }}"
-                                   class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                        </div>
-
-                        <div>
-                            <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                            <select name="currency" id="currency" required
-                                    class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                                @foreach($currencies as $currency)
-                                    <option value="{{ $currency->code }}" {{ $invoice->currency == $currency->code ? 'selected' : '' }}>
-                                        {{ $currency->code }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
-                            <select name="language" id="language" required
-                                    class="w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
-                                <option value="en" {{ $invoice->language?->value === 'en' ? 'selected' : '' }}>English</option>
-                                <option value="bs" {{ $invoice->language?->value === 'bs' ? 'selected' : '' }}>Bosnian</option>
-                                <option value="hr" {{ $invoice->language?->value === 'hr' ? 'selected' : '' }}>Croatian</option>
-                                <option value="sr" {{ $invoice->language?->value === 'sr' ? 'selected' : '' }}>Serbian</option>
-                                <option value="de" {{ $invoice->language?->value === 'de' ? 'selected' : '' }}>German</option>
-                            </select>
+                    <div class="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
+                        <div class="flex items-start gap-4">
+                            <x-app.avatar name="Acme Corporation" size="md" />
+                            <div class="flex-1">
+                                <p class="font-bold text-slate-900 dark:text-white">Acme Corporation</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">billing@acme.com</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">123 Business Ave, New York, NY 10001</p>
+                            </div>
+                            <x-app.button variant="ghost" size="xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                Change
+                            </x-app.button>
                         </div>
                     </div>
-                </div>
+                </x-app.card>
+            </div>
 
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Items</h3>
-                        <button type="button" @click="addItem()" 
-                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Add Item
-                        </button>
+            {{-- Invoice Items --}}
+            <div class="stagger-2 page-enter opacity-0 relative z-10" style="animation-fill-mode: forwards;">
+                <x-app.card>
+                    <x-app.section-header 
+                        title="Invoice Items" 
+                        subtitle="Modify products or services" 
+                        icon="clipboard-document-list" 
+                        variant="info" 
+                    />
+                    
+                    {{-- Items Header --}}
+                    <div class="hidden lg:grid lg:grid-cols-12 gap-3 mb-2 px-1">
+                        <div class="col-span-5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            Article
+                        </div>
+                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty</div>
+                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Price</div>
+                        <div class="col-span-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Total</div>
+                        <div class="col-span-1"></div>
                     </div>
 
-                    <div class="space-y-4">
+                    {{-- Items --}}
+                    <div class="space-y-2">
                         <template x-for="(item, index) in items" :key="index">
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="grid grid-cols-12 gap-4">
-                                    <div class="col-span-5">
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Name</label>
-                                        <input type="text" x-model="item.name" :name="'items['+index+'][name]'" required
-                                               class="w-full h-9 px-3 py-1 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
+                            <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/40">
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+                                    <div class="lg:col-span-5">
+                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Article</label>
+                                        <div class="relative">
+                                            <select x-model="item.article" @change="selectArticle(index, $event.target.value)" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 appearance-none cursor-pointer transition-all">
+                                                <option value="">Select article...</option>
+                                                <template x-for="article in articles" :key="article.id">
+                                                    <option :value="article.id" x-text="article.name" :selected="item.article == article.id"></option>
+                                                </template>
+                                            </select>
+                                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
                                     </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
-                                        <input type="number" x-model="item.quantity" :name="'items['+index+'][quantity]'" min="1" required
-                                               @input="calculateTotal(index)"
-                                               class="w-full h-9 px-3 py-1 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
+                                    <div class="lg:col-span-2">
+                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Qty</label>
+                                        <input type="number" x-model="item.quantity" min="1" class="w-full h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
                                     </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Price</label>
-                                        <input type="number" x-model="item.unit_price" :name="'items['+index+'][unit_price]'" min="0" step="0.01" required
-                                               @input="calculateTotal(index)"
-                                               class="w-full h-9 px-3 py-1 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400">
+                                    <div class="lg:col-span-2">
+                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Price</label>
+                                        <div class="relative">
+                                            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs">€</span>
+                                            <input type="number" x-model="item.price" step="0.01" class="w-full h-9 pl-7 pr-2 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                                        </div>
                                     </div>
-                                    <div class="col-span-2">
-                                        <label class="block text-xs font-medium text-gray-500 mb-1">Total</label>
-                                        <div class="h-9 px-3 py-1 text-sm bg-gray-50 border border-gray-200 rounded-md flex items-center" x-text="formatNumber(item.total)"></div>
+                                    <div class="lg:col-span-2 flex items-center lg:justify-end h-9">
+                                        <label class="lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-auto">Total</label>
+                                        <span class="text-sm font-bold text-slate-900 dark:text-white" x-text="'€' + (item.quantity * item.price).toFixed(2)"></span>
                                     </div>
-                                    <div class="col-span-1 flex items-end justify-end">
-                                        <button type="button" @click="removeItem(index)" x-show="items.length > 1"
-                                                class="h-9 w-9 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
+                                    <div class="lg:col-span-1 flex justify-end">
+                                        <button type="button" @click="removeItem(index)" class="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" :disabled="items.length === 1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </button>
                                     </div>
                                 </div>
@@ -137,76 +112,172 @@
                         </template>
                     </div>
 
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <div class="flex justify-end">
-                            <div class="text-right">
-                                <div class="text-sm text-gray-500">Subtotal</div>
-                                <div class="text-2xl font-semibold text-gray-900" x-text="formatNumber(grandTotal())"></div>
+                    {{-- Add Item Button --}}
+                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600/60 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Item
+                    </button>
+                </x-app.card>
+            </div>
+
+            {{-- Danger Zone --}}
+            <div class="stagger-3 page-enter opacity-0" style="animation-fill-mode: forwards;">
+                <x-app.card class="border-rose-200 dark:border-rose-900/50">
+                    <x-app.section-header 
+                        title="Danger Zone" 
+                        subtitle="Irreversible actions" 
+                        icon="exclamation-triangle" 
+                        variant="danger" 
+                    />
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60">
+                        <div>
+                            <p class="text-sm font-medium text-rose-800 dark:text-rose-200">Delete this invoice</p>
+                            <p class="text-xs text-rose-600/70 dark:text-rose-300/70">Once deleted, this cannot be undone</p>
+                        </div>
+                        <x-app.button variant="danger" size="sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Delete Invoice
+                        </x-app.button>
+                    </div>
+                </x-app.card>
+            </div>
+        </div>
+
+        {{-- Sidebar --}}
+        <div class="space-y-4">
+            {{-- Invoice Details --}}
+            <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
+                <x-app.card>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Invoice Details
+                    </h3>
+                    <div class="space-y-3">
+                        <x-app.input label="Invoice Number" value="INV-2024-0042" readonly class="bg-slate-50 dark:bg-slate-700" />
+                        <x-app.input label="Issue Date" type="date" value="2024-01-15" />
+                        <x-app.input label="Due Date" type="date" value="2024-02-14" />
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
+                            <select class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
+                                <option value="draft">Draft</option>
+                                <option value="pending">Pending</option>
+                                <option value="paid" selected>Paid</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                    </div>
+                </x-app.card>
+            </div>
+
+            {{-- Summary --}}
+            <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
+                <div class="rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-5 text-white shadow-xl shadow-violet-500/30">
+                    <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        Summary
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-violet-200 text-sm">Subtotal</span>
+                            <span class="font-semibold" x-text="'€' + subtotal.toFixed(2)"></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-violet-200 text-sm">Tax (17%)</span>
+                            <span class="font-semibold" x-text="'€' + tax.toFixed(2)"></span>
+                        </div>
+                        <div class="border-t border-white/20 pt-3 mt-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-base font-bold">Total</span>
+                                <span class="text-2xl font-bold" x-text="'€' + total.toFixed(2)"></span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Notes</h3>
-                    <textarea name="notes" rows="3" 
-                              class="w-full px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400"
-                              placeholder="Add any notes or payment instructions...">{{ $invoice->notes }}</textarea>
-                </div>
             </div>
 
-            <div>
-                <div class="bg-white shadow rounded-lg p-6 sticky top-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Summary</h3>
-                    <dl class="space-y-3 text-sm">
-                        <div class="flex justify-between">
-                            <dt class="text-gray-500">Items</dt>
-                            <dd class="font-medium text-gray-900" x-text="items.length"></dd>
+            {{-- Activity --}}
+            <div class="stagger-3 page-enter opacity-0 pb-24 lg:pb-0" style="animation-fill-mode: forwards;">
+                <x-app.card>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Activity
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-800 dark:text-white">Payment received</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Feb 10, 2024</p>
+                            </div>
                         </div>
-                        <div class="flex justify-between pt-3 border-t border-gray-200">
-                            <dt class="text-gray-900 font-medium">Total</dt>
-                            <dd class="font-semibold text-gray-900" x-text="formatNumber(grandTotal())"></dd>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-sky-600 dark:text-sky-400 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-800 dark:text-white">Invoice viewed</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Jan 20, 2024</p>
+                            </div>
                         </div>
-                    </dl>
-
-                    <div class="mt-6 space-y-3">
-                        <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 text-sm font-medium text-white bg-neutral-950 rounded-md hover:bg-neutral-900">
-                            Update Invoice
-                        </button>
-                        <a href="{{ route('app.invoices.show', [$company, $invoice]) }}" class="w-full inline-flex justify-center items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                            Cancel
-                        </a>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-800 dark:text-white">Invoice sent</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Jan 15, 2024</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </x-app.card>
             </div>
         </div>
-    </form>
+    </div>
+</form>
 
-    <script>
-        function invoiceForm(existingItems = []) {
-            return {
-                items: existingItems.length > 0 ? existingItems : [{ name: '', quantity: 1, unit_price: 0, total: 0 }],
-                
-                addItem() {
-                    this.items.push({ name: '', quantity: 1, unit_price: 0, total: 0 });
-                },
-                
-                removeItem(index) {
-                    this.items.splice(index, 1);
-                },
-                
-                calculateTotal(index) {
-                    this.items[index].total = (parseFloat(this.items[index].quantity) || 0) * (parseFloat(this.items[index].unit_price) || 0);
-                },
-                
-                grandTotal() {
-                    return this.items.reduce((sum, item) => sum + (item.total || 0), 0);
-                },
-                
-                formatNumber(num) {
-                    return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
-                }
+@push('scripts')
+<script>
+function invoiceForm() {
+    return {
+        articles: [
+            { id: 1, name: 'Website Design & Development', price: 1500 },
+            { id: 2, name: 'Logo Design', price: 500 },
+            { id: 3, name: 'SEO Optimization', price: 300 },
+            { id: 4, name: 'Hosting Setup', price: 150 },
+            { id: 5, name: 'Maintenance (Monthly)', price: 200 },
+        ],
+        items: [
+            { article: 1, quantity: 1, price: 1500 },
+            { article: 2, quantity: 1, price: 500 },
+            { article: 3, quantity: 1, price: 340 },
+        ],
+        get subtotal() {
+            return this.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        },
+        get tax() {
+            return this.subtotal * 0.17;
+        },
+        get total() {
+            return this.subtotal + this.tax;
+        },
+        addItem() {
+            this.items.push({ article: '', quantity: 1, price: 0 });
+        },
+        removeItem(index) {
+            if (this.items.length > 1) {
+                this.items.splice(index, 1);
+            }
+        },
+        selectArticle(index, articleId) {
+            const article = this.articles.find(a => a.id == articleId);
+            if (article) {
+                this.items[index].price = article.price;
             }
         }
-    </script>
-</x-app-layout>
+    }
+}
+</script>
+@endpush
+@endsection

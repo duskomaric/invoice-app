@@ -21,8 +21,8 @@ $iconBg = [
 <x-invoice5.card hover class="group">
     <div class="flex items-start justify-between gap-3">
         <div class="flex-1 min-w-0">
-            <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">{{ $title }}</p>
-            <p class="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{{ $value }}</p>
+            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">{{ $title }}</p>
+            <p class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $value }}</p>
             @if($trend)
                 <div class="flex items-center gap-1 mt-1.5">
                     @if($trendUp)

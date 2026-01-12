@@ -22,17 +22,14 @@
         {{-- Main Content --}}
         <div class="xl:col-span-2 space-y-4">
             {{-- Client Selection --}}
-            <div class="stagger-1 page-enter opacity-0" style="animation-fill-mode: forwards;">
+            <div class="stagger-1 page-enter opacity-0 relative z-50" style="animation-fill-mode: forwards;">
                 <x-invoice5.card>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Client Information</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Update client details</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Client Information" 
+                        subtitle="Update client details" 
+                        icon="user" 
+                        variant="primary" 
+                    />
                     
                     <div class="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                         <div class="flex items-start gap-4">
@@ -52,17 +49,14 @@
             </div>
 
             {{-- Invoice Items --}}
-            <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
+            <div class="stagger-2 page-enter opacity-0 relative z-10" style="animation-fill-mode: forwards;">
                 <x-invoice5.card>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Invoice Items</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Modify products or services</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Invoice Items" 
+                        subtitle="Modify products or services" 
+                        icon="clipboard-document-list" 
+                        variant="info" 
+                    />
                     
                     {{-- Items Header --}}
                     <div class="hidden lg:grid lg:grid-cols-12 gap-3 mb-2 px-1">
@@ -119,7 +113,7 @@
                     </div>
 
                     {{-- Add Item Button --}}
-                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-medium transition-all flex items-center justify-center gap-2">
+                    <button type="button" @click="addItem()" class="w-full mt-3 h-10 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600/60 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-900/20 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         Add Item
                     </button>
@@ -129,15 +123,12 @@
             {{-- Danger Zone --}}
             <div class="stagger-3 page-enter opacity-0" style="animation-fill-mode: forwards;">
                 <x-invoice5.card class="border-rose-200 dark:border-rose-900/50">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-rose-700 dark:text-rose-400">Danger Zone</h3>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Irreversible actions</p>
-                        </div>
-                    </div>
+                    <x-invoice5.section-header 
+                        title="Danger Zone" 
+                        subtitle="Irreversible actions" 
+                        icon="exclamation-triangle" 
+                        variant="danger" 
+                    />
                     <div class="flex items-center justify-between p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60">
                         <div>
                             <p class="text-sm font-medium text-rose-800 dark:text-rose-200">Delete this invoice</p>
@@ -166,8 +157,8 @@
                         <x-invoice5.input label="Issue Date" type="date" value="2024-01-15" />
                         <x-invoice5.input label="Due Date" type="date" value="2024-02-14" />
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
-                            <select class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all">
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
+                            <select class="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-500 transition-all shadow-sm">
                                 <option value="draft">Draft</option>
                                 <option value="pending">Pending</option>
                                 <option value="paid" selected>Paid</option>

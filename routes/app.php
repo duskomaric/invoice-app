@@ -38,13 +38,6 @@ Route::prefix('templates')->name('templates.')->group(function () {
 
 Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(function () {
 
-    Route::post('/logout', function () {
-        auth()->logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-        return redirect('/');
-    })->name('logout');
-
     Route::get('/', [CompanyController::class, 'select'])->name('company.select');
     Route::post('/switch-company/{company}', [CompanyController::class, 'switch'])->name('company.switch');
 
@@ -88,9 +81,21 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('app.')->group(func
                 Route::get('/invoice', [SettingsController::class, 'invoice'])->name('invoice');
                 Route::put('/invoice', [SettingsController::class, 'updateInvoice'])->name('invoice.update');
                 Route::get('/currencies', [SettingsController::class, 'currencies'])->name('currencies');
+                Route::post('/currencies', [SettingsController::class, 'storeCurrency'])->name('currencies.store');
+                Route::delete('/currencies/{currency}', [SettingsController::class, 'deleteCurrency'])->name('currencies.destroy');
+
                 Route::get('/bank-accounts', [SettingsController::class, 'bankAccounts'])->name('bank-accounts');
+                Route::post('/bank-accounts', [SettingsController::class, 'storeBankAccount'])->name('bank-accounts.store');
+                Route::put('/bank-accounts/{bankAccount}', [SettingsController::class, 'updateBankAccount'])->name('bank-accounts.update');
+                Route::delete('/bank-accounts/{bankAccount}', [SettingsController::class, 'deleteBankAccount'])->name('bank-accounts.destroy');
                 Route::get('/email-templates', [SettingsController::class, 'emailTemplates'])->name('email-templates');
                 Route::get('/email-signatures', [SettingsController::class, 'emailSignatures'])->name('email-signatures');
+                
+                Route::get('/fiscalization', [SettingsController::class, 'fiscalization'])->name('fiscalization');
+                Route::get('/appearance', [SettingsController::class, 'appearance'])->name('appearance');
+                Route::get('/email', [SettingsController::class, 'email'])->name('email');
+                Route::get('/notifications', [SettingsController::class, 'notifications'])->name('notifications');
+                Route::get('/roles', [SettingsController::class, 'roles'])->name('roles');
             });
         });
 });

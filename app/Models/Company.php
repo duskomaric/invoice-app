@@ -58,6 +58,16 @@ class Company extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function proformas(): HasMany
+    {
+        return $this->hasMany(Proforma::class);
+    }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
+    }
+
     public function clients(): HasMany
     {
         return $this->hasMany(Client::class);
@@ -86,5 +96,15 @@ class Company extends Model
     public function incomeBookEntries(): HasMany
     {
         return $this->hasMany(IncomeBookEntry::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 }

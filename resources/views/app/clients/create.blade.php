@@ -1,68 +1,66 @@
-<x-app-layout>
-    <x-slot name="title">Create Client - {{ $company->name }}</x-slot>
+@extends('layouts.app')
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Create Client</h1>
-    </div>
+@section('title', 'Add Client - ' . $company->name)
+@section('page-title', 'Create New Client')
+@section('page-subtitle', 'Add a new client to your business network')
 
-    <form action="{{ route('app.clients.store', $company) }}" method="POST">
-        @csrf
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg font-medium mb-4">Basic Information</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                            <input type="text" name="name" value="{{ old('name') }}" required class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300 focus:ring-2 focus:ring-neutral-400">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" name="email" value="{{ old('email') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="text" name="phone" value="{{ old('phone') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">VAT Number</label>
-                            <input type="text" name="vat_number" value="{{ old('vat_number') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                    </div>
+@section('content')
+<form action="{{ route('app.clients.store', $company) }}" method="POST" class="max-w-4xl mx-auto">
+    @csrf
+    
+    <div class="space-y-6">
+        <x-app.card>
+            <x-app.section-header title="Basic Information" subtitle="Client contact details" icon="user" variant="primary" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="md:col-span-2">
+                    <x-app.input label="Full Name / Company Name" name="name" placeholder="e.g. Acme Corp" required :value="old('name')" />
+                </div>
+                
+                <div>
+                    <x-app.input label="Email Address" name="email" type="email" placeholder="billing@client.com" :value="old('email')" />
                 </div>
 
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg font-medium mb-4">Address</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" name="address" value="{{ old('address') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                            <input type="text" name="city" value="{{ old('city') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                            <input type="text" name="postal_code" value="{{ old('postal_code') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                            <input type="text" name="country" value="{{ old('country') }}" class="w-full h-10 px-3 text-sm border rounded-md border-neutral-300">
-                        </div>
-                    </div>
+                <div>
+                    <x-app.input label="Phone Number" name="phone" placeholder="+1 234 567 890" :value="old('phone')" />
                 </div>
 
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h3 class="text-lg font-medium mb-4">Notes</h3>
-                    <textarea name="notes" rows="3" class="w-full px-3 py-2 text-sm border rounded-md border-neutral-300">{{ old('notes') }}</textarea>
+                <div class="md:col-span-2">
+                    <x-app.input label="VAT / Tax Number" name="vat_number" placeholder="e.g. US123456789" :value="old('vat_number')" />
                 </div>
             </div>
+        </x-app.card>
 
-            <div class="bg-white shadow rounded-lg p-6 h-fit sticky top-6">
-                <button type="submit" class="w-full mb-3 px-4 py-2 text-sm font-medium text-white bg-neutral-950 rounded-md hover:bg-neutral-900">Create Client</button>
-                <a href="{{ route('app.clients.index', $company) }}" class="w-full block text-center px-4 py-2 text-sm text-gray-700 border rounded-md hover:bg-gray-50">Cancel</a>
+        <x-app.card>
+            <x-app.section-header title="Address & Location" subtitle="Physical billing address" icon="map-pin" variant="secondary" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="md:col-span-2">
+                    <x-app.input label="Steet Address" name="address" placeholder="123 Main St" :value="old('address')" />
+                </div>
+
+                <div>
+                    <x-app.input label="City" name="city" placeholder="New York" :value="old('city')" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <x-app.input label="Postal Code" name="postal_code" placeholder="10001" :value="old('postal_code')" />
+                    <x-app.input label="Country" name="country" placeholder="USA" :value="old('country')" />
+                </div>
             </div>
+        </x-app.card>
+
+        <x-app.card>
+            <x-app.section-header title="Additional Notes" subtitle="Internal notes about this client" icon="document-text" variant="warning" />
+            <div class="mt-6">
+                <textarea name="notes" rows="4" class="w-full rounded-2xl bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-sm text-slate-800 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all p-4" placeholder="Any private notes for your team...">{{ old('notes') }}</textarea>
+            </div>
+        </x-app.card>
+
+        <div class="flex items-center justify-end gap-3 pb-12">
+            <x-app.button :href="route('app.clients.index', $company)" variant="secondary">Cancel</x-app.button>
+            <x-app.button type="submit" variant="primary">Create Client</x-app.button>
         </div>
-    </form>
-</x-app-layout>
+    </div>
+</form>
+@endsection

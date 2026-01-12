@@ -1,148 +1,116 @@
-<x-app-layout>
-    <x-slot name="title">Dashboard - {{ $company->name }}</x-slot>
+@extends('layouts.app')
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <p class="mt-1 text-sm text-gray-500">Welcome back! Here's an overview of your business.</p>
+@section('title', 'Dashboard - App')
+@section('page-title', 'Overview')
+@section('page-subtitle', 'Welcome back! Here is what is happening with your business today.')
+
+@section('header-actions')
+<div class="flex items-center gap-2">
+    <x-app.button href="{{ route('app.invoices.create', $company) }}" variant="primary" size="sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        New Invoice
+    </x-app.button>
+</div>
+@endsection
+
+@section('content')
+<div class="space-y-8">
+    {{-- Stats Grid --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <x-app.stats-card
+            title="Total Invoices"
+            value="{{ $stats['invoices_count'] }}"
+            icon="document-text"
+            variant="primary"
+        />
+        <x-app.stats-card
+            title="Open Quotes"
+            value="{{ $stats['quotes_count'] }}"
+            icon="chat-bubble-bottom-center-text"
+            variant="blue"
+        />
+        <x-app.stats-card
+            title="Proformas"
+            value="{{ $stats['proformas_count'] }}"
+            icon="document-duplicate"
+            variant="warning"
+        />
+        <x-app.stats-card
+            title="Active Contracts"
+            value="{{ $stats['contracts_count'] }}"
+            icon="shield-check"
+            variant="success"
+        />
     </div>
 
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Invoices</dt>
-                            <dd class="text-lg font-semibold text-gray-900">{{ $stats['invoices_count'] }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-5 py-3">
-                <a href="{{ route('app.invoices.index', $company) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
-            </div>
+    {{-- Recent Invoices --}}
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-4 bg-violet-500 rounded-full"></span>
+                Recent Invoices
+            </h2>
+            <a href="{{ route('app.invoices.index', $company) }}" class="text-[11px] font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors uppercase tracking-tight">View All Invoices →</a>
         </div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Quotes</dt>
-                            <dd class="text-lg font-semibold text-gray-900">{{ $stats['quotes_count'] }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-5 py-3">
-                <a href="{{ route('app.quotes.index', $company) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
-            </div>
-        </div>
+        <div class="relative z-10">
+            <x-app.table>
+                <x-slot name="head">
+                    <x-app.table-th icon="hashtag">Invoice</x-app.table-th>
+                    <x-app.table-th icon="user">Client</x-app.table-th>
+                    <x-app.table-th icon="calendar">Date</x-app.table-th>
+                    <x-app.table-th icon="banknotes">Amount</x-app.table-th>
+                    <x-app.table-th>Status</x-app.table-th>
+                    <x-app.table-th class="text-right">Actions</x-app.table-th>
+                </x-slot>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Proformas</dt>
-                            <dd class="text-lg font-semibold text-gray-900">{{ $stats['proformas_count'] }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-5 py-3">
-                <a href="{{ route('app.proformas.index', $company) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
-            </div>
-        </div>
-
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Contracts</dt>
-                            <dd class="text-lg font-semibold text-gray-900">{{ $stats['contracts_count'] }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-5 py-3">
-                <a href="{{ route('app.contracts.index', $company) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Recent Invoices</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                @forelse($stats['recent_invoices'] as $invoice)
+                    <x-app.table-tr hover>
+                        <x-app.table-td>
+                            <a href="{{ route('app.invoices.show', [$company, $invoice]) }}" class="font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 text-xs">
+                                {{ $invoice->invoice_prefix }}{{ $invoice->id }}
+                            </a>
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <div class="flex items-center gap-2.5">
+                                <x-app.avatar :name="$invoice->client->name" size="xs" />
+                                <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">{{ $invoice->client->name }}</span>
+                            </div>
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <span class="text-xs text-slate-700 dark:text-slate-300 font-medium">{{ $invoice->date->format('M d, Y') }}</span>
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            <span class="text-sm font-bold text-slate-900 dark:text-white">{{ $invoice->currency === 'EUR' ? '€' : ($invoice->currency === 'USD' ? '$' : $invoice->currency) }}{{ number_format($invoice->total_amount / 100, 2) }}</span>
+                        </x-app.table-td>
+                        <x-app.table-td>
+                            @php
+                                $statusColors = [
+                                    'paid' => 'success',
+                                    'draft' => 'slate',
+                                    'sent' => 'amber',
+                                    'overdue' => 'danger',
+                                    'cancelled' => 'slate',
+                                ];
+                                $color = $statusColors[strtolower($invoice->status->value)] ?? 'violet';
+                            @endphp
+                            <x-app.status-badge :status="$invoice->status->value" :variant="$color" size="sm" dot :pulse="$invoice->status->value === 'overdue'" />
+                        </x-app.table-td>
+                        <x-app.table-td class="text-right">
+                            <x-app.button href="{{ route('app.invoices.show', [$company, $invoice]) }}" variant="ghost" size="icon-xs" title="View">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </x-app.button>
+                        </x-app.table-td>
+                    </x-app.table-tr>
+                @empty
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <p class="text-sm font-medium">No recent invoices found</p>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($stats['recent_invoices'] as $invoice)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <a href="{{ route('app.invoices.show', [$company, $invoice]) }}" class="text-indigo-600 hover:text-indigo-900">
-                                    {{ $invoice->formatted_number }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $invoice->client?->name ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $invoice->date?->format('d.m.Y') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                    {{ $invoice->status->value === 'paid' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $invoice->status->value === 'draft' ? 'bg-gray-100 text-gray-800' : '' }}
-                                    {{ $invoice->status->value === 'sent' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $invoice->status->value === 'overdue' ? 'bg-red-100 text-red-800' : '' }}">
-                                    {{ $invoice->status->value }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                                {{ number_format($invoice->total / 100, 2) }} {{ $invoice->currency }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
-                                No invoices yet. <a href="{{ route('app.invoices.create', $company) }}" class="text-indigo-600 hover:text-indigo-500">Create your first invoice</a>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                @endforelse
+            </x-app.table>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection

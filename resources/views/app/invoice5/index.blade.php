@@ -60,7 +60,7 @@ $statusConfig = [
     </div>
 
     {{-- Filters --}}
-    <div class="stagger-2 page-enter opacity-0" style="animation-fill-mode: forwards;">
+    <div class="stagger-2 page-enter opacity-0 relative z-50" style="animation-fill-mode: forwards;">
         <x-invoice5.card padding="p-3">
             <div class="flex flex-wrap items-center gap-2">
                 {{-- Search --}}
@@ -70,7 +70,7 @@ $statusConfig = [
                 </div>
 
                 {{-- Status Filter --}}
-                <x-invoice5.dropdown label="Status" icon="funnel">
+                <x-invoice5.dropdown label="Status" icon="funnel" class="shadow-sm">
                     <button @click="filters.status = ''" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2" :class="!filters.status && 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20'">
                         <span class="w-4 h-4 rounded border flex items-center justify-center" :class="!filters.status ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600'">
                             <svg x-show="!filters.status" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -101,7 +101,7 @@ $statusConfig = [
                 </x-invoice5.dropdown>
 
                 {{-- Currency Filter --}}
-                <x-invoice5.dropdown label="Currency">
+                <x-invoice5.dropdown label="Currency" class="shadow-sm">
                     <template x-for="curr in ['EUR', 'USD', 'GBP', 'BAM']" :key="curr">
                         <button @click="toggleCurrency(curr)" class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2" :class="filters.currencies.includes(curr) && 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20'">
                             <span class="w-4 h-4 rounded border flex items-center justify-center" :class="filters.currencies.includes(curr) ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-600'">
@@ -113,7 +113,7 @@ $statusConfig = [
                 </x-invoice5.dropdown>
 
                 {{-- Attachments Toggle --}}
-                <div class="flex items-center gap-2 h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600" :class="filters.hasAttachments && 'border-violet-400 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/20'">
+                <div class="flex items-center gap-2 h-9 px-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-300/80 dark:border-slate-600 shadow-sm" :class="filters.hasAttachments && 'border-violet-400 dark:border-violet-500/50 bg-violet-50 dark:bg-violet-900/20'">
                     <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     <span class="text-xs text-slate-600 dark:text-slate-300">Files</span>
                     <button @click="filters.hasAttachments = !filters.hasAttachments" class="relative w-9 h-5 rounded-full transition-colors" :class="filters.hasAttachments ? 'bg-violet-500' : 'bg-slate-200 dark:bg-slate-600'">
@@ -144,22 +144,22 @@ $statusConfig = [
     </div>
 
     {{-- Table --}}
-    <div class="stagger-3 page-enter opacity-0 hidden lg:block" style="animation-fill-mode: forwards;">
+    <div class="stagger-3 page-enter opacity-0 hidden lg:block relative z-10" style="animation-fill-mode: forwards;">
         <x-invoice5.table>
             <x-slot:head>
-                <th class="text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
+                <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Invoice
                     </div>
                 </th>
-                <th class="text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
+                <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         Client
                     </div>
                 </th>
-                <th class="text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
+                <th class="text-left text-[10px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-wider px-4 py-3">
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Amount
