@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\Article;
 use App\Models\Invoice;
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use App\Enums\RoleEnum;
 use function Pest\Livewire\livewire;
 
@@ -24,7 +24,7 @@ it('can create invoice with calculated totals', function () {
     livewire(\App\Filament\Resources\Invoices\Pages\CreateInvoice::class)
         ->fillForm([
             'client_id' => $client->id,
-            'status' => InvoiceStatus::Draft->value,
+            'status' => InvoiceStatusEnum::Draft->value,
             'date' => now()->format('Y-m-d'),
             'due_date' => now()->addDays(30)->format('Y-m-d'),
         ])
@@ -40,7 +40,7 @@ it('can create invoice with calculated totals', function () {
         ->assertHasNoFormErrors();
 
     $invoice = Invoice::latest()->first();
-    
+
     expect($invoice)->not->toBeNull()
         ->and($invoice->client_id)->toBe($client->id)
         ->and($invoice->subtotal)->toBe(2000000) // 2 * 100.00, MoneyInput stores as cents * 100
@@ -54,7 +54,7 @@ it('calculates invoice item totals correctly', function () {
     livewire(\App\Filament\Resources\Invoices\Pages\CreateInvoice::class)
         ->fillForm([
             'client_id' => $client->id,
-            'status' => InvoiceStatus::Draft->value,
+            'status' => InvoiceStatusEnum::Draft->value,
             'date' => now()->format('Y-m-d'),
         ])
         ->set('data.items', [
@@ -76,7 +76,7 @@ it('calculates invoice item totals correctly', function () {
 
     $invoice = Invoice::latest()->first();
     $items = $invoice->items;
-    
+
     expect($items)->toHaveCount(2)
         ->and($items[0]->total)->toBe(1500000) // 3 * 50.00, MoneyInput * 100
         ->and($items[1]->total)->toBe(1000000) // 1 * 100.00, MoneyInput * 100
@@ -87,13 +87,13 @@ it('calculates invoice item totals correctly', function () {
 it('can edit invoice and recalculate totals', function () {
     $client = Client::factory()->create();
     $article = Article::factory()->create(['price' => 5000]);
-    
+
     // Create invoice manually to avoid factory overwriting totals
     $invoice = Invoice::create([
         'client_id' => $client->id,
         'date' => now(),
         'due_date' => now()->addDays(30),
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
     ]);
 
     // Add items to invoice
@@ -121,7 +121,7 @@ it('can edit invoice and recalculate totals', function () {
         ->assertHasNoFormErrors();
 
     $invoice->refresh();
-    
+
     expect($invoice->subtotal)->toBe(1500000) // 5 * 30.00, MoneyInput * 100
         ->and($invoice->total)->toBe(1500000);
 });

@@ -22,8 +22,8 @@ class EditCompanyProfile extends EditTenantProfile
                     ->schema([
                         \Filament\Forms\Components\Placeholder::make('subscription_info')
                             ->label('Valid Until')
-                            ->content(fn ($record) => $record->subscription_ends_at 
-                                ? $record->subscription_ends_at->format('d.m.Y') . 
+                            ->content(fn ($record) => $record->subscription_ends_at
+                                ? $record->subscription_ends_at->format('d.m.Y') .
                                   ' (' . ($record->subscription_ends_at->isPast() ? 'Expired' : $record->subscription_ends_at->diffForHumans()) . ')'
                                 : 'Lifetime Subscription (Unlimited)'
                             )
@@ -60,9 +60,6 @@ class EditCompanyProfile extends EditTenantProfile
                         TextInput::make('vat_number')
                             ->label('VAT Number')
                             ->maxLength(20),
-                        TextInput::make('bank_account')
-                            ->label('Bank Account')
-                            ->maxLength(50),
                     ])->columns(2),
 
                 Section::make('Fiscalization (OFS)')

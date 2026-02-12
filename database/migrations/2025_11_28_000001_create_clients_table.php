@@ -13,12 +13,15 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->unsignedSmallInteger('invoice_due_days')->nullable();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('city')->nullable();
             $table->string('zip')->nullable();
             $table->string('country')->nullable();
             $table->string('tax_id')->nullable();
+            $table->string('vat_id')->nullable();
             $table->timestamps();
         });
     }

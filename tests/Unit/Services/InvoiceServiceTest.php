@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Services;
 
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +17,7 @@ class InvoiceServiceTest extends TestCase
         $invoice = Invoice::create([
             'client_id' => \App\Models\Client::factory()->create()->id,
             'amount_paid' => 0,
-            'status' => InvoiceStatus::Sent,
+            'status' => InvoiceStatusEnum::Sent,
             'date' => now(),
             'due_date' => now(),
         ]);
@@ -33,7 +33,7 @@ class InvoiceServiceTest extends TestCase
         $service->updateStatus($invoice, 10000);
 
         $this->assertEquals(10000, $invoice->amount_paid);
-        $this->assertEquals(InvoiceStatus::Paid, $invoice->status);
+        $this->assertEquals(InvoiceStatusEnum::Paid, $invoice->status);
     }
 
     public function test_it_updates_invoice_status_to_partial_when_partially_paid(): void
@@ -41,7 +41,7 @@ class InvoiceServiceTest extends TestCase
         $invoice = Invoice::create([
             'client_id' => \App\Models\Client::factory()->create()->id,
             'amount_paid' => 0,
-            'status' => InvoiceStatus::Sent,
+            'status' => InvoiceStatusEnum::Sent,
             'date' => now(),
             'due_date' => now(),
         ]);
@@ -57,7 +57,7 @@ class InvoiceServiceTest extends TestCase
         $service->updateStatus($invoice, 5000);
 
         $this->assertEquals(5000, $invoice->amount_paid);
-        $this->assertEquals(InvoiceStatus::Partial, $invoice->status);
+        $this->assertEquals(InvoiceStatusEnum::Partial, $invoice->status);
     }
 
     public function test_it_updates_invoice_status_to_sent_when_unpaid_and_not_overdue(): void
@@ -65,7 +65,7 @@ class InvoiceServiceTest extends TestCase
         $invoice = Invoice::create([
             'client_id' => \App\Models\Client::factory()->create()->id,
             'amount_paid' => 5000,
-            'status' => InvoiceStatus::Partial,
+            'status' => InvoiceStatusEnum::Partial,
             'date' => now(),
             'due_date' => now()->addDays(10),
         ]);
@@ -81,7 +81,7 @@ class InvoiceServiceTest extends TestCase
         $service->updateStatus($invoice, 0);
 
         $this->assertEquals(0, $invoice->amount_paid);
-        $this->assertEquals(InvoiceStatus::Sent, $invoice->status);
+        $this->assertEquals(InvoiceStatusEnum::Sent, $invoice->status);
     }
 
     public function test_it_updates_invoice_status_to_overdue_when_unpaid_and_overdue(): void
@@ -89,7 +89,7 @@ class InvoiceServiceTest extends TestCase
         $invoice = Invoice::create([
             'client_id' => \App\Models\Client::factory()->create()->id,
             'amount_paid' => 5000,
-            'status' => InvoiceStatus::Partial,
+            'status' => InvoiceStatusEnum::Partial,
             'date' => now(),
             'due_date' => now()->subDays(1),
         ]);
@@ -105,6 +105,6 @@ class InvoiceServiceTest extends TestCase
         $service->updateStatus($invoice, 0);
 
         $this->assertEquals(0, $invoice->amount_paid);
-        $this->assertEquals(InvoiceStatus::Overdue, $invoice->status);
+        $this->assertEquals(InvoiceStatusEnum::Overdue, $invoice->status);
     }
 }

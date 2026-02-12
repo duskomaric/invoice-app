@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->integer('unit_price');
             $table->integer('total');
+            $table->integer('tax_rate')->default(0);
             $table->timestamps();
         });
     }

@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\InvoiceFrequency;
-use App\Enums\InvoiceStatus;
-use App\Models\Setting;
+use App\Enums\InvoiceFrequencyEnum;
+use App\Enums\InvoiceStatusEnum;
+use App\Enums\LanguageEnum;
+use App\Services\DocumentNumberingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Invoice extends Model
 {
@@ -27,11 +30,14 @@ class Invoice extends Model
         'frequency',
         'next_invoice_date',
         'parent_id',
+        'sourceable_type',
+        'sourceable_id',
         // Currency & Invoice Numbering
         'currency',
+        'invoice_prefix',
+        'invoice_year',
         'invoice_number',
-        'sequence_number',
-        'sequence_year',
+        'invoice_template',
         // Fiscal data
         'is_fiscalized',
         'fiscal_invoice_number',
@@ -44,20 +50,18 @@ class Invoice extends Model
 
 
     protected $casts = [
-        'status' => InvoiceStatus::class,
-        'frequency' => InvoiceFrequency::class,
+        'status' => InvoiceStatusEnum::class,
+        'frequency' => InvoiceFrequencyEnum::class,
         'date' => 'date',
         'due_date' => 'date',
         'next_invoice_date' => 'date',
         'amount_paid' => 'integer',
         'is_recurring' => 'boolean',
-        // Currency & numbering
-        'sequence_number' => 'integer',
-        'sequence_year' => 'integer',
         // Fiscal data casts
         'is_fiscalized' => 'boolean',
         'fiscalized_at' => 'datetime',
         'fiscal_meta' => 'array',
+        'language' => LanguageEnum::class,
     ];
 
     protected static function boot()
@@ -76,27 +80,11 @@ class Invoice extends Model
      */
     public function generateInvoiceNumber(): void
     {
-        $year = now()->year;
-        $currency = $this->currency ?? Setting::get('invoice_default_currency', 'BAM');
-
-        // Get current sequences
-        $sequences = Setting::get('invoice_sequences', []);
-        $currentNumber = $sequences[$currency][$year] ?? 0;
-        $nextNumber = $currentNumber + 1;
-
-        // Update sequence in settings
-        $sequences[$currency][$year] = $nextNumber;
-        Setting::set('invoice_sequences', $sequences);
-
-        // Get prefix for currency
-        $prefixes = Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']);
-        $prefix = $prefixes[$currency] ?? $currency;
-
-        // Set values
-        $this->currency = $currency;
-        $this->sequence_number = $nextNumber;
-        $this->sequence_year = $year;
-        $this->invoice_number = sprintf('%s-%03d/%d', $prefix, $nextNumber, $year);
+        app(DocumentNumberingService::class)->assign($this, [
+            'prefix' => 'invoice_prefix',
+            'year' => 'invoice_year',
+            'number' => 'invoice_number',
+        ]);
     }
 
     /**
@@ -104,7 +92,17 @@ class Invoice extends Model
      */
     public function getFormattedNumberAttribute(): string
     {
-        return $this->invoice_number ?? "ID-{$this->id}";
+        if (! $this->invoice_number) {
+            return "ID-{$this->id}";
+        }
+
+        $year = $this->invoice_year ?: (int) ($this->date?->year ?? now()->year);
+
+        if (! $this->invoice_prefix) {
+            return "{$this->invoice_number}/{$year}";
+        }
+
+        return "{$this->invoice_prefix}-{$this->invoice_number}/{$year}";
     }
 
     public function getSubtotalAttribute(): int
@@ -132,6 +130,12 @@ class Invoice extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function bankAccounts(): BelongsToMany
+    {
+        return $this->belongsToMany(CompanyBankAccount::class)
+            ->withTimestamps();
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(InvoiceItem::class);
@@ -150,5 +154,15 @@ class Invoice extends Model
     public function emailLogs(): HasMany
     {
         return $this->hasMany(InvoiceEmailLog::class);
+    }
+
+    public function incomeBookEntries(): HasMany
+    {
+        return $this->hasMany(IncomeBookEntry::class);
+    }
+
+    public function sourceable(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

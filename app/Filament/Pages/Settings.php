@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
+use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Models\Permission;
 use App\Models\PermissionRoleEnum;
 use App\Models\Setting;
@@ -32,11 +33,15 @@ class Settings extends Page
 {
     use InteractsWithForms;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|\UnitEnum|null $navigationGroup = 'Application Settings';
 
     protected static ?string $navigationLabel = 'Settings';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+
+    protected static ?string $cluster = SettingsCluster::class;
 
     protected static ?int $navigationSort = 2;
 
@@ -80,12 +85,7 @@ class Settings extends Page
 
     public string $warning_color;
 
-    public $invoice_email_subject;
 
-    public $invoice_email_body;
-
-    public $invoice_email_subject_sr;
-    public $invoice_email_body_sr;
 
     public $invoice_pdf_filename_format;
 
@@ -94,7 +94,15 @@ class Settings extends Page
     public $company_email;
     public $company_phone;
     public $company_vat_id;
-    public $company_bank_account;
+
+    // SMTP Settings
+    public $smtp_host;
+    public $smtp_port;
+    public $smtp_username;
+    public $smtp_password;
+    public $smtp_encryption;
+    public $smtp_from_address;
+    public $smtp_from_name;
 
     // OFS Fiscalization Settings
     public $ofs_base_url;
@@ -105,10 +113,6 @@ class Settings extends Page
     public $ofs_seller_name;
     public $ofs_seller_address;
     public $ofs_seller_town;
-
-    // Invoice Numbering Settings
-    public $invoice_prefixes;
-    public $invoice_default_currency;
 
     public ?string $selectedRole;
 
@@ -143,10 +147,6 @@ class Settings extends Page
             'success_color' => Setting::get('success_color'),
             'warning_color' => Setting::get('warning_color'),
 
-            'invoice_email_subject' => (string) Setting::get('invoice_email_subject'),
-            'invoice_email_body' => (string) Setting::get('invoice_email_body'),
-            'invoice_email_subject_sr' => (string) Setting::get('invoice_email_subject_sr'),
-            'invoice_email_body_sr' => (string) Setting::get('invoice_email_body_sr'),
             'invoice_pdf_filename_format' => (string) Setting::get('invoice_pdf_filename_format'),
 
             'company_name' => (string) Setting::get('company_name'),
@@ -154,7 +154,6 @@ class Settings extends Page
             'company_email' => (string) Setting::get('company_email'),
             'company_phone' => (string) Setting::get('company_phone'),
             'company_vat_id' => (string) Setting::get('company_vat_id'),
-            'company_bank_account' => (string) Setting::get('company_bank_account'),
 
             'ofs_base_url' => (string) Setting::get('ofs_base_url'),
             'ofs_api_key' => (string) Setting::get('ofs_api_key'),
@@ -165,8 +164,14 @@ class Settings extends Page
             'ofs_seller_address' => (string) Setting::get('ofs_seller_address'),
             'ofs_seller_town' => (string) Setting::get('ofs_seller_town'),
 
-            'invoice_prefixes' => Setting::get('invoice_prefixes', ['BAM' => 'BAM', 'EUR' => 'EUR']),
-            'invoice_default_currency' => (string) Setting::get('invoice_default_currency', 'BAM'),
+            // SMTP Settings
+            'smtp_host' => (string) Setting::get('smtp_host'),
+            'smtp_port' => (string) Setting::get('smtp_port'),
+            'smtp_username' => (string) Setting::get('smtp_username'),
+            'smtp_password' => (string) Setting::get('smtp_password'),
+            'smtp_encryption' => (string) Setting::get('smtp_encryption'),
+            'smtp_from_address' => (string) Setting::get('smtp_from_address'),
+            'smtp_from_name' => (string) Setting::get('smtp_from_name'),
         ]);
 
         $this->logViewerUrl = Setting::get('log_viewer_access_key')
@@ -274,63 +279,8 @@ class Settings extends Page
                                 ->label('Company Address')
                                 ->rows(3)
                                 ->columnSpanFull(),
-                            TextInput::make('company_phone')
-                                ->label('Company Phone')
-                                ->tel()
-                                ->columnSpan(6),
-                            TextInput::make('company_vat_id')
-                                ->label('Company VAT / Tax ID')
-                                ->columnSpan(6),
-                            TextInput::make('company_bank_account')
-                                ->label('Bank Account / IBAN')
-                                ->columnSpanFull(),
-                        ])->columns(12),
-
-                    Section::make('Email Configuration')
-                        ->description('Configure the email template sent to clients.')
-                        ->schema([
-                            Fieldset::make('English Template')
-                                ->schema([
-                                    TextInput::make('invoice_email_subject')
-                                        ->label('Email Subject')
-                                        ->helperText('Available placeholders: {{ number }}')
-                                        ->required()
-                                        ->columnSpanFull(),
-
-                                    RichEditor::make('invoice_email_body')
-                                        ->label('Email Body (Markdown)')
-                                        ->helperText('Available placeholders: {{ client }}, {{ number }}, {{ amount }}, {{ due_date }}, {{ company }}')
-                                        ->toolbarButtons([
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            ['bulletList', 'orderedList'],
-                                            ['link'],
-                                            ['undo', 'redo'],
-                                        ])
-                                        ->required()
-                                        ->columnSpanFull(),
-                                ])->columnSpanFull()->columns(12),
-
-                            Fieldset::make('Serbian (Latin) Template')
-                                ->schema([
-                                    TextInput::make('invoice_email_subject_sr')
-                                        ->label('Email Subject')
-                                        ->helperText('Available placeholders: {{ number }}')
-                                        ->required()
-                                        ->columnSpanFull(),
-
-                                    RichEditor::make('invoice_email_body_sr')
-                                        ->label('Email Body (Markdown)')
-                                        ->helperText('Available placeholders: {{ client }}, {{ number }}, {{ amount }}, {{ due_date }}, {{ company }}')
-                                        ->toolbarButtons([
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            ['bulletList', 'orderedList'],
-                                            ['link'],
-                                            ['undo', 'redo'],
-                                        ])
-                                        ->required()
-                                        ->columnSpanFull(),
-                                ])->columnSpanFull()->columns(12),
-                        ])->columnSpanFull()->columns(12),
+                        ])
+                        ->columns(12),
 
                     Section::make('PDF Configuration')
                         ->description('Configure the generated PDF invoice.')
@@ -341,7 +291,8 @@ class Settings extends Page
                                 ->placeholder('invoice_{{ number }}.pdf')
                                 ->required()
                                 ->columnSpanFull(),
-                        ])->columns(12),
+                        ])
+                        ->columns(12),
                 ]),
 
                 // -----------------------
@@ -413,56 +364,40 @@ class Settings extends Page
                 ]),
 
                 // -----------------------
-                // Invoice Numbering
+                // Email Settings
                 // -----------------------
-                Tab::make('Invoice Numbering')->schema([
-                    Section::make('Currency Prefixes')
-                        ->description('Configure invoice number prefixes for each currency. Format: PREFIX-###/YEAR')
+                Tab::make('Email')->schema([
+                    Section::make('SMTP Configuration')
+                        ->description('Configure your email server settings. Leave blank to use the system default.')
                         ->schema([
-                            \Filament\Forms\Components\KeyValue::make('invoice_prefixes')
-                                ->label('Currency Prefixes')
-                                ->keyLabel('Currency Code (e.g., EUR, BAM)')
-                                ->valueLabel('Prefix')
-                                ->helperText('Example: EUR → EUR will create invoices like EUR-001/'. date('Y'))
-                                ->addButtonLabel('Add Currency')
-                                ->reorderable(false)
-                                ->columnSpanFull(),
-
-                            Select::make('invoice_default_currency')
-                                ->label('Default Currency')
-                                ->options(fn ($get) => $get('invoice_prefixes') ?? ['BAM' => 'BAM', 'EUR' => 'EUR'])
-                                ->required()
-                                ->default('BAM')
-                                ->columnSpan(6),
-                        ])->columns(12),
-
-                    Section::make('Sequence Counters')
-                        ->description('Current invoice numbers per currency and year. These update automatically.')
-                        ->schema([
-                            Placeholder::make('sequences_display')
-                                ->label('Current Sequences')
-                                ->content(function () {
-                                    $sequences = Setting::get('invoice_sequences', []);
-                                    if (empty($sequences)) {
-                                        return new HtmlString('<p class="text-sm text-gray-500">No invoices created yet.</p>');
-                                    }
-
-                                    $output = '<div class="space-y-2">';
-                                    foreach ($sequences as $currency => $years) {
-                                        $output .= '<div class="font-semibold">' . $currency . ':</div>';
-                                        $output .= '<ul class="ml-4 space-y-1">';
-                                        foreach ($years as $year => $number) {
-                                            $output .= '<li class="text-sm">Year ' . $year . ': <span class="font-mono">' . $number . '</span></li>';
-                                        }
-                                        $output .= '</ul>';
-                                    }
-                                    $output .= '</div>';
-
-                                    return new HtmlString($output);
-                                })
-                                ->columnSpanFull(),
-                        ]),
-                ]),
+                            TextInput::make('smtp_host')
+                                ->label('SMTP Host')
+                                ->placeholder('smtp.mailtrap.io'),
+                            TextInput::make('smtp_port')
+                                ->label('SMTP Port')
+                                ->numeric()
+                                ->placeholder('587'),
+                            TextInput::make('smtp_username')
+                                ->label('SMTP Username'),
+                            TextInput::make('smtp_password')
+                                ->label('SMTP Password')
+                                ->password()
+                                ->revealable(),
+                            TextInput::make('smtp_encryption')
+                                ->label('Encryption')
+                                ->placeholder('tls')
+                                ->helperText('Usually "tls" or "ssl"'),
+                            TextInput::make('smtp_from_address')
+                                ->label('From Email Address')
+                                ->email()
+                                ->placeholder('noreply@yourdomain.com'),
+                            TextInput::make('smtp_from_name')
+                                ->label('From Name')
+                                ->placeholder('Your Company Name'),
+                        ])
+                        ->columns(2),
+                ])
+                ->icon('heroicon-o-envelope'),
 
                 // -----------------------
                 // Notifications
@@ -563,7 +498,8 @@ class Settings extends Page
                         ->description('Assign and manage permissions for each role.')
                         ->schema($this->buildPermissionsFields()),
                 ]),
-            ]),
+
+            ])->vertical(),
         ];
     }
 
@@ -654,18 +590,23 @@ class Settings extends Page
         Setting::set('success_color', $data['success_color'] ?? Color::Green->value);
         Setting::set('warning_color', $data['warning_color'] ?? Color::Yellow->value);
 
-        Setting::set('invoice_email_subject', $data['invoice_email_subject'] ?? '');
-        Setting::set('invoice_email_body', $data['invoice_email_body'] ?? '');
-        Setting::set('invoice_email_subject_sr', $data['invoice_email_subject_sr'] ?? '');
-        Setting::set('invoice_email_body_sr', $data['invoice_email_body_sr'] ?? '');
+
         Setting::set('invoice_pdf_filename_format', $data['invoice_pdf_filename_format'] ?? '');
 
         Setting::set('company_name', $data['company_name'] ?? '');
+        
+        // SMTP Settings
+        Setting::set('smtp_host', $data['smtp_host'] ?? '');
+        Setting::set('smtp_port', $data['smtp_port'] ?? '');
+        Setting::set('smtp_username', $data['smtp_username'] ?? '');
+        Setting::set('smtp_password', $data['smtp_password'] ?? '');
+        Setting::set('smtp_encryption', $data['smtp_encryption'] ?? '');
+        Setting::set('smtp_from_address', $data['smtp_from_address'] ?? '');
+        Setting::set('smtp_from_name', $data['smtp_from_name'] ?? '');
         Setting::set('company_address', $data['company_address'] ?? '');
         Setting::set('company_email', $data['company_email'] ?? '');
         Setting::set('company_phone', $data['company_phone'] ?? '');
         Setting::set('company_vat_id', $data['company_vat_id'] ?? '');
-        Setting::set('company_bank_account', $data['company_bank_account'] ?? '');
 
         Setting::set('ofs_base_url', $data['ofs_base_url'] ?? 'https://pos.ofs.ba');
         Setting::set('ofs_api_key', $data['ofs_api_key'] ?? '');
@@ -675,9 +616,6 @@ class Settings extends Page
         Setting::set('ofs_seller_name', $data['ofs_seller_name'] ?? '');
         Setting::set('ofs_seller_address', $data['ofs_seller_address'] ?? '');
         Setting::set('ofs_seller_town', $data['ofs_seller_town'] ?? '');
-
-        Setting::set('invoice_prefixes', $data['invoice_prefixes'] ?? ['BAM' => 'BAM', 'EUR' => 'EUR']);
-        Setting::set('invoice_default_currency', $data['invoice_default_currency'] ?? 'BAM');
 
         // Your existing permissions logic...
         //        if (!empty($this->selectedRole)) {

@@ -1,235 +1,274 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Invoice {{ $invoice->id }}</title>
+    <meta charset="utf-8">
+    <title>Račun {{ $invoice->number ?? $invoice->id }}</title>
+
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 10px;
+            color: #000;
         }
-        .container {
-            width: 100%;
+
+        /* A4 printable area */
+        .page {
+            width: 190mm;
             margin: 0 auto;
-            padding: 20px;
         }
-        .header {
-            margin-bottom: 40px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-        }
-        .company-details {
-            float: right;
-            text-align: right;
-        }
-        .company-details h2 {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 24px;
-        }
-        .invoice-details {
-            float: left;
-        }
-        .invoice-details h1 {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
-            font-size: 32px;
-            letter-spacing: 1px;
-        }
-        .client-details {
-            margin-bottom: 40px;
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        .client-details h3 {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            table-layout: fixed;
         }
-        table th {
-            background-color: #2c3e50;
-            color: #fff;
-            padding: 12px;
-            text-align: left;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-        table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .totals {
-            float: right;
-            width: 350px;
-        }
-        .totals table th {
-            background-color: transparent;
-            color: #555;
-            text-align: left;
-            padding: 5px 10px;
-            border: none;
-        }
-        .totals table td {
-            padding: 5px 10px;
-            border: none;
-        }
-        .totals .total-row td {
-            border-top: 2px solid #2c3e50;
-            font-weight: bold;
+
+        .right { text-align: right; }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .small { font-size: 9px; }
+
+        .mt-5 { margin-top: 5px; }
+        .mt-10 { margin-top: 10px; }
+        .mt-20 { margin-top: 20px; }
+
+        .title {
             font-size: 18px;
-            color: #2c3e50;
-            padding-top: 10px;
-        }
-        .notes {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-style: italic;
-            color: #666;
-        }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 50px;
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
             font-weight: bold;
-            text-transform: uppercase;
-            color: #fff;
         }
-        .badge-paid { background-color: #28a745; }
-        .badge-sent { background-color: #007bff; }
-        .badge-overdue { background-color: #dc3545; }
-        .badge-draft { background-color: #6c757d; }
-        .badge-partial { background-color: #ffc107; color: #000; }
+
+        /* horizontal rules like on original */
+        .hr {
+            border-top: 1px solid #000;
+            margin: 8px 0;
+        }
+
+        /* ===== ITEMS TABLE ===== */
+
+        .items {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .items th,
+        .items td {
+            padding: 3px 4px;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* NO left/right outer borders */
+        .items th:first-child,
+        .items td:first-child {
+            border-left: none;
+        }
+
+        .items th:last-child,
+        .items td:last-child {
+            border-right: none;
+        }
+
+        /* dashed vertical inner borders */
+        .items th:not(:last-child),
+        .items td:not(:last-child) {
+            border-right: 1px dashed #000;
+        }
+
+        /* header bottom line */
+        .items thead th {
+            border-bottom: 1px solid #000;
+            font-weight: bold;
+        }
+
+        /* NO horizontal lines between rows */
+        .items tbody td {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        /* column widths tuned for A4 */
+        .col-ident { width: 8%; }
+        .col-name  { width: 36%; }
+        .col-qty   { width: 10%; }
+        .col-unit  { width: 6%; }
+        .col-price { width: 10%; }
+        .col-disc  { width: 6%; }
+        .col-vat   { width: 6%; }
+        .col-net   { width: 18%; }
+
+        /* totals */
+        .totals td {
+            padding: 3px;
+        }
+
+        .totals .line-top {
+            border-top: 1px solid #000;
+        }
+
+        /* VAT recap */
+        .vat {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .vat th,
+        .vat td {
+            padding: 3px 4px;
+        }
+
+        .vat th:not(:last-child),
+        .vat td:not(:last-child) {
+            border-right: 1px dashed #000;
+        }
+
+        .vat th {
+            border-bottom: 1px solid #000;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header clearfix">
-            <div class="invoice-details">
-                <h1>{{ __('invoice.invoice') }}</h1>
-                <p>
-                    <strong>{{ __('invoice.invoice') }} #:</strong> {{ $invoice->id }}<br>
-                    <strong>{{ __('invoice.date') }}:</strong> {{ $invoice->date->format('M d, Y') }}<br>
-                    <strong>{{ __('invoice.due_date') }}:</strong> {{ $invoice->due_date->format('M d, Y') }}<br>
-                    <span class="badge badge-{{ strtolower($invoice->status->value) }}">
-                        {{ __('invoice.' . strtolower($invoice->status->value)) }}
-                    </span>
-                </p>
-            </div>
-            <div class="company-details">
-                <h2>{{ \App\Models\Setting::get('company_name', config('app.name')) }}</h2>
-                <p>
-                    {!! nl2br(e(\App\Models\Setting::get('company_address'))) !!}<br>
-                    @if(\App\Models\Setting::get('company_email'))
-                        {{ __('invoice.email') }}: {{ \App\Models\Setting::get('company_email') }}<br>
-                    @endif
-                    @if(\App\Models\Setting::get('company_phone'))
-                        {{ __('invoice.phone') }}: {{ \App\Models\Setting::get('company_phone') }}<br>
-                    @endif
-                    @if(\App\Models\Setting::get('company_vat_id'))
-                        {{ __('invoice.vat_id') }}: {{ \App\Models\Setting::get('company_vat_id') }}<br>
-                    @endif
-                    @if(\App\Models\Setting::get('company_bank_account'))
-                        {{ __('invoice.bank_account') }}: {{ \App\Models\Setting::get('company_bank_account') }}
-                    @endif
-                </p>
-            </div>
-        </div>
 
-        <div class="client-details">
-            <h3>{{ __('invoice.to') }}:</h3>
-            <p>
-                <strong>{{ $invoice->client->name }}</strong><br>
+<div class="page">
+
+    {{-- HEADER --}}
+    <table>
+        <tr>
+            <td></td>
+            <td class="right small">
+                <strong>{{ \App\Models\Setting::get('company_name') }}</strong><br>
+                {{ \App\Models\Setting::get('company_address') }}<br>
+                {{ \App\Models\Setting::get('company_zip') }}
+                {{ \App\Models\Setting::get('company_city') }}<br>
+                {{ \App\Models\Setting::get('company_website') }}<br><br>
+
+                Reg. sud: {{ \App\Models\Setting::get('company_court') }}<br>
+                JIB: {{ \App\Models\Setting::get('company_jib') }}<br>
+                PDV: {{ \App\Models\Setting::get('company_pdv') }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="hr"></div>
+
+    {{-- BUYER / DELIVERY --}}
+    <table class="mt-5">
+        <tr>
+            <td width="50%">
+                <strong>Kupac:</strong><br>
+                {{ $invoice->client->name }}<br>
+                JIB: {{ $invoice->client->jib }}<br>
+                PDV: {{ $invoice->client->vat_id }}<br>
                 {{ $invoice->client->address }}<br>
-                {{ $invoice->client->city }}, {{ $invoice->client->zip }}<br>
-                {{ $invoice->client->country }}<br>
-                {{ __('invoice.email') }}: {{ $invoice->client->email }}
-            </p>
-        </div>
+                {{ $invoice->client->zip }} {{ $invoice->client->city }}
+            </td>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>{{ __('invoice.description') }}</th>
-                    <th class="text-right">{{ __('invoice.quantity') }}</th>
-                    <th class="text-right">{{ __('invoice.price') }}</th>
-                    <th class="text-right">{{ __('invoice.total') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($invoice->items as $item)
-                <tr>
-                    <td>{{ $item->description }}</td>
-                    <td class="text-right">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ number_format($item->unit_price / 100, 2) }}</td>
-                    <td class="text-right">{{ number_format($item->total / 100, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            <td width="50%">
+                <strong>Isporuka:</strong><br>
+                {{ $invoice->client->name }}<br>
+                JIB: {{ $invoice->client->jib }}<br>
+                PDV: {{ $invoice->client->vat_id }}<br>
+                {{ $invoice->client->address }}<br>
+                {{ $invoice->client->zip }} {{ $invoice->client->city }}
+            </td>
+        </tr>
+    </table>
 
-        <div class="totals clearfix">
-            <table>
-                <tr>
-                    <td><strong>{{ __('invoice.subtotal') }}:</strong></td>
-                    <td class="text-right">{{ number_format($invoice->subtotal / 100, 2) }}</td>
-                </tr>
-                <tr>
-                    <td><strong>{{ __('invoice.tax') }} (0%):</strong></td>
-                    <td class="text-right">{{ number_format($invoice->tax / 100, 2) }}</td>
-                </tr>
-                <tr class="total-row">
-                    <td><strong>{{ __('invoice.total') }}:</strong></td>
-                    <td class="text-right">{{ number_format($invoice->total / 100, 2) }} BAM</td>
-                </tr>
-            </table>
-        </div>
+    <div class="hr"></div>
 
-        @if($invoice->notes)
-        <div class="notes">
-            <strong>Notes:</strong> {{ $invoice->notes }}
-        </div>
-        @endif
+    {{-- META --}}
+    <table>
+        <tr>
+            <td>
+                Dat. izd.: {{ $invoice->date->format('d.m.Y') }}<br>
+                Datum valute: {{ $invoice->due_date->format('d.m.Y') }}<br>
+                Mjesto, dan: {{ \App\Models\Setting::get('company_city') }},
+                {{ $invoice->date->format('d.m.Y') }}
+            </td>
+            <td class="center title">Račun</td>
+            <td class="right">
+                Broj: {{ $invoice->number ?? $invoice->id }}<br>
+                Odgovorna osoba: Administrator
+            </td>
+        </tr>
+    </table>
 
-        <div class="footer">
-            <p>{{ \App\Models\Setting::get('company_name') }}</p>
-        </div>
-    </div>
+    <div class="hr"></div>
+
+    {{-- ITEMS --}}
+    <table class="items mt-10">
+        <thead>
+        <tr>
+            <th class="col-ident">Ident</th>
+            <th class="col-name">Naziv</th>
+            <th class="col-qty right">Količina</th>
+            <th class="col-unit">MJ</th>
+            <th class="col-price right">Cijena</th>
+            <th class="col-disc right">R.%</th>
+            <th class="col-vat right">PDV %</th>
+            <th class="col-net right">Vrijednost bez PDV</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($invoice->items as $item)
+            <tr>
+                <td>{{ $item->code }}</td>
+                <td>{{ $item->description }}</td>
+                <td class="right">{{ number_format($item->quantity, 2, ',', '.') }}</td>
+                <td>{{ $item->unit }}</td>
+                <td class="right">{{ number_format($item->unit_price / 100, 2, ',', '.') }}</td>
+                <td class="right">{{ $item->discount ?? 0 }}</td>
+                <td class="right">17</td>
+                <td class="right">{{ number_format($item->subtotal / 100, 2, ',', '.') }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+
+    {{-- TOTALS --}}
+    <table class="mt-10 totals">
+        <tr>
+            <td width="70%"></td>
+            <td>Ukupno</td>
+            <td class="right">{{ number_format($invoice->subtotal / 100, 2, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Popust</td>
+            <td class="right">{{ number_format($invoice->discount / 100, 2, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>PDV</td>
+            <td class="right">{{ number_format($invoice->tax / 100, 2, ',', '.') }}</td>
+        </tr>
+        <tr class="bold line-top">
+            <td></td>
+            <td>Za platiti KM</td>
+            <td class="right">{{ number_format($invoice->total / 100, 2, ',', '.') }}</td>
+        </tr>
+    </table>
+
+    {{-- VAT RECAP --}}
+    <table class="vat mt-20">
+        <tr>
+            <th>PORESKE STOPE</th>
+            <th class="right">Osnova</th>
+            <th class="right">PDV</th>
+            <th class="right">Vrijednost</th>
+        </tr>
+        <tr>
+            <td>PDV - isporuke/prijemi</td>
+            <td class="right">{{ number_format($invoice->subtotal / 100, 2, ',', '.') }}</td>
+            <td class="right">{{ number_format($invoice->tax / 100, 2, ',', '.') }}</td>
+            <td class="right">{{ number_format($invoice->total / 100, 2, ',', '.') }}</td>
+        </tr>
+    </table>
+
+    <p class="mt-10 small">
+        Pri plaćanju platnim nalogom navesti model 12 i poziv na broj.
+    </p>
+
+</div>
 </body>
 </html>

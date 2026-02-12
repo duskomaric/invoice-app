@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceStatusEnum;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceEmailLog;
@@ -27,7 +27,7 @@ it('has items relationship', function () {
 it('has parent relationship', function () {
     $parent = Invoice::create([
         'client_id' => Client::factory()->create()->id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -35,7 +35,7 @@ it('has parent relationship', function () {
 
     $child = Invoice::create([
         'client_id' => $parent->client_id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -48,7 +48,7 @@ it('has parent relationship', function () {
 it('has children relationship', function () {
     $parent = Invoice::create([
         'client_id' => Client::factory()->create()->id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -56,7 +56,7 @@ it('has children relationship', function () {
 
     $child = Invoice::create([
         'client_id' => $parent->client_id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -69,7 +69,7 @@ it('has children relationship', function () {
 it('has email logs relationship', function () {
     $invoice = Invoice::create([
         'client_id' => Client::factory()->create()->id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -85,7 +85,7 @@ it('has email logs relationship', function () {
 it('calculates subtotal as sum of items', function () {
     $invoice = Invoice::create([
         'client_id' => Client::factory()->create()->id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -117,7 +117,7 @@ it('returns zero for tax', function () {
 it('calculates total as subtotal plus tax', function () {
     $invoice = Invoice::create([
         'client_id' => Client::factory()->create()->id,
-        'status' => InvoiceStatus::Draft,
+        'status' => InvoiceStatusEnum::Draft,
         'date' => now(),
         'due_date' => now()->addDays(30),
         'is_recurring' => false,
@@ -138,11 +138,11 @@ it('creates valid invoice via factory', function () {
     $client = Client::factory()->create();
     $invoice = Invoice::factory()->create([
         'client_id' => $client->id,
-        'status' => InvoiceStatus::Sent,
+        'status' => InvoiceStatusEnum::Sent,
     ]);
 
     $this->assertDatabaseHas('invoices', [
         'client_id' => $client->id,
-        'status' => InvoiceStatus::Sent->value,
+        'status' => InvoiceStatusEnum::Sent->value,
     ]);
 });

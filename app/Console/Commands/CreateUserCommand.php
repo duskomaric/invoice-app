@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enums\RoleEnum;
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -39,7 +39,7 @@ class CreateUserCommand extends Command
                 'last_name' => $last_name,
                 'email_verified_at' => now(),
                 'role' => RoleEnum::SuperAdmin,
-                'status' => UserStatus::ACTIVE,
+                'status' => UserStatusEnum::ACTIVE,
                 'password' => bcrypt($password),
             ]
         );

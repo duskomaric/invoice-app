@@ -173,6 +173,7 @@ class ViewInvoice extends ViewRecord
 
 
                             'invoiceRequest' => [
+                                'language' => 'en-US', // en-US, sr-Cyrl-RS, sr-RS
                                 // REQUIRED: Invoice type
                                 'invoiceType' => 'Normal', // Normal, Proforma, Copy, Training
 

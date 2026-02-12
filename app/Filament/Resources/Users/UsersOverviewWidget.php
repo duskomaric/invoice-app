@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Users;
 
 use App\Enums\RoleEnum;
-use App\Enums\UserStatus;
+use App\Enums\UserStatusEnum;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -25,7 +25,7 @@ class UsersOverviewWidget extends StatsOverviewWidget
         $active24 = User::where('last_seen_at', '>=', Carbon::now()->subDay())->count();
 
         // Status counts
-        $statusCounts = collect(UserStatus::cases())
+        $statusCounts = collect(UserStatusEnum::cases())
             ->mapWithKeys(fn ($status) => [
                 $status->value => User::where('status', $status)->count(),
             ]);
@@ -53,7 +53,7 @@ class UsersOverviewWidget extends StatsOverviewWidget
                 ->columnSpan(1),
 
             // Status widgets
-            ...collect(UserStatus::cases())->map(function (UserStatus $status) use ($statusCounts, $total) {
+            ...collect(UserStatusEnum::cases())->map(function (UserStatusEnum $status) use ($statusCounts, $total) {
                 $count = $statusCounts[$status->value];
 
                 return Stat::make($status->getLabel(), $count)
@@ -64,9 +64,9 @@ class UsersOverviewWidget extends StatsOverviewWidget
                     )
                     ->color($status->getColor())
                     ->icon(match ($status) {
-                        UserStatus::ACTIVE => 'heroicon-o-check-circle',
-                        UserStatus::PENDING => 'heroicon-o-clock',
-                        UserStatus::DEACTIVATED => 'heroicon-o-x-circle',
+                        UserStatusEnum::ACTIVE => 'heroicon-o-check-circle',
+                        UserStatusEnum::PENDING => 'heroicon-o-clock',
+                        UserStatusEnum::DEACTIVATED => 'heroicon-o-x-circle',
                     });
             }),
 

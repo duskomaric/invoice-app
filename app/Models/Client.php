@@ -15,12 +15,20 @@ class Client extends Model
         'company_id',
         'name',
         'email',
+        'is_active',
+        'invoice_due_days',
         'phone',
         'address',
         'city',
         'zip',
         'country',
         'tax_id',
+        'vat_id',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'invoice_due_days' => 'integer',
     ];
 
     public function company(): BelongsTo
@@ -36,16 +44,5 @@ class Client extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
-    }
-    public function getBalanceAttribute(): int
-    {
-        $totalInvoiced = InvoiceItem::whereHas('invoice', function ($query) {
-            $query->where('client_id', $this->id)
-                  ->where('status', '!=', \App\Enums\InvoiceStatus::Draft);
-        })->sum('total');
-            
-        $totalPaid = $this->payments()->sum('amount');
-
-        return $totalInvoiced - $totalPaid;
     }
 }

@@ -13,9 +13,10 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('price');
+            $table->json('prices_meta')->nullable();
             $table->string('unit')->default('service');
             $table->string('tax_category')->nullable();
+            $table->string('type')->default('services');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Company;
+use App\Services\EmailTemplateDefaultsService;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Schemas\Schema;
@@ -34,6 +35,8 @@ class RegisterCompany extends RegisterTenant
         $company = Company::create($data);
 
         $company->users()->attach(auth()->user());
+
+        app(EmailTemplateDefaultsService::class)->ensureDefaults($company);
 
         return $company;
     }

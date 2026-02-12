@@ -34,7 +34,6 @@ return [
     'company_email' => 'info@company.com',
     'company_phone' => '+1234567890',
     'company_vat_id' => '',
-    'company_bank_account' => '',
 
     // OFS Fiscalization Settings (Test credentials from api.ofs.ba)
     'ofs_base_url' => 'https://pos.ofs.ba',
@@ -47,14 +46,14 @@ return [
     'ofs_seller_town' => 'Pranjvor',
 
     // Invoice Numbering Settings
-    'invoice_prefixes' => [
-        'BAM' => 'BAM',
-        'EUR' => 'EUR',
-    ],
-    'invoice_sequences' => [
-        'BAM' => [],
-        'EUR' => [],
-    ],
-    'invoice_default_currency' => 'BAM',
+//    'invoice_prefixes' => [
+//        'BAM' => 'BAM',
+//        'EUR' => 'EUR',
+//    ],
+//    'invoice_sequences' => [
+//        'BAM' => [],
+//        'EUR' => [],
+//    ],
+//    'invoice_default_currency' => 'BAM',
 
 ];

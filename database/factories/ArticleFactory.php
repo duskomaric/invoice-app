@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\ArticleTypeEnum;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ArticleFactory extends Factory
@@ -9,10 +11,18 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
+            'company_id' => Company::factory(),
+            'name' => fake()->unique()->catchPhrase(),
             'description' => fake()->sentence(),
-            'price' => fake()->randomFloat(2, 10, 1000),
+            'prices_meta' => [
+                'USD' => 100.50,
+                'EUR' => 122.30,
+                'BAM' => 196.60,
+            ],
+            'unit' => fake()->randomElement(['KOM', 'SAT']),
+            'tax_category' => fake()->randomElement(['F', 'N', 'T', 'E', 'P']),
             'is_active' => true,
+            'type' => ArticleTypeEnum::SERVICES,
         ];
     }
 }
